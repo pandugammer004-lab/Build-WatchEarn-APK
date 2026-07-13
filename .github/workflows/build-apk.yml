@@ -99,25 +99,46 @@ jobs:
         run: |
           import os, re
 
-          # Root build.gradle
+          # 1. Root settings.gradle (Flutter 3.16+)
+          settings_gradle = 'android/settings.gradle'
+          if os.path.exists(settings_gradle):
+              with open(settings_gradle, 'r') as f: c = f.read()
+              if 'com.google.gms.google-services' not in c:
+                  c = re.sub(r'(id "com.android.application".*)', r'\1\n    id "com.google.gms.google-services" version "4.4.1" apply false', c)
+                  with open(settings_gradle, 'w') as f: f.write(c)
+
+          # 2. Root build.gradle (Pre-3.16)
           root_gradle = 'android/build.gradle'
           if os.path.exists(root_gradle):
               with open(root_gradle, 'r') as f: c = f.read()
-              if 'com.google.gms:google-services' not in c:
+              if 'com.google.gms:google-services' not in c and 'dependencies {' in c:
                   c = c.replace('dependencies {', "dependencies {\n        classpath 'com.google.gms:google-services:4.4.1'")
               c = re.sub(r"ext\.kotlin_version\s*=\s*'[^']*'", "ext.kotlin_version = '1.9.24'", c)
               with open(root_gradle, 'w') as f: f.write(c)
 
-          # App build.gradle
+          # 3. App build.gradle
           app_gradle = 'android/app/build.gradle'
           if os.path.exists(app_gradle):
               with open(app_gradle, 'r') as f: c = f.read()
-              if 'com.google.gms.google-services' not in c:
+              
+              # Handle new plugins block (Flutter 3.16+)
+              if 'id "com.android.application"' in c and 'id "com.google.gms.google-services"' not in c:
+                  c = c.replace('id "com.android.application"', 'id "com.android.application"\n    id "com.google.gms.google-services"')
+              # Handle old apply plugin (Pre-3.16)
+              elif "apply plugin: 'com.android.application'" in c and "apply plugin: 'com.google.gms.google-services'" not in c:
                   c = c.replace("apply plugin: 'com.android.application'", "apply plugin: 'com.android.application'\napply plugin: 'com.google.gms.google-services'")
+              
+              # Fix namespace and applicationId
               c = re.sub(r'applicationId\s+"[^"]*"', 'applicationId "nexa.web.solution1122"', c)
+              c = re.sub(r'applicationId\s+=\s+"[^"]*"', 'applicationId = "nexa.web.solution1122"', c)
               c = re.sub(r'namespace\s+"[^"]*"', 'namespace "nexa.web.solution1122"', c)
+              c = re.sub(r'namespace\s+=\s+"[^"]*"', 'namespace = "nexa.web.solution1122"', c)
+              
               c = c.replace('minSdkVersion flutter.minSdkVersion', 'minSdkVersion 23')
+              c = c.replace('minSdkVersion = flutter.minSdkVersion', 'minSdkVersion = 23')
               c = c.replace('compileSdkVersion flutter.compileSdkVersion', 'compileSdkVersion 34')
+              c = c.replace('compileSdkVersion = flutter.compileSdkVersion', 'compileSdkVersion = 34')
+              
               with open(app_gradle, 'w') as f: f.write(c)
 
       - name: Get Dependencies
