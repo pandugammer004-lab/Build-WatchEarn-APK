@@ -3,7 +3,7 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
 import '../../core/constants/app_colors.dart';
 import '../../core/widgets/video_card.dart';
-import '../../core/widgets/custom_textfield.dart';
+import '../../core/widgets/custom_text_field.dart';
 import '../../data/providers/video_provider.dart';
 import '../../data/providers/user_provider.dart';
 import '../player/video_player_screen.dart';
