@@ -3,7 +3,7 @@ import 'package:provider/provider.dart';
 import 'theme.dart';
 import '../core/constants/app_strings.dart';
 import '../screens/splash/splash_screen.dart';
-import '../screens/auth/onboarding_screen.dart';
+import '../screens/onboarding/onboarding_screen.dart';
 import '../screens/auth/login_screen.dart';
 import '../screens/auth/signup_screen.dart';
 import '../screens/home/main_navigation.dart';

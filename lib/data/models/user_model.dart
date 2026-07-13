@@ -112,7 +112,7 @@ class UserModel {
     return lastDailyReset.day != now.day || lastDailyReset.month != now.month || lastDailyReset.year != now.year;
   }
 
-  factory fromFirestore(DocumentSnapshot doc) {
+  factory UserModel.fromFirestore(DocumentSnapshot doc) {
     Map data = doc.data() as Map<String, dynamic>;
     return UserModel(
       uid: doc.id,
