@@ -21,6 +21,7 @@ jobs:
       - name: Setup Flutter
         uses: subosito/flutter-action@v2
         with:
+          flutter-version: '3.16.9'
           channel: 'stable'
           
       - name: Generate Flutter Android Folders
@@ -35,58 +36,28 @@ jobs:
             echo "Warning: google-services.json not found in root!"
           fi
 
-      - name: Patch Gradle for Firebase (Kotlin DSL)
+      - name: Patch Gradle for Firebase
         shell: python
         run: |
           import os
           
-          # Patch Project level
-          p_file = 'android/build.gradle.kts'
-          if os.path.exists(p_file):
-              with open(p_file, 'r') as f: c = f.read()
+          # Groovy patching (Flutter 3.16 default)
+          if os.path.exists('android/build.gradle'):
+              with open('android/build.gradle', 'r') as f: c = f.read()
+              if 'com.google.gms:google-services' not in c:
+                  c = c.replace('dependencies {', "dependencies {\n        classpath 'com.google.gms:google-services:4.4.1'")
+                  with open('android/build.gradle', 'w') as f: f.write(c)
+                  
+          if os.path.exists('android/app/build.gradle'):
+              with open('android/app/build.gradle', 'r') as f: c = f.read()
               if 'com.google.gms.google-services' not in c:
-                  if 'plugins {' in c:
-                      c = c.replace('plugins {', 'plugins {\n    id("com.google.gms.google-services") version "4.4.1" apply false')
-                  else:
-                      c = 'plugins {\n    id("com.google.gms.google-services") version "4.4.1" apply false\n}\n' + c
-                  with open(p_file, 'w') as f: f.write(c)
-          
-          # Patch App level
-          a_file = 'android/app/build.gradle.kts'
-          if os.path.exists(a_file):
-              with open(a_file, 'r') as f: c = f.read()
-              if 'com.google.gms.google-services' not in c:
-                  if 'plugins {' in c:
-                      c = c.replace('plugins {', 'plugins {\n    id("com.google.gms.google-services")')
-                  else:
-                      c = 'plugins {\n    id("com.google.gms.google-services")\n}\n' + c
-                  c = c.replace('minSdk = flutter.minSdkVersion', 'minSdk = 23')
-                  with open(a_file, 'w') as f: f.write(c)
+                  c = c.replace("apply plugin: 'com.android.application'", "apply plugin: 'com.android.application'\napply plugin: 'com.google.gms.google-services'")
+                  # Also increase minSdk if found
+                  c = c.replace('minSdkVersion flutter.minSdkVersion', 'minSdkVersion 23')
+                  with open('android/app/build.gradle', 'w') as f: f.write(c)
 
       - name: Get Dependencies
         run: flutter pub get
-
-      - name: Fix Plugin AGP 8 Issues
-        shell: python
-        run: |
-          import glob
-          import os
-
-          for path in glob.glob('/home/runner/.pub-cache/hosted/pub.dev/*/android/build.gradle'):
-              if os.path.exists(path):
-                  with open(path, 'r') as f: c = f.read()
-                  
-                  # Fix Proguard
-                  c = c.replace("getDefaultProguardFile('proguard-android.txt')", "'proguard-android-optimize.txt'")
-                  
-                  # Fix Namespace
-                  if 'namespace ' not in c and 'android {' in c:
-                      c = c.replace('android {', 'android {\n    namespace "com.pichillilorenzo.flutter_inappwebview"\n', 1)
-                      
-                  # Fix Configurations.all
-                  c = c.replace('configurations.all', 'configurations.configureEach')
-                  
-                  with open(path, 'w') as f: f.write(c)
 
       - name: Build APK
         run: flutter build apk --release
