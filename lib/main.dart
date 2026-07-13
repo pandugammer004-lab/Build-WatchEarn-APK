@@ -14,10 +14,11 @@ import 'data/providers/referral_provider.dart';
 import 'data/providers/vip_provider.dart';
 import 'data/providers/earn_provider.dart';
 import 'data/providers/ad_provider.dart';
+
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  
-  // Initialize Firebase (Assuming options will be added later)
+
+  // Initialize Firebase
   try {
     await Firebase.initializeApp();
   } catch (e) {
@@ -27,8 +28,12 @@ void main() async {
   // Initialize Hive
   await Hive.initFlutter();
 
-  // Initialize Mobile Ads SDK
-  await MobileAds.instance.initialize();
+  // Initialize Mobile Ads SDK (test IDs configured)
+  try {
+    await MobileAds.instance.initialize();
+  } catch (e) {
+    debugPrint("AdMob initialization error: $e");
+  }
 
   // Set portrait orientation only
   await SystemChrome.setPreferredOrientations([

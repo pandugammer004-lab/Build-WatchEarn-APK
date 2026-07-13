@@ -5,11 +5,11 @@ import '../../core/constants/app_config.dart';
 
 class AdProvider extends ChangeNotifier {
   final AdService _adService = AdService();
-  
+
   BannerAd? _bannerAd;
   InterstitialAd? _interstitialAd;
   RewardedAd? _rewardedAd;
-  
+
   bool _isBannerLoaded = false;
   bool _isInterstitialLoaded = false;
   bool _isRewardedLoaded = false;
@@ -36,7 +36,7 @@ class AdProvider extends ChangeNotifier {
       onFailed: () {
         _isBannerLoaded = false;
         notifyListeners();
-      }
+      },
     );
     await _bannerAd?.load();
   }
@@ -51,7 +51,7 @@ class AdProvider extends ChangeNotifier {
       onFailed: () {
         _isInterstitialLoaded = false;
         notifyListeners();
-      }
+      },
     );
   }
 
@@ -65,7 +65,7 @@ class AdProvider extends ChangeNotifier {
       onFailed: () {
         _isRewardedLoaded = false;
         notifyListeners();
-      }
+      },
     );
   }
 
@@ -75,7 +75,7 @@ class AdProvider extends ChangeNotifier {
       _isInterstitialLoaded = false;
       _interstitialAd = null;
       notifyListeners();
-      loadInterstitialAd(); // Load next ad
+      loadInterstitialAd();
     }
   }
 
@@ -85,12 +85,12 @@ class AdProvider extends ChangeNotifier {
       await _rewardedAd!.show(
         onUserEarnedReward: (AdWithoutView ad, RewardItem reward) {
           rewardAmount = reward.amount.toInt();
-        }
+        },
       );
       _isRewardedLoaded = false;
       _rewardedAd = null;
       notifyListeners();
-      loadRewardedAd(); // Load next ad
+      loadRewardedAd();
     }
     return rewardAmount;
   }

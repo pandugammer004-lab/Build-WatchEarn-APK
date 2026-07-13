@@ -8,13 +8,15 @@ class AdService {
   AdService._internal();
 
   Future<void> initialize() async {
-    await MobileAds.instance.initialize();
-    
-    // Set test device IDs if needed
-    RequestConfiguration config = RequestConfiguration(
-      testDeviceIds: <String>[], // Add your test device IDs here
-    );
-    await MobileAds.instance.updateRequestConfiguration(config);
+    try {
+      await MobileAds.instance.initialize();
+      RequestConfiguration config = RequestConfiguration(
+        testDeviceIds: <String>[],
+      );
+      await MobileAds.instance.updateRequestConfiguration(config);
+    } catch (e) {
+      debugPrint('AdService init error: $e');
+    }
   }
 
   BannerAd getBannerAd({required VoidCallback onLoaded, required VoidCallback onFailed}) {
@@ -27,7 +29,7 @@ class AdService {
         onAdFailedToLoad: (ad, error) {
           ad.dispose();
           onFailed();
-          debugPrint('BannerAd failed to load: $error');
+          debugPrint('BannerAd failed: $error');
         },
       ),
     );
@@ -37,55 +39,55 @@ class AdService {
     required Function(InterstitialAd) onLoaded,
     required VoidCallback onFailed,
   }) async {
-    await InterstitialAd.load(
-      adUnitId: AdIds.interstitialId,
-      request: const AdRequest(),
-      adLoadCallback: InterstitialAdLoadCallback(
-        onAdLoaded: (ad) {
-          ad.fullScreenContentCallback = FullScreenContentCallback(
-            onAdDismissedFullScreenContent: (ad) {
-              ad.dispose();
-            },
-            onAdFailedToShowFullScreenContent: (ad, error) {
-              ad.dispose();
-              debugPrint('InterstitialAd failed to show: $error');
-            },
-          );
-          onLoaded(ad);
-        },
-        onAdFailedToLoad: (error) {
-          debugPrint('InterstitialAd failed to load: $error');
-          onFailed();
-        },
-      ),
-    );
+    try {
+      await InterstitialAd.load(
+        adUnitId: AdIds.interstitialId,
+        request: const AdRequest(),
+        adLoadCallback: InterstitialAdLoadCallback(
+          onAdLoaded: (ad) {
+            ad.fullScreenContentCallback = FullScreenContentCallback(
+              onAdDismissedFullScreenContent: (ad) => ad.dispose(),
+              onAdFailedToShowFullScreenContent: (ad, error) => ad.dispose(),
+            );
+            onLoaded(ad);
+          },
+          onAdFailedToLoad: (error) {
+            debugPrint('InterstitialAd failed: $error');
+            onFailed();
+          },
+        ),
+      );
+    } catch (e) {
+      debugPrint('loadInterstitialAd error: $e');
+      onFailed();
+    }
   }
 
   Future<void> loadRewardedAd({
     required Function(RewardedAd) onLoaded,
     required VoidCallback onFailed,
   }) async {
-    await RewardedAd.load(
-      adUnitId: AdIds.rewardedId,
-      request: const AdRequest(),
-      rewardedAdLoadCallback: RewardedAdLoadCallback(
-        onAdLoaded: (ad) {
-          ad.fullScreenContentCallback = FullScreenContentCallback(
-            onAdDismissedFullScreenContent: (ad) {
-              ad.dispose();
-            },
-            onAdFailedToShowFullScreenContent: (ad, error) {
-              ad.dispose();
-              debugPrint('RewardedAd failed to show: $error');
-            },
-          );
-          onLoaded(ad);
-        },
-        onAdFailedToLoad: (error) {
-          debugPrint('RewardedAd failed to load: $error');
-          onFailed();
-        },
-      ),
-    );
+    try {
+      await RewardedAd.load(
+        adUnitId: AdIds.rewardedId,
+        request: const AdRequest(),
+        rewardedAdLoadCallback: RewardedAdLoadCallback(
+          onAdLoaded: (ad) {
+            ad.fullScreenContentCallback = FullScreenContentCallback(
+              onAdDismissedFullScreenContent: (ad) => ad.dispose(),
+              onAdFailedToShowFullScreenContent: (ad, error) => ad.dispose(),
+            );
+            onLoaded(ad);
+          },
+          onAdFailedToLoad: (error) {
+            debugPrint('RewardedAd failed: $error');
+            onFailed();
+          },
+        ),
+      );
+    } catch (e) {
+      debugPrint('loadRewardedAd error: $e');
+      onFailed();
+    }
   }
 }
