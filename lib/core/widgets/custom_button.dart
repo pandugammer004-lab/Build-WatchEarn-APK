@@ -6,7 +6,7 @@ enum ButtonVariant { gradient, outline, text }
 
 class CustomButton extends StatelessWidget {
   final String text;
-  final VoidCallback onPressed;
+  final VoidCallback? onPressed;
   final ButtonVariant variant;
   final bool isLoading;
   final IconData? icon;
@@ -17,7 +17,7 @@ class CustomButton extends StatelessWidget {
   const CustomButton({
     Key? key,
     required this.text,
-    required this.onPressed,
+    this.onPressed,
     this.variant = ButtonVariant.gradient,
     this.isLoading = false,
     this.icon,
