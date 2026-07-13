@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:hive_flutter/hive_flutter.dart';
-import 'package:google_mobile_ads/google_mobile_ads.dart';
 import 'package:provider/provider.dart';
 
 import 'app/app.dart';
@@ -28,13 +27,6 @@ void main() async {
   // Initialize Hive
   await Hive.initFlutter();
 
-  // Initialize Mobile Ads SDK (test IDs configured)
-  try {
-    await MobileAds.instance.initialize();
-  } catch (e) {
-    debugPrint("AdMob initialization error: $e");
-  }
-
   // Set portrait orientation only
   await SystemChrome.setPreferredOrientations([
     DeviceOrientation.portraitUp,
@@ -46,7 +38,7 @@ void main() async {
     const SystemUiOverlayStyle(
       statusBarColor: Colors.transparent,
       statusBarIconBrightness: Brightness.light,
-      systemNavigationBarColor: Color(0xFF0D0D1A), // Match AppColors.background
+      systemNavigationBarColor: Color(0xFF0D0D1A),
       systemNavigationBarIconBrightness: Brightness.light,
     ),
   );
