@@ -24,7 +24,7 @@ jobs:
         run: flutter pub get
 
       - name: Generate Web Folder
-        run: flutter create --platforms=web .
+        run: flutter create --project-name watchearn --platforms=web .
 
       - name: Build Web
         run: flutter build web --release --base-href "/Build-WatchEarn-APK/"
