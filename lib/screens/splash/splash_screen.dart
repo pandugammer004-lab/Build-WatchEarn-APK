@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/foundation.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -29,6 +30,12 @@ class _SplashScreenState extends State<SplashScreen> {
     await Future.delayed(const Duration(seconds: 3));
 
     if (!mounted) return;
+
+    // On web, skip Firebase auth check and go to onboarding
+    if (kIsWeb) {
+      Navigator.pushReplacementNamed(context, '/onboarding');
+      return;
+    }
 
     final prefs = await SharedPreferences.getInstance();
     final bool isFirstTime = prefs.getBool('is_first_time') ?? true;
