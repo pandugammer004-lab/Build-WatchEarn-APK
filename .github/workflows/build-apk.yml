@@ -57,6 +57,7 @@ jobs:
                   c = re.sub(r'applicationId\s+".*"', 'applicationId "nexa.web.solution1122"', c)
                   c = re.sub(r'namespace\s+".*"', 'namespace "nexa.web.solution1122"', c)
                   c = c.replace('minSdkVersion flutter.minSdkVersion', 'minSdkVersion 23')
+                  c = c.replace('compileSdkVersion flutter.compileSdkVersion', 'compileSdkVersion 34')
                   with open('android/app/build.gradle', 'w') as f: f.write(c)
 
       - name: Get Dependencies
