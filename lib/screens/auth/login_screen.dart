@@ -123,19 +123,8 @@ class _LoginScreenState extends State<LoginScreen> {
                               controller: _passwordController,
                               hintText: 'Password',
                               prefixIcon: Icons.lock_outline,
-                              obscureText: _obscurePassword,
+                              isPassword: true,
                               validator: Validators.validatePassword,
-                              suffixIcon: IconButton(
-                                icon: Icon(
-                                  _obscurePassword ? Icons.visibility_off : Icons.visibility,
-                                  color: Colors.white54,
-                                ),
-                                onPressed: () {
-                                  setState(() {
-                                    _obscurePassword = !_obscurePassword;
-                                  });
-                                },
-                              ),
                             ),
                             const SizedBox(height: 12),
                             Align(

@@ -174,19 +174,8 @@ class _SignupScreenState extends State<SignupScreen> {
                               controller: _passwordController,
                               hintText: 'Password',
                               prefixIcon: Icons.lock_outline,
-                              obscureText: _obscurePassword,
+                              isPassword: true,
                               validator: Validators.validatePassword,
-                              suffixIcon: IconButton(
-                                icon: Icon(
-                                  _obscurePassword ? Icons.visibility_off : Icons.visibility,
-                                  color: Colors.white54,
-                                ),
-                                onPressed: () {
-                                  setState(() {
-                                    _obscurePassword = !_obscurePassword;
-                                  });
-                                },
-                              ),
                             ),
                             if (_passwordController.text.isNotEmpty) ...[
                               const SizedBox(height: 8),
@@ -213,24 +202,13 @@ class _SignupScreenState extends State<SignupScreen> {
                               controller: _confirmPasswordController,
                               hintText: 'Confirm Password',
                               prefixIcon: Icons.lock_outline,
-                              obscureText: _obscureConfirmPassword,
+                              isPassword: true,
                               validator: (val) {
                                 if (val != _passwordController.text) {
                                   return 'Passwords do not match';
                                 }
                                 return null;
                               },
-                              suffixIcon: IconButton(
-                                icon: Icon(
-                                  _obscureConfirmPassword ? Icons.visibility_off : Icons.visibility,
-                                  color: Colors.white54,
-                                ),
-                                onPressed: () {
-                                  setState(() {
-                                    _obscureConfirmPassword = !_obscureConfirmPassword;
-                                  });
-                                },
-                              ),
                             ),
                             const SizedBox(height: 16),
                             CustomTextField(
