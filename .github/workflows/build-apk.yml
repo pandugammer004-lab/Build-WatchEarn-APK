@@ -66,10 +66,11 @@ jobs:
       - name: Get Dependencies
         run: flutter pub get
 
-      - name: Fix flutter_inappwebview AGP 8 issue
+      - name: Fix Plugin AGP 8 Issues
         run: |
           sed -i "s/getDefaultProguardFile('proguard-android.txt')/'proguard-android-optimize.txt'/g" ~/.pub-cache/hosted/pub.dev/flutter_inappwebview-*/android/build.gradle
           sed -i 's/android {/android {\n    namespace "com.pichillilorenzo.flutter_inappwebview"/g' ~/.pub-cache/hosted/pub.dev/flutter_inappwebview-*/android/build.gradle
+          sed -i 's/configurations.all {/configurations.configureEach {/g' ~/.pub-cache/hosted/pub.dev/google_mobile_ads-*/android/build.gradle
 
       - name: Build APK
         run: flutter build apk --release
