@@ -12,34 +12,8 @@ import 'data/providers/video_provider.dart';
 import 'data/providers/coin_provider.dart';
 import 'data/providers/referral_provider.dart';
 import 'data/providers/vip_provider.dart';
-import 'screens/auth/login_screen.dart';
-import 'screens/auth/signup_screen.dart';
-import 'screens/auth/splash_screen.dart';
-import 'screens/auth/onboarding_screen.dart';
-import 'screens/home/main_navigation.dart';
-import 'screens/player/video_player_screen.dart';
-import 'screens/explore/category_videos_screen.dart';
-import 'screens/earn/earn_screen.dart';
-import 'screens/earn/spin_wheel_screen.dart';
-import 'screens/earn/scratch_card_screen.dart';
-import 'screens/earn/mystery_box_screen.dart';
-import 'screens/earn/daily_goals_screen.dart';
-import 'screens/referral/referral_screen.dart';
-import 'screens/vip/vip_plans_screen.dart';
-import 'screens/wallet/wallet_screen.dart';
-import 'screens/wallet/withdraw_screen.dart';
-import 'screens/leaderboard/leaderboard_screen.dart';
-import 'screens/achievements/achievements_screen.dart';
-import 'screens/profile/profile_screen.dart';
-import 'screens/profile/edit_profile_screen.dart';
-import 'screens/settings/settings_screen.dart';
-import 'screens/notifications/notifications_screen.dart';
-import 'screens/help/help_screen.dart';
-import 'screens/legal/legal_screen.dart';
 import 'data/providers/earn_provider.dart';
 import 'data/providers/ad_provider.dart';
-import 'theme/app_theme.dart';
-
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   
