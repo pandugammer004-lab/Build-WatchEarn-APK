@@ -15,12 +15,16 @@ import 'data/providers/vip_provider.dart';
 import 'data/providers/earn_provider.dart';
 import 'data/providers/ad_provider.dart';
 
+import 'firebase_options.dart';
+
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
   // Initialize Firebase
   try {
-    await Firebase.initializeApp();
+    await Firebase.initializeApp(
+      options: DefaultFirebaseOptions.currentPlatform,
+    );
   } catch (e) {
     debugPrint("Firebase initialization error: $e");
   }

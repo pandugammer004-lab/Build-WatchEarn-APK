@@ -10,9 +10,8 @@ class AuthService {
   factory AuthService() => _instance;
   AuthService._internal();
 
-  // Safely get FirebaseAuth instance (not available on web without init)
+  // Safely get FirebaseAuth instance
   FirebaseAuth? get _auth {
-    if (kIsWeb) return null;
     try {
       return FirebaseAuth.instance;
     } catch (e) {
@@ -24,14 +23,13 @@ class AuthService {
   final FirestoreService _firestoreService = FirestoreService();
 
   Stream<User?> get authStateChanges {
-    if (kIsWeb || _auth == null) return const Stream.empty();
+    if (_auth == null) return const Stream.empty();
     return _auth!.authStateChanges();
   }
 
-  User? get currentUser => kIsWeb ? null : _auth?.currentUser;
+  User? get currentUser => _auth?.currentUser;
 
   Future<UserCredential?> signInWithGoogle() async {
-    if (kIsWeb) throw Exception('Google Sign-In not available on web preview.');
     try {
       final GoogleSignInAccount? googleUser = await _googleSignIn.signIn();
       if (googleUser == null) return null;
@@ -51,7 +49,6 @@ class AuthService {
   }
 
   Future<UserCredential> signInWithEmail(String email, String password) async {
-    if (kIsWeb) throw Exception('Login requires Firebase setup. Use the mobile app.');
     try {
       final userCredential = await _auth!.signInWithEmailAndPassword(
         email: email,
@@ -64,7 +61,6 @@ class AuthService {
   }
 
   Future<UserCredential> signUpWithEmail(String name, String email, String password, String? referralCode) async {
-    if (kIsWeb) throw Exception('Signup requires Firebase setup. Use the mobile app.');
     try {
       final userCredential = await _auth!.createUserWithEmailAndPassword(
         email: email,
@@ -81,7 +77,7 @@ class AuthService {
   }
 
   Future<void> _checkAndCreateUserDocument(User? user, {String? name, String? referredBy}) async {
-    if (user == null || kIsWeb) return;
+    if (user == null) return;
     
     final existingUser = await _firestoreService.getUser(user.uid);
     if (existingUser == null) {
@@ -122,7 +118,6 @@ class AuthService {
   }
 
   Future<void> sendPasswordReset(String email) async {
-    if (kIsWeb) throw Exception('Password reset requires Firebase setup.');
     try {
       await _auth!.sendPasswordResetEmail(email: email);
     } catch (e) {
@@ -131,7 +126,6 @@ class AuthService {
   }
 
   Future<void> signOut() async {
-    if (kIsWeb) return;
     try {
       await Future.wait([
         _auth!.signOut(),
@@ -143,7 +137,6 @@ class AuthService {
   }
 
   Future<void> deleteAccount() async {
-    if (kIsWeb) return;
     try {
       await currentUser?.delete();
     } catch (e) {
