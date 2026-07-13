@@ -34,11 +34,28 @@
 
   <script>
     // The value below is injected by flutter build, do not touch.
-    const serviceWorkerVersion = "582207768";
+    const serviceWorkerVersion = "82575325";
   </script>
   <!-- This script adds the flutter initialization JS code -->
   <script src="flutter.js" defer></script>
-</head>
+
+<!-- Firebase JS SDK -->
+<script src="https://www.gstatic.com/firebasejs/10.7.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.7.0/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.7.0/firebase-firestore-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.7.0/firebase-storage-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.7.0/firebase-messaging-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.7.0/firebase-analytics-compat.js"></script>
+<script>
+  firebase.initializeApp({
+    apiKey: "AIzaSyA9xQfWbNc1Ht99KXx5GMLIuk_wfItw9BA",
+    authDomain: "mobile-app-f270c.firebaseapp.com",
+    projectId: "mobile-app-f270c",
+    storageBucket: "mobile-app-f270c.firebasestorage.app",
+    messagingSenderId: "461764093304",
+    appId: "1:461764093304:android:61891c996e598d1624d48d"
+  });
+</script>\n  </head>
 <body>
   <script>
     window.addEventListener('load', function(ev) {
