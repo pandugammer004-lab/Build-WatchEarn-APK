@@ -1,4 +1,4 @@
-name: Build WatchEarn APK
+name: Build WatchEarn APK + Web
 
 on:
   push:
@@ -6,9 +6,35 @@ on:
   workflow_dispatch:
 
 jobs:
-  build:
+  # ─────────────── WEB BUILD → GitHub Pages ───────────────
+  build-web:
     runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
 
+      - name: Setup Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          flutter-version: '3.16.9'
+          channel: 'stable'
+
+      - name: Get Dependencies
+        run: flutter pub get
+
+      - name: Build Web
+        run: flutter build web --release --base-href "/Build-WatchEarn-APK/"
+
+      - name: Deploy to GitHub Pages
+        uses: peaceiris/actions-gh-pages@v3
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: ./build/web
+
+  # ─────────────── APK BUILD ───────────────
+  build-apk:
+    runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
 
@@ -23,7 +49,7 @@ jobs:
         with:
           flutter-version: '3.16.9'
           channel: 'stable'
-          
+
       - name: Generate Flutter Android Folders
         run: flutter create --project-name watchearn --platforms=android .
 
@@ -31,73 +57,34 @@ jobs:
         run: |
           if [ -f "google-services.json" ]; then
             cp google-services.json android/app/
-            echo "Moved google-services.json to android/app/"
-          else
-            echo "Warning: google-services.json not found in root!"
+            echo "google-services.json copied to android/app/"
           fi
 
       - name: Patch Android Files
         shell: python
         run: |
-          import os
-          import re
+          import os, re
 
-          # --- Patch android/build.gradle (root) ---
+          # Root build.gradle
           root_gradle = 'android/build.gradle'
           if os.path.exists(root_gradle):
-              with open(root_gradle, 'r') as f:
-                  c = f.read()
-              # Add Google Services classpath
+              with open(root_gradle, 'r') as f: c = f.read()
               if 'com.google.gms:google-services' not in c:
-                  c = c.replace(
-                      'dependencies {',
-                      "dependencies {\n        classpath 'com.google.gms:google-services:4.4.1'"
-                  )
-              # Update Kotlin version to fix incompatibility with google_mobile_ads
+                  c = c.replace('dependencies {', "dependencies {\n        classpath 'com.google.gms:google-services:4.4.1'")
               c = re.sub(r"ext\.kotlin_version\s*=\s*'[^']*'", "ext.kotlin_version = '1.9.24'", c)
-              with open(root_gradle, 'w') as f:
-                  f.write(c)
-              print("Patched android/build.gradle")
+              with open(root_gradle, 'w') as f: f.write(c)
 
-          # --- Patch android/app/build.gradle ---
+          # App build.gradle
           app_gradle = 'android/app/build.gradle'
           if os.path.exists(app_gradle):
-              with open(app_gradle, 'r') as f:
-                  c = f.read()
-              # Add google-services plugin
+              with open(app_gradle, 'r') as f: c = f.read()
               if 'com.google.gms.google-services' not in c:
-                  c = c.replace(
-                      "apply plugin: 'com.android.application'",
-                      "apply plugin: 'com.android.application'\napply plugin: 'com.google.gms.google-services'"
-                  )
-              # Fix applicationId
+                  c = c.replace("apply plugin: 'com.android.application'", "apply plugin: 'com.android.application'\napply plugin: 'com.google.gms.google-services'")
               c = re.sub(r'applicationId\s+"[^"]*"', 'applicationId "nexa.web.solution1122"', c)
-              # Fix namespace
               c = re.sub(r'namespace\s+"[^"]*"', 'namespace "nexa.web.solution1122"', c)
-              # Fix minSdkVersion
               c = c.replace('minSdkVersion flutter.minSdkVersion', 'minSdkVersion 23')
-              # Fix compileSdkVersion to 34
               c = c.replace('compileSdkVersion flutter.compileSdkVersion', 'compileSdkVersion 34')
-              with open(app_gradle, 'w') as f:
-                  f.write(c)
-              print("Patched android/app/build.gradle")
-
-          # --- Patch AndroidManifest.xml (add AdMob APPLICATION_ID) ---
-          manifest = 'android/app/src/main/AndroidManifest.xml'
-          if os.path.exists(manifest):
-              with open(manifest, 'r') as f:
-                  c = f.read()
-              # Only add if not already present
-              ADMOB_APP_ID = 'ca-app-pub-3940256099942544~3347511713'
-              if 'com.google.android.gms.ads.APPLICATION_ID' not in c:
-                  # Insert before </application>
-                  meta_tag = '    <meta-data\n        android:name="com.google.android.gms.ads.APPLICATION_ID"\n        android:value="' + ADMOB_APP_ID + '"/>\n'
-                  c = c.replace('</application>', meta_tag + '</application>')
-                  with open(manifest, 'w') as f:
-                      f.write(c)
-                  print("Added AdMob APPLICATION_ID to AndroidManifest.xml")
-              else:
-                  print("AdMob APPLICATION_ID already present")
+              with open(app_gradle, 'w') as f: f.write(c)
 
       - name: Get Dependencies
         run: flutter pub get
