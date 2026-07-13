@@ -67,10 +67,26 @@ jobs:
         run: flutter pub get
 
       - name: Fix Plugin AGP 8 Issues
+        shell: python
         run: |
-          sed -i "s/getDefaultProguardFile('proguard-android.txt')/'proguard-android-optimize.txt'/g" ~/.pub-cache/hosted/pub.dev/flutter_inappwebview-*/android/build.gradle
-          sed -i 's/android {/android {\n    namespace "com.pichillilorenzo.flutter_inappwebview"/g' ~/.pub-cache/hosted/pub.dev/flutter_inappwebview-*/android/build.gradle
-          sed -i 's/configurations.all {/configurations.configureEach {/g' ~/.pub-cache/hosted/pub.dev/google_mobile_ads-*/android/build.gradle
+          import glob
+          import os
+
+          for path in glob.glob('/home/runner/.pub-cache/hosted/pub.dev/*/android/build.gradle'):
+              if os.path.exists(path):
+                  with open(path, 'r') as f: c = f.read()
+                  
+                  # Fix Proguard
+                  c = c.replace("getDefaultProguardFile('proguard-android.txt')", "'proguard-android-optimize.txt'")
+                  
+                  # Fix Namespace
+                  if 'namespace ' not in c and 'android {' in c:
+                      c = c.replace('android {', 'android {\n    namespace "com.pichillilorenzo.flutter_inappwebview"\n', 1)
+                      
+                  # Fix Configurations.all
+                  c = c.replace('configurations.all', 'configurations.configureEach')
+                  
+                  with open(path, 'w') as f: f.write(c)
 
       - name: Build APK
         run: flutter build apk --release
