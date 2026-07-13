@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import '../models/user_model.dart';
 import '../models/transaction_model.dart';
 import '../models/notification_model.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import '../../core/services/firestore_service.dart';
 
 class UserProvider extends ChangeNotifier {
