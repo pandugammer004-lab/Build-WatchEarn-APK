@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'dart:math' as math;
 import '../models/user_model.dart';
 import '../models/daily_goal_model.dart';
-import '../services/firestore_service.dart';
+import '../../core/services/firestore_service.dart';
 
 class EarnProvider extends ChangeNotifier {
   final FirestoreService _firestore = FirestoreService();

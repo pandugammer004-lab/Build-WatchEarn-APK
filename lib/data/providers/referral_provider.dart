@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import '../models/user_model.dart';
 import '../models/referral_model.dart';
-import '../services/firestore_service.dart';
+import '../../core/services/firestore_service.dart';
 
 class ReferralProvider extends ChangeNotifier {
   final FirestoreService _firestore = FirestoreService();
