@@ -26,20 +26,11 @@ class _SplashScreenState extends State<SplashScreen> {
   }
 
   Future<void> _initApp() async {
-    // 3 seconds minimum splash duration
     await Future.delayed(const Duration(seconds: 3));
-
     if (!mounted) return;
-
-    // On web, skip Firebase auth check and go to onboarding
-    if (kIsWeb) {
-      Navigator.pushReplacementNamed(context, '/onboarding');
-      return;
-    }
 
     final prefs = await SharedPreferences.getInstance();
     final bool isFirstTime = prefs.getBool('is_first_time') ?? true;
-    
     final authProvider = Provider.of<AuthProvider>(context, listen: false);
 
     if (isFirstTime) {

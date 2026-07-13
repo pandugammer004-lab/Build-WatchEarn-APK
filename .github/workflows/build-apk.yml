@@ -26,6 +26,37 @@ jobs:
       - name: Generate Web Folder
         run: flutter create --project-name watchearn --platforms=web .
 
+      - name: Inject Firebase JS SDK into index.html
+        shell: python
+        run: |
+          import re
+          with open('web/index.html', 'r') as f:
+              html = f.read()
+
+          firebase_scripts = """
+    <!-- Firebase JS SDK -->
+    <script src="https://www.gstatic.com/firebasejs/10.7.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.0/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.0/firebase-firestore-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.0/firebase-storage-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.0/firebase-messaging-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.0/firebase-analytics-compat.js"></script>
+    <script>
+      firebase.initializeApp({
+        apiKey: "AIzaSyA9xQfWbNc1Ht99KXx5GMLIuk_wfItw9BA",
+        authDomain: "mobile-app-f270c.firebaseapp.com",
+        projectId: "mobile-app-f270c",
+        storageBucket: "mobile-app-f270c.firebasestorage.app",
+        messagingSenderId: "461764093304",
+        appId: "1:461764093304:android:61891c996e598d1624d48d"
+      });
+    </script>"""
+
+          html = html.replace('</head>', firebase_scripts + '\n  </head>')
+          with open('web/index.html', 'w') as f:
+              f.write(html)
+          print("Firebase JS SDK injected into index.html")
+
       - name: Build Web
         run: flutter build web --release --base-href "/Build-WatchEarn-APK/"
 
