@@ -9,11 +9,11 @@ class EarnProvider extends ChangeNotifier {
   final math.Random _random = math.Random();
 
   List<DailyGoalModel> _dailyGoals = [
-    DailyGoalModel(id: 'g1', title: 'First Video', description: 'Watch 1 video', reward: 20, target: 1, type: 'video'),
-    DailyGoalModel(id: 'g2', title: 'Morning Viewer', description: 'Watch 3 videos', reward: 40, target: 3, type: 'video'),
-    DailyGoalModel(id: 'g3', title: 'Half Way', description: 'Watch 5 videos', reward: 60, target: 5, type: 'video'),
-    DailyGoalModel(id: 'g4', title: 'Dedicated', description: 'Watch 10 videos', reward: 120, target: 10, type: 'video'),
-    DailyGoalModel(id: 'g5', title: 'Ad Supporter', description: 'Watch 5 ads', reward: 100, target: 5, type: 'ad'),
+    DailyGoalModel(id: 'g1', title: 'First Video', description: 'Watch 1 video', icon: '🎬', reward: 20, target: 1, current: 0, isClaimed: false, type: 'video'),
+    DailyGoalModel(id: 'g2', title: 'Morning Viewer', description: 'Watch 3 videos', icon: '🌅', reward: 40, target: 3, current: 0, isClaimed: false, type: 'video'),
+    DailyGoalModel(id: 'g3', title: 'Half Way', description: 'Watch 5 videos', icon: '📈', reward: 60, target: 5, current: 0, isClaimed: false, type: 'video'),
+    DailyGoalModel(id: 'g4', title: 'Dedicated', description: 'Watch 10 videos', icon: '👀', reward: 120, target: 10, current: 0, isClaimed: false, type: 'video'),
+    DailyGoalModel(id: 'g5', title: 'Ad Supporter', description: 'Watch 5 ads', icon: '📺', reward: 100, target: 5, current: 0, isClaimed: false, type: 'ad'),
   ];
   List<DailyGoalModel> get dailyGoals => _dailyGoals;
 
