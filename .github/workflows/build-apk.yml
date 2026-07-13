@@ -36,15 +36,32 @@ jobs:
           fi
 
       - name: Patch Gradle for Firebase (Kotlin DSL)
+        shell: python
         run: |
-          # Add google-services plugin to project build.gradle.kts
-          sed -i 's/plugins {/plugins {\n    id("com.google.gms.google-services") version "4.4.1" apply false/' android/build.gradle.kts
+          import os
           
-          # Add google-services plugin to app build.gradle.kts
-          sed -i 's/plugins {/plugins {\n    id("com.google.gms.google-services")/' android/app/build.gradle.kts
+          # Patch Project level
+          p_file = 'android/build.gradle.kts'
+          if os.path.exists(p_file):
+              with open(p_file, 'r') as f: c = f.read()
+              if 'com.google.gms.google-services' not in c:
+                  if 'plugins {' in c:
+                      c = c.replace('plugins {', 'plugins {\n    id("com.google.gms.google-services") version "4.4.1" apply false')
+                  else:
+                      c = 'plugins {\n    id("com.google.gms.google-services") version "4.4.1" apply false\n}\n' + c
+                  with open(p_file, 'w') as f: f.write(c)
           
-          # Increase minSdk to 23 for Firebase compatibility if needed
-          sed -i 's/minSdk = flutter.minSdkVersion/minSdk = 23/' android/app/build.gradle.kts
+          # Patch App level
+          a_file = 'android/app/build.gradle.kts'
+          if os.path.exists(a_file):
+              with open(a_file, 'r') as f: c = f.read()
+              if 'com.google.gms.google-services' not in c:
+                  if 'plugins {' in c:
+                      c = c.replace('plugins {', 'plugins {\n    id("com.google.gms.google-services")')
+                  else:
+                      c = 'plugins {\n    id("com.google.gms.google-services")\n}\n' + c
+                  c = c.replace('minSdk = flutter.minSdkVersion', 'minSdk = 23')
+                  with open(a_file, 'w') as f: f.write(c)
 
       - name: Get Dependencies
         run: flutter pub get
