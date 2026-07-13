@@ -26,20 +26,36 @@ class _SplashScreenState extends State<SplashScreen> {
   }
 
   Future<void> _initApp() async {
-    await Future.delayed(const Duration(seconds: 3));
-    if (!mounted) return;
+    try {
+      if (!kIsWeb) {
+        await Future.delayed(const Duration(seconds: 3));
+      } else {
+        await Future.delayed(const Duration(milliseconds: 500));
+      }
+      if (!mounted) return;
 
-    final prefs = await SharedPreferences.getInstance();
-    final bool isFirstTime = prefs.getBool('is_first_time') ?? true;
-    final authProvider = Provider.of<AuthProvider>(context, listen: false);
+      final prefs = await SharedPreferences.getInstance();
+      final bool isFirstTime = prefs.getBool('is_first_time') ?? true;
+      final authProvider = Provider.of<AuthProvider>(context, listen: false);
 
-    if (isFirstTime) {
-      await prefs.setBool('is_first_time', false);
-      if (mounted) Navigator.pushReplacementNamed(context, '/onboarding');
-    } else if (authProvider.isLoggedIn) {
-      if (mounted) Navigator.pushReplacementNamed(context, '/main');
-    } else {
-      if (mounted) Navigator.pushReplacementNamed(context, '/login');
+      if (isFirstTime) {
+        await prefs.setBool('is_first_time', false);
+        if (mounted) Navigator.pushReplacementNamed(context, '/onboarding');
+      } else if (authProvider.isLoggedIn) {
+        if (mounted) Navigator.pushReplacementNamed(context, '/home'); // fixed from /main
+      } else {
+        if (mounted) Navigator.pushReplacementNamed(context, '/login');
+      }
+    } catch (e) {
+      if (mounted) {
+        showDialog(
+          context: context,
+          builder: (_) => AlertDialog(
+            title: const Text("Error"),
+            content: Text(e.toString()),
+          ),
+        );
+      }
     }
   }
 
