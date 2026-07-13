@@ -25,7 +25,7 @@ jobs:
           channel: 'stable'
           
       - name: Generate Flutter Android Folders
-        run: flutter create --platforms=android .
+        run: flutter create --project-name watchearn --platforms=android .
 
       - name: Setup Firebase Files
         run: |
@@ -52,7 +52,10 @@ jobs:
               with open('android/app/build.gradle', 'r') as f: c = f.read()
               if 'com.google.gms.google-services' not in c:
                   c = c.replace("apply plugin: 'com.android.application'", "apply plugin: 'com.android.application'\napply plugin: 'com.google.gms.google-services'")
-                  # Also increase minSdk if found
+                  # Also increase minSdk and fix package name for Firebase
+                  import re
+                  c = re.sub(r'applicationId\s+".*"', 'applicationId "nexa.web.solution1122"', c)
+                  c = re.sub(r'namespace\s+".*"', 'namespace "nexa.web.solution1122"', c)
                   c = c.replace('minSdkVersion flutter.minSdkVersion', 'minSdkVersion 23')
                   with open('android/app/build.gradle', 'w') as f: f.write(c)
 
