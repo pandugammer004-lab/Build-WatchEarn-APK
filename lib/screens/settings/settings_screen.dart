@@ -291,6 +291,10 @@ class _SettingsScreenState extends State<SettingsScreen> {
   }
 
   void _showChangePasswordSheet() {
+    final currentPasswordController = TextEditingController();
+    final newPasswordController = TextEditingController();
+    final confirmPasswordController = TextEditingController();
+
     showModalBottomSheet(
       context: context,
       backgroundColor: AppColors.cardColor,
@@ -306,11 +310,11 @@ class _SettingsScreenState extends State<SettingsScreen> {
               children: [
                 const Text('Change Password', style: TextStyle(color: Colors.white, fontSize: 20, fontWeight: FontWeight.bold)),
                 const SizedBox(height: 24),
-                const CustomTextField(hintText: 'Current Password', prefixIcon: Icons.lock_outline, isPassword: true),
+                CustomTextField(controller: currentPasswordController, hintText: 'Current Password', prefixIcon: Icons.lock_outline, isPassword: true),
                 const SizedBox(height: 16),
-                const CustomTextField(hintText: 'New Password', prefixIcon: Icons.lock, isPassword: true),
+                CustomTextField(controller: newPasswordController, hintText: 'New Password', prefixIcon: Icons.lock, isPassword: true),
                 const SizedBox(height: 16),
-                const CustomTextField(hintText: 'Confirm New Password', prefixIcon: Icons.lock, isPassword: true),
+                CustomTextField(controller: confirmPasswordController, hintText: 'Confirm New Password', prefixIcon: Icons.lock, isPassword: true),
                 const SizedBox(height: 24),
                 CustomButton(text: 'Save Password', onPressed: () => Navigator.pop(context)),
               ],
