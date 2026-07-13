@@ -46,7 +46,9 @@ jobs:
               with open('android/build.gradle', 'r') as f: c = f.read()
               if 'com.google.gms:google-services' not in c:
                   c = c.replace('dependencies {', "dependencies {\n        classpath 'com.google.gms:google-services:4.4.1'")
-                  with open('android/build.gradle', 'w') as f: f.write(c)
+              import re
+              c = re.sub(r"ext\.kotlin_version\s*=\s*'.*'", "ext.kotlin_version = '1.9.24'", c)
+              with open('android/build.gradle', 'w') as f: f.write(c)
                   
           if os.path.exists('android/app/build.gradle'):
               with open('android/app/build.gradle', 'r') as f: c = f.read()
