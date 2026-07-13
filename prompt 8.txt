@@ -1,0 +1,1198 @@
+## ✅ PROMPT 8 - FINAL ADMIN PANEL READY HAI BHAI!
+
+---
+
+## 🚀 PROMPT 8 (COPY FROM HERE)
+
+```
+You are an expert Flutter/Web developer continuing the WatchEarn project.
+Now create the COMPLETE ADMIN PANEL for WatchEarn using Flutter Web.
+This is the most important part - admin controls everything from here.
+
+═══════════════════════════════════════════════════
+ADMIN PANEL OVERVIEW
+═══════════════════════════════════════════════════
+
+Type: Flutter Web App (separate entry point)
+Entry: lib/admin/admin_main.dart
+Access: Only admin users (hardcoded email check)
+Design: Professional dark dashboard
+Style: Like Firebase Console meets Stripe Dashboard
+
+Admin Credentials (hardcoded for now):
+- Email: admin@watchearn.app
+- Check: if user email == admin email → allow
+
+═══════════════════════════════════════════════════
+FILE 1: lib/admin/admin_main.dart
+═══════════════════════════════════════════════════
+
+Create separate Flutter Web entry point:
+
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
+  runApp(AdminApp());
+}
+
+AdminApp:
+- MaterialApp for web
+- Dark theme (same as mobile)
+- Routes setup
+- Auth check on start
+- If not admin → redirect to admin login
+
+═══════════════════════════════════════════════════
+FILE 2: lib/admin/admin_login.dart
+═══════════════════════════════════════════════════
+
+DESIGN:
+- Full screen centered card
+- Dark background (#0D0D1A)
+- Center card: white 5% opacity, blur
+- WatchEarn Admin logo (top)
+- "Admin Panel" title
+- "Authorized Access Only" subtitle (red warning)
+
+Form:
+- Email field
+- Password field
+- "Login to Admin Panel" button (gradient)
+- Error messages
+- Loading state
+
+SECURITY:
+- Check if email is admin email
+- If not → show "Access Denied" 
+- Max 3 attempts then lockout
+- Log all admin login attempts to Firebase
+
+═══════════════════════════════════════════════════
+FILE 3: lib/admin/admin_app.dart
+═══════════════════════════════════════════════════
+
+LAYOUT (Responsive Web Dashboard):
+
+┌─────────────────────────────────────────────┐
+│          TOP BAR                            │
+├──────────┬──────────────────────────────────┤
+│          │                                  │
+│ SIDEBAR  │     MAIN CONTENT AREA            │
+│          │                                  │
+│          │                                  │
+└──────────┴──────────────────────────────────┘
+
+TOP BAR:
+- WatchEarn Admin logo (left)
+- Page title (center)
+- Right: admin name + avatar + logout button
+- Background: #1A1A2E
+- Height: 60px
+- Subtle bottom border
+
+SIDEBAR (260px wide):
+- Background: #12122A
+- WatchEarn logo + "Admin Panel" (top)
+- Admin profile (small, below logo)
+- Navigation items (with icons):
+
+  📊 Dashboard (home icon)
+  🎬 Videos (video icon)
+  👥 Users (people icon)
+  📁 Categories (folder icon)
+  💸 Withdrawals (money icon)
+  💎 VIP Management (crown icon)
+  🔔 Notifications (bell icon)
+  📈 Analytics (chart icon)
+  ⚙️ App Settings (gear icon)
+  
+  ─────────────────
+  🚪 Logout (bottom)
+
+- Selected item: gradient background + white text
+- Hover: subtle highlight
+- Active indicator: left border (primary color)
+
+RESPONSIVE:
+- Desktop (>1200px): Full sidebar visible
+- Tablet (768-1200px): Compact sidebar (icons only)
+- Mobile (<768px): Drawer sidebar
+
+MAIN CONTENT:
+- Background: #0D0D1A
+- Padding: 24px
+- Scrollable
+- Each page loads here
+
+═══════════════════════════════════════════════════
+FILE 4: lib/admin/admin_dashboard.dart
+═══════════════════════════════════════════════════
+
+Create POWERFUL analytics dashboard:
+
+━━━ ROW 1: KEY METRICS (4 cards) ━━━
+
+Card 1: 👥 Total Users
+- Big number (animated count)
+- Subtitle: "+[X] today"
+- Chart: mini sparkline (last 7 days)
+- Color: Purple
+
+Card 2: 🎬 Total Videos
+- Total video count
+- Subtitle: "+[X] this week"
+- Color: Cyan
+
+Card 3: 💰 Total Revenue
+- "$[X].XX"
+- Subtitle: "This month: $[X]"
+- Chart: mini sparkline
+- Color: Gold
+
+Card 4: 📺 Videos Watched Today
+- Count
+- Subtitle: "Avg: [X] per user"
+- Color: Pink
+
+━━━ ROW 2: CHARTS ━━━
+
+Chart 1: User Growth (Line Chart)
+- Last 30 days
+- Daily new users
+- fl_chart LineChart
+- Gradient fill below line
+- Purple color
+
+Chart 2: Revenue Chart (Bar Chart)
+- Last 12 months
+- Monthly revenue (ads + VIP)
+- Gold bars
+- fl_chart BarChart
+
+━━━ ROW 3: MORE STATS ━━━
+
+Card: VIP Distribution (Pie Chart)
+- Free vs Silver vs Gold vs Platinum
+  vs Diamond vs Lifetime
+- fl_chart PieChart
+- Each slice different color
+- Legend below
+
+Card: Top Categories
+- Bar chart showing views per category
+- Horizontal bars
+- Sorted by views
+
+━━━ ROW 4: RECENT ACTIVITY ━━━
+
+Table 1: Recent Users (last 10)
+Columns: Avatar | Name | Email | Joined | VIP | Coins | Action
+
+Table 2: Recent Withdrawals (pending)
+Columns: User | Amount | Method | Date | Status | Action
+
+Table 3: Top Videos (by views)
+Columns: Thumbnail | Title | Category | Views | Coins Given | Action
+
+━━━ ROW 5: QUICK ACTIONS ━━━
+Buttons:
+- "Add New Video" → Videos page
+- "Send Notification" → Notifications page
+- "View Pending Withdrawals" → Withdrawals page
+- "Export Data" → Download CSV
+
+═══════════════════════════════════════════════════
+FILE 5: lib/admin/admin_videos.dart
+═══════════════════════════════════════════════════
+
+Create COMPLETE video management:
+
+LAYOUT:
+
+━━━ HEADER ━━━
+- Title: "🎬 Video Management"
+- Search bar (search by title/ID)
+- Filter: [All] [Trending] [Featured] [VIP Only] [Inactive]
+- Filter by category dropdown
+- "Add New Video" button (gradient, top right)
+
+━━━ STATS BAR ━━━
+- Total Videos: [X]
+- Active: [X]
+- Trending: [X]
+- VIP Only: [X]
+
+━━━ VIDEO TABLE ━━━
+Columns:
+1. # (checkbox for bulk select)
+2. Thumbnail (small, 80x45)
+3. YouTube ID (monospace, copyable)
+4. Title (clickable, opens edit)
+5. Category (colored chip)
+6. Duration
+7. Views
+8. Status (Active/Inactive toggle)
+9. Trending (toggle)
+10. Featured (toggle)
+11. VIP Only (toggle)
+12. Added Date
+13. Actions: [Edit] [Delete]
+
+Table features:
+- Sort by any column (click header)
+- Pagination (20 per page)
+- Bulk actions (delete selected)
+- Row hover highlight
+- Loading shimmer
+
+━━━ ADD/EDIT VIDEO DIALOG ━━━
+Modal dialog (or side panel):
+
+Fields:
+- YouTube Video ID (text field)
+  * Auto-preview thumbnail when entered
+  * Show thumbnail preview (real YouTube thumb)
+  * Validate YouTube ID format
+  
+- Title (text field, required)
+  * 100 char limit
+  
+- Description (textarea)
+  * 500 char limit
+  
+- Category (dropdown selector)
+  * Show all categories
+  
+- Duration (auto-fetch or manual input)
+  * Format: MM:SS
+  
+- Order (number, for sorting)
+
+Toggles:
+  [✓] Is Trending
+  [✓] Is Featured
+  [✓] Is VIP Only
+  [✓] Is Active
+
+Preview section:
+- Show YouTube thumbnail (live)
+- Show how it looks in app card
+
+Save/Cancel buttons
+
+━━━ DELETE CONFIRMATION ━━━
+- Dialog: "Delete '[title]'?"
+- Warning: "This cannot be undone"
+- Type video title to confirm
+- Delete button (red)
+
+━━━ BULK ACTIONS ━━━
+When videos selected:
+- "Delete Selected ([X])"
+- "Set Active"
+- "Set Inactive"
+- "Set Trending"
+- "Remove Trending"
+
+━━━ YOUTUBE ID HELPER ━━━
+Info box:
+"How to get YouTube Video ID:
+1. Open your YouTube video
+2. Copy ID from URL: youtube.com/watch?v=[THIS_PART]
+3. Paste it in the field above"
+
+Live preview when ID entered
+
+═══════════════════════════════════════════════════
+FILE 6: lib/admin/admin_users.dart
+═══════════════════════════════════════════════════
+
+Create USER MANAGEMENT system:
+
+━━━ HEADER ━━━
+- Title: "👥 User Management"
+- Search (name/email/referral code)
+- Filters: [All] [VIP] [Free] [Active] [Flagged]
+- Export CSV button
+- Total user count
+
+━━━ USER TABLE ━━━
+Columns:
+1. Avatar + Name
+2. Email
+3. Referral Code
+4. Coins (editable)
+5. VIP Plan (colored badge)
+6. VIP Expiry
+7. Videos Watched
+8. Streak
+9. Referrals Made
+10. Joined Date
+11. Last Active
+12. Status (Active/Flagged)
+13. Actions: [View] [Edit] [Ban] [Delete]
+
+━━━ USER DETAIL PANEL ━━━
+Click user → slide-in panel (right side):
+
+Panel sections:
+1. Profile Header
+   - Avatar + name + email
+   - VIP badge
+   - Join date + last active
+
+2. Stats
+   - Coins, total earned, withdrawn
+   - Videos watched, watch time
+   - Streak, referrals
+
+3. Edit Coins
+   - Add/Remove coins field
+   - Reason input
+   - Apply button
+   - This creates transaction record
+
+4. VIP Management
+   - Current VIP plan
+   - Grant VIP dropdown (select plan)
+   - Expiry date picker
+   - Apply VIP button
+
+5. Transaction History
+   - Last 10 transactions
+   - Type + amount + date
+
+6. Actions
+   - Send notification to user
+   - Reset password email
+   - Suspend account (toggle)
+   - Delete account (with confirmation)
+
+━━━ FLAGGED USERS ━━━
+Users flagged for:
+- Too many coins earned (suspicious)
+- Multiple accounts (same device)
+- Cheat attempts
+
+Show flag reason
+Admin can: Clear flag / Ban / Delete
+
+═══════════════════════════════════════════════════
+FILE 7: lib/admin/admin_categories.dart
+═══════════════════════════════════════════════════
+
+Create CATEGORY management:
+
+━━━ LAYOUT ━━━
+- Title: "📁 Category Management"
+- "Add Category" button
+
+━━━ CATEGORIES GRID ━━━
+Cards in responsive grid:
+
+Each category card:
+- Large emoji icon
+- Category name
+- Video count badge
+- Color preview bar (top)
+- Active/Inactive toggle
+- Order number (drag to reorder)
+- Edit / Delete buttons
+
+━━━ ADD/EDIT CATEGORY DIALOG ━━━
+Fields:
+- Category Name (text)
+- Emoji Icon (emoji picker or text input)
+- Color Hex (#FF6B9D format)
+  * Color preview
+  * Color picker widget
+- Display Order (number)
+- Active toggle
+
+Preview:
+- Show how category chip looks in app
+
+━━━ REORDER ━━━
+Drag and drop to reorder categories
+Save order button
+Auto-update in Firestore
+
+═══════════════════════════════════════════════════
+FILE 8: lib/admin/admin_withdrawals.dart
+═══════════════════════════════════════════════════
+
+Create WITHDRAWAL management (most critical):
+
+━━━ STATS HEADER ━━━
+4 stat cards:
+1. Pending Withdrawals: [X] ($[X] total)
+2. Approved Today: [X] ($[X])
+3. Rejected Today: [X]
+4. Total Paid Out: $[X]
+
+━━━ FILTER TABS ━━━
+[All] [Pending] [Approved] [Rejected] [Processing]
+
+━━━ WITHDRAWAL TABLE ━━━
+Columns:
+1. # ID
+2. User (avatar + name, clickable)
+3. Amount ($)
+4. Coins Deducted
+5. Payment Method (icon + name)
+6. Payment Email/Details
+7. Request Date
+8. Status (colored badge)
+9. Actions
+
+━━━ PENDING ACTIONS ━━━
+For each pending withdrawal:
+
+[✅ Approve] [❌ Reject] [👁️ View User]
+
+Approve flow:
+1. Click Approve
+2. Dialog: "Confirm payment of $[X] to [email] via [method]?"
+3. Confirm → Status: Approved
+4. Send notification to user
+5. Update Firestore
+
+Reject flow:
+1. Click Reject
+2. Dialog: Enter rejection reason
+3. Confirm → Status: Rejected
+4. Coins returned to user
+5. Send notification with reason
+
+━━━ BULK ACTIONS ━━━
+Select multiple → Bulk approve/reject
+
+━━━ WITHDRAWAL SETTINGS ━━━
+Section at bottom:
+- Minimum withdrawal amount (free)
+- Minimum withdrawal amount (VIP)
+- Processing days (free)
+- Processing days (VIP)
+- Max withdrawal per day
+- Enable/disable withdrawals
+- Save settings to Firebase
+
+═══════════════════════════════════════════════════
+FILE 9: lib/admin/admin_notifications.dart
+═══════════════════════════════════════════════════
+
+Create NOTIFICATION broadcast system:
+
+━━━ SEND NOTIFICATION ━━━
+Large form:
+
+Target Audience:
+- Radio buttons:
+  * 📢 All Users
+  * 💎 VIP Users Only
+  * 🆓 Free Users Only
+  * 👤 Specific User (enter user ID/email)
+
+Notification Content:
+- Title field (50 char limit)
+- Body field (200 char limit)
+- Icon selector (emoji)
+- Notification type dropdown:
+  * Daily Bonus 🎁
+  * New Video 🎬
+  * VIP Offer 💎
+  * Referral Update 👥
+  * Announcement 📢
+  * Special Offer ⚡
+
+Deep Link (optional):
+- Where to navigate on tap
+- Dropdown: [Home, VIP Plans, Earn, Referral, Wallet]
+
+Preview:
+- Show notification preview
+  (like phone notification style)
+
+Schedule:
+- Send Now (default)
+- Schedule for later (date/time picker)
+
+Send button (gradient, large)
+
+━━━ NOTIFICATION HISTORY ━━━
+Table of sent notifications:
+- Title + body preview
+- Target audience
+- Sent date/time
+- Sent by (admin)
+- Delivered count (if available)
+- Actions: Resend / Delete
+
+━━━ AUTOMATED NOTIFICATIONS ━━━
+Toggle automations:
+- Daily bonus reminder: ON/OFF + time
+- Streak warning: ON/OFF + time
+- New video alerts: ON/OFF
+- VIP expiry warning: ON/OFF + days before
+- Inactivity reminder: ON/OFF + days
+
+═══════════════════════════════════════════════════
+FILE 10: lib/admin/admin_analytics.dart
+═══════════════════════════════════════════════════
+
+Create DETAILED analytics page:
+
+━━━ DATE RANGE FILTER ━━━
+- Preset: [Today] [7 Days] [30 Days] [90 Days] [1 Year]
+- Custom date range picker
+
+━━━ REVENUE SECTION ━━━
+
+Card: Total Revenue Breakdown
+- Ad Revenue: $[X] ([X]% of total)
+- VIP Revenue: $[X] ([X]% of total)
+- Total: $[X]
+- Donut chart showing split
+
+Line Chart: Revenue Over Time
+- Two lines: Ads vs VIP
+- Date range selected
+- Hover tooltips with exact values
+- Export CSV button
+
+━━━ USER METRICS ━━━
+
+Card: User Retention
+- Day 1 retention: [X]%
+- Day 7 retention: [X]%
+- Day 30 retention: [X]%
+- Simple bar chart
+
+Card: User Activity
+- Daily Active Users (DAU)
+- Monthly Active Users (MAU)
+- DAU/MAU ratio
+- Line chart
+
+Card: VIP Conversion
+- Total users: [X]
+- VIP users: [X]
+- Conversion rate: [X]%
+- Revenue per user: $[X]
+
+━━━ VIDEO METRICS ━━━
+
+Table: Top 10 Videos (by views)
+- Rank + Thumbnail + Title + Views + Coins Given + Category
+
+Card: Videos by Category (pie chart)
+- Views distribution across categories
+
+Card: Average Watch Time
+- Overall average
+- By category
+- Trend over time
+
+━━━ EARNING METRICS ━━━
+
+Card: Coins Distribution
+- Coins earned from videos: [X]%
+- From spin wheel: [X]%
+- From scratch cards: [X]%
+- From referrals: [X]%
+- From daily bonus: [X]%
+- Pie chart
+
+Card: Withdrawal Stats
+- Total withdrawn: $[X]
+- Average withdrawal: $[X]
+- Most popular method: PayPal ([X]%)
+- Pending amount: $[X]
+
+━━━ REFERRAL METRICS ━━━
+- Total referrals made: [X]
+- Active referral chains: [X]
+- Avg referrals per user: [X]
+- Top referrers table (top 10)
+
+━━━ EXPORT OPTIONS ━━━
+- Export Users CSV
+- Export Transactions CSV
+- Export Revenue Report PDF (placeholder)
+- Export Videos CSV
+
+═══════════════════════════════════════════════════
+FILE 11: lib/admin/admin_settings.dart
+═══════════════════════════════════════════════════
+
+Create APP CONFIGURATION panel:
+
+━━━ COIN SYSTEM SETTINGS ━━━
+Editable fields (save to Firebase appConfig):
+
+Earning Rates:
+- Coins per video: [10] (number input)
+- Coins per ad watched: [15]
+- Coins per referral join: [500]
+- Coins per referral watches 10 videos: [200]
+- Coins per rate app: [300]
+- Coins per share: [50]
+- Coins to Dollar ratio: [10000]
+
+Daily Limits:
+- Max videos per day (free): [100]
+- Max coins from video per day (free): [1000]
+- Max spins per day (free): [1]
+- Max scratch cards per day (free): [3]
+- Max mystery boxes per day (free): [1]
+
+━━━ VIP SETTINGS ━━━
+For each VIP plan:
+- Price: editable
+- Duration: editable
+- Multiplier: editable
+- Active: toggle
+
+━━━ WITHDRAWAL SETTINGS ━━━
+- Min withdrawal (free): $[5.00]
+- Min withdrawal (VIP): $[2.00]
+- Processing days (free): [3-5]
+- Processing days (VIP): [1]
+- Enable withdrawals: toggle
+- Auto-approve withdrawals under $[X]: toggle
+
+━━━ AD SETTINGS ━━━
+- Ads after videos (free): [4]
+- Ads after videos (VIP): [8]
+- Banner ads enabled: toggle
+- Interstitial ads enabled: toggle
+- Rewarded ads enabled: toggle
+
+━━━ STREAK SETTINGS ━━━
+Editable streak rewards:
+Day 1: [25] coins
+Day 2: [35] coins
+Day 3: [50] coins
+Day 4: [65] coins
+Day 5: [80] coins
+Day 6: [100] coins
+Day 7: [200] coins
+
+━━━ SPIN WHEEL SETTINGS ━━━
+Editable prizes and probabilities:
+Table with 8 rows:
+| Prize | Probability% | Edit |
+
+━━━ APP INFO ━━━
+- App Name: WatchEarn
+- Support Email: support@watchearn.app
+- Privacy Policy URL: (editable)
+- Terms URL: (editable)
+- App Store URL: (editable)
+- Play Store URL: (editable)
+- Maintenance Mode: toggle (shows maintenance screen to users)
+- Force Update: toggle + minimum version field
+
+━━━ SAVE BUTTON ━━━
+- "Save All Settings" (gradient button)
+- Confirmation dialog before save
+- Success toast
+- All changes saved to Firebase appConfig collection
+
+═══════════════════════════════════════════════════
+FILE 12: lib/admin/admin_vip.dart
+═══════════════════════════════════════════════════
+
+Create VIP MANAGEMENT page:
+
+━━━ VIP STATS ━━━
+Cards:
+- Total VIP Users: [X]
+- Silver VIPs: [X]
+- Gold VIPs: [X]
+- Platinum VIPs: [X]
+- Diamond VIPs: [X]
+- Lifetime VIPs: [X]
+- VIP Revenue This Month: $[X]
+
+━━━ VIP USERS TABLE ━━━
+Columns:
+- User (avatar + name)
+- Email
+- VIP Plan (colored badge)
+- Purchase Date
+- Expiry Date
+- Amount Paid
+- Status (Active/Expired)
+- Actions: [Extend] [Revoke] [View User]
+
+━━━ GRANT VIP ━━━
+Form to manually grant VIP:
+- Search user by email
+- Select VIP plan
+- Set duration (days)
+- Reason (internal note)
+- Grant button
+
+━━━ EXPIRING SOON ━━━
+List of VIPs expiring in 7 days:
+- Send renewal reminder button
+- Extend VIP button
+
+━━━ VIP REVENUE CHART ━━━
+Monthly revenue by plan type
+Stacked bar chart
+fl_chart implementation
+
+═══════════════════════════════════════════════════
+ADMIN PROVIDER & SERVICES
+═══════════════════════════════════════════════════
+
+Create lib/admin/admin_provider.dart:
+
+State:
+- List<UserModel> users
+- List<VideoModel> videos
+- List<CategoryModel> categories
+- List<TransactionModel> withdrawals
+- Map<String, dynamic> analytics
+- Map<String, dynamic> appConfig
+- bool isLoading
+- int totalUsers
+- int totalVideos
+- double totalRevenue
+
+Methods:
+- Future<void> loadDashboardData()
+- Future<void> loadUsers({String? search, String? filter})
+- Future<void> loadVideos({String? search, String? category})
+- Future<void> loadWithdrawals({String? status})
+- Future<void> addVideo(VideoModel video)
+- Future<void> updateVideo(String id, Map data)
+- Future<void> deleteVideo(String id)
+- Future<void> updateUserCoins(String uid, int coins, String reason)
+- Future<void> grantVip(String uid, String plan, int days)
+- Future<void> approveWithdrawal(String id)
+- Future<void> rejectWithdrawal(String id, String reason)
+- Future<void> sendNotification(Map data)
+- Future<void> updateAppConfig(Map data)
+- Future<void> deleteUser(String uid)
+- Future<void> suspendUser(String uid, bool suspend)
+- Future<Map> loadAnalytics(DateRange range)
+- Future<void> loadCategories()
+- Future<void> addCategory(CategoryModel cat)
+- Future<void> updateCategory(String id, Map data)
+- Future<void> deleteCategory(String id)
+- Future<void> reorderCategories(List<String> orderedIds)
+
+═══════════════════════════════════════════════════
+ADMIN COMMON WIDGETS
+═══════════════════════════════════════════════════
+
+Create these admin-specific widgets:
+
+1. AdminStatCard:
+- Icon + label + value + subtitle
+- Mini sparkline chart option
+- Trend indicator (up/down arrow)
+- Colored border-left accent
+
+2. AdminDataTable:
+- Sortable columns
+- Pagination
+- Search integration
+- Row actions
+- Bulk select
+- Responsive (horizontal scroll on small)
+- Loading shimmer rows
+- Empty state
+
+3. AdminChartCard:
+- Title + subtitle
+- Chart area
+- Legend
+- Export button
+- Date filter
+- Loading state
+
+4. AdminFormField:
+- Label above
+- Dark input
+- Validation
+- Helper text
+
+5. AdminDropdown:
+- Dark styled
+- Searchable option
+- Multi-select option
+
+6. AdminToggle:
+- Label + description + switch
+- Loading state on change
+- Color: green (on) / grey (off)
+
+7. AdminBadge:
+- Colored pill badge
+- Status badges: Active/Inactive/Pending/VIP
+
+8. AdminDialog:
+- Centered modal
+- Dark background
+- Title + content + actions
+- Close button
+
+9. AdminSidebar:
+- Navigation items list
+- Active state
+- Collapse option
+- Admin profile section
+
+10. AdminTopBar:
+- Title
+- Breadcrumb navigation
+- Action buttons area
+- Admin profile dropdown
+
+═══════════════════════════════════════════════════
+FIREBASE SECURITY FOR ADMIN
+═══════════════════════════════════════════════════
+
+Update firestore.rules:
+
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+  
+    // Admin check function
+    function isAdmin() {
+      return request.auth != null && 
+             request.auth.token.email == 'admin@watchearn.app';
+    }
+    
+    // Users collection
+    match /users/{userId} {
+      allow read, write: if request.auth.uid == userId || isAdmin();
+    }
+    
+    // Videos collection
+    match /videos/{videoId} {
+      allow read: if true; // public read
+      allow write: if isAdmin(); // only admin writes
+    }
+    
+    // Categories collection
+    match /categories/{categoryId} {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
+    
+    // Transactions collection
+    match /transactions/{transactionId} {
+      allow read: if request.auth.uid == resource.data.userId || isAdmin();
+      allow create: if request.auth != null;
+      allow update, delete: if isAdmin();
+    }
+    
+    // Referrals collection
+    match /referrals/{referralId} {
+      allow read: if request.auth.uid == resource.data.referrerUserId || isAdmin();
+      allow create: if request.auth != null;
+      allow update: if isAdmin();
+    }
+    
+    // App Config (admin only write)
+    match /appConfig/{document} {
+      allow read: if request.auth != null;
+      allow write: if isAdmin();
+    }
+    
+    // Notifications
+    match /notifications/{notificationId} {
+      allow read: if request.auth.uid == resource.data.userId || isAdmin();
+      allow write: if isAdmin();
+    }
+    
+    // Leaderboard (public read)
+    match /leaderboard/{document} {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
+    
+    // Withdrawals
+    match /withdrawals/{withdrawalId} {
+      allow read: if request.auth.uid == resource.data.userId || isAdmin();
+      allow create: if request.auth != null;
+      allow update: if isAdmin();
+    }
+    
+    // Admin logs
+    match /adminLogs/{logId} {
+      allow read, write: if isAdmin();
+    }
+  }
+}
+
+═══════════════════════════════════════════════════
+FIREBASE INDEXES REQUIRED
+═══════════════════════════════════════════════════
+
+Create firestore.indexes.json:
+
+{
+  "indexes": [
+    {
+      "collectionGroup": "videos",
+      "queryScope": "COLLECTION",
+      "fields": [
+        {"fieldPath": "categoryId", "order": "ASCENDING"},
+        {"fieldPath": "order", "order": "ASCENDING"}
+      ]
+    },
+    {
+      "collectionGroup": "videos",
+      "queryScope": "COLLECTION",
+      "fields": [
+        {"fieldPath": "isTrending", "order": "ASCENDING"},
+        {"fieldPath": "views", "order": "DESCENDING"}
+      ]
+    },
+    {
+      "collectionGroup": "videos",
+      "queryScope": "COLLECTION",
+      "fields": [
+        {"fieldPath": "isFeatured", "order": "ASCENDING"},
+        {"fieldPath": "publishedAt", "order": "DESCENDING"}
+      ]
+    },
+    {
+      "collectionGroup": "transactions",
+      "queryScope": "COLLECTION",
+      "fields": [
+        {"fieldPath": "userId", "order": "ASCENDING"},
+        {"fieldPath": "timestamp", "order": "DESCENDING"}
+      ]
+    },
+    {
+      "collectionGroup": "referrals",
+      "queryScope": "COLLECTION",
+      "fields": [
+        {"fieldPath": "referrerUserId", "order": "ASCENDING"},
+        {"fieldPath": "timestamp", "order": "DESCENDING"}
+      ]
+    },
+    {
+      "collectionGroup": "users",
+      "queryScope": "COLLECTION",
+      "fields": [
+        {"fieldPath": "weeklyCoins", "order": "DESCENDING"}
+      ]
+    },
+    {
+      "collectionGroup": "withdrawals",
+      "queryScope": "COLLECTION",
+      "fields": [
+        {"fieldPath": "status", "order": "ASCENDING"},
+        {"fieldPath": "timestamp", "order": "DESCENDING"}
+      ]
+    }
+  ]
+}
+
+═══════════════════════════════════════════════════
+COMPLETE SETUP GUIDE (README.md)
+═══════════════════════════════════════════════════
+
+Generate README.md with:
+
+# WatchEarn Setup Guide
+
+## Prerequisites
+- Flutter SDK 3.19+
+- Firebase account
+- Android Studio / VS Code
+- Google AdMob account
+
+## Step 1: Firebase Setup
+1. Create Firebase project
+2. Add Android app (com.watchearn.app)
+3. Add iOS app
+4. Download google-services.json → android/app/
+5. Download GoogleService-Info.plist → ios/Runner/
+6. Enable Authentication (Email + Google)
+7. Create Firestore database
+8. Enable Firebase Storage
+9. Enable Firebase Messaging
+
+## Step 2: AdMob Setup
+1. Create AdMob account
+2. Create Android app in AdMob
+3. Create iOS app in AdMob
+4. Create ad units:
+   - Banner
+   - Interstitial
+   - Rewarded
+5. Replace test IDs in ad_ids.dart
+
+## Step 3: Google Sign In
+1. Add SHA-1 fingerprint to Firebase
+2. Download updated google-services.json
+
+## Step 4: Initial Data Setup
+Run this in Firebase Console:
+
+Collections to create:
+- appConfig (document: config)
+- categories (10 default categories)
+- videos (add your YouTube videos)
+
+## Step 5: Admin Panel
+1. Set admin email in admin_login.dart
+2. Deploy to Firebase Hosting:
+   flutter build web
+   firebase deploy --only hosting
+
+## Step 6: First Video Setup
+1. Upload video to YouTube
+2. Copy YouTube video ID
+3. Login to Admin Panel
+4. Go to Videos → Add New Video
+5. Paste YouTube ID
+6. Fill details
+7. Save
+
+## Step 7: Publishing
+Android:
+- flutter build apk --release
+- flutter build appbundle --release
+- Upload to Play Store
+
+iOS:
+- flutter build ios --release
+- Upload to App Store
+
+## Ad Revenue Optimization
+- US/Europe users = $15-45 RPM
+- Use AppLovin MAX for higher RPM
+- Enable mediation in AdMob
+
+═══════════════════════════════════════════════════
+IMPORTANT FINAL REQUIREMENTS
+═══════════════════════════════════════════════════
+1. Admin panel must be FULLY FUNCTIONAL
+2. Video add/edit must work with YouTube preview
+3. User management must be COMPLETE
+4. Withdrawal approval must be SECURE
+5. Analytics must show REAL data from Firebase
+6. Notifications must actually SEND via FCM
+7. Settings changes must REFLECT in app immediately
+8. All admin actions must be LOGGED
+9. Security rules must be STRICT
+10. Admin panel must be RESPONSIVE (web)
+11. All charts must use REAL data
+12. Export functions must work
+13. Generate EVERY admin file completely
+14. No TODO comments anywhere
+15. This is PRODUCTION code - make it perfect
+16. Admin panel should feel like
+    a PROFESSIONAL SaaS dashboard
+17. Every table must have sorting + search
+18. All destructive actions need confirmation
+19. Show loading states everywhere
+20. Handle all error cases gracefully
+```
+
+---
+
+## ✅ PROMPT 8 COMPLETE CHECKLIST:
+
+- [ ] Admin Login with security?
+- [ ] Dashboard with analytics?
+- [ ] Video Management (add/edit/delete)?
+- [ ] YouTube ID preview working?
+- [ ] User Management complete?
+- [ ] Edit user coins + VIP?
+- [ ] Category Management?
+- [ ] Withdrawal Approval system?
+- [ ] Push Notification sender?
+- [ ] Analytics with charts?
+- [ ] App Settings panel?
+- [ ] VIP Management?
+- [ ] Firebase Security Rules?
+- [ ] Firestore Indexes?
+- [ ] README.md setup guide?
+- [ ] Admin sidebar navigation?
+- [ ] All admin widgets?
+
+---
+
+## 🎉 CONGRATULATIONS BHAI!
+
+**8 Prompts Complete = Full WatchEarn App Ready!**
+
+```
+✅ Prompt 1: Project Setup + Theme
+✅ Prompt 2: Models + Services + Providers
+✅ Prompt 3: Splash + Onboarding + Auth
+✅ Prompt 4: Home + Video Player + Coins
+✅ Prompt 5: Earn Center + Spin + Scratch
+✅ Prompt 6: Referral + VIP + Wallet
+✅ Prompt 7: Profile + Settings + Polish
+✅ Prompt 8: Admin Panel (Complete)
+```
+
+---
+
+## 📋 FINAL STEPS AFTER ALL PROMPTS:
+
+### Step 1: Firebase Setup
+```
+1. firebase.google.com → New Project
+2. Add Android App → package: com.watchearn.app
+3. Download google-services.json
+4. Enable: Auth, Firestore, Storage, Messaging
+```
+
+### Step 2: AdMob Setup
+```
+1. admob.google.com → New App
+2. Create 4 ad units (Banner, Interstitial, Rewarded, Native)
+3. Replace IDs in ad_ids.dart
+```
+
+### Step 3: Add First Videos
+```
+1. Upload satisfying videos to YouTube
+2. Open Admin Panel
+3. Add videos with YouTube IDs
+4. Set categories, trending flags
+```
+
+### Step 4: Deploy Admin Panel
+```
+flutter build web
+firebase deploy --only hosting
+```
+
+### Step 5: Publish App
+```
+flutter build appbundle --release
+Upload to Google Play Store
+```
+
+---
+
+## 💰 EXPECTED EARNINGS:
+
+| Users | Monthly Revenue |
+|-------|----------------|
+| 1,000 | $300-600 |
+| 5,000 | $1,500-3,000 |
+| 10,000 | $3,700-7,500 |
+| 50,000 | $18,000-37,000 |
+| 100,000 | $37,000-75,000 |
+
+---
+
+**Ab tumhare paas complete app hai!**
+
+**Agar koi error aaye ya kuch aur chahiye toh mujhe batao!** 🔥👑

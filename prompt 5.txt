@@ -1,0 +1,576 @@
+## ✅ PROMPT 5 READY HAI BHAI!
+
+---
+
+## 🚀 PROMPT 5 (COPY FROM HERE)
+
+```
+You are an expert Flutter developer continuing the WatchEarn project.
+Now create COMPLETE EARN CENTER with all mini-games and reward systems.
+
+═══════════════════════════════════════════════════
+SCREEN 1: lib/screens/earn/earn_screen.dart
+═══════════════════════════════════════════════════
+
+Create the main Earn Center screen (most engaging screen in app):
+
+LAYOUT:
+
+━━━ HEADER ━━━
+- Title: "Earn Center" with coin icon
+- Subtitle: "Multiple ways to earn coins daily"
+- Total coins earned today: "Today: +[X] 🪙"
+- Gradient background strip (purple → pink)
+
+━━━ SECTION 1: DAILY BONUS (TOP PRIORITY) ━━━
+Large prominent card:
+- Gradient background (#6C63FF → #FF6B9D)
+- Left: Calendar/gift icon with glow
+- Right: 
+  * "Daily Login Bonus"
+  * Day streak: "🔥 Day 7 Streak!"
+  * Reward: "200 Coins"
+  * Claim button (gold gradient)
+  
+If already claimed:
+- Greyed out with checkmark
+- "Come back tomorrow!"
+- Show next claim countdown timer
+
+━━━ SECTION 2: STREAK CALENDAR ━━━
+7-day streak calendar widget:
+- 7 circular day indicators
+- Completed days: filled with gradient + checkmark
+- Today: pulsing glow + current
+- Future days: empty/dark
+- Above each: coin amount
+- [25] [35] [50] [65] [80] [100] [200]
+- Day labels: Mon Tue Wed Thu Fri Sat Sun
+
+━━━ SECTION 3: EARN CARDS GRID ━━━
+2x2 grid of earn options:
+
+Card 1: 🎰 Lucky Spin
+- Gradient: purple → blue
+- Spin wheel preview (mini)
+- "Win up to 1000 coins!"
+- Free spins remaining: "1 Free Spin"
+- VIP: "Unlimited Spins"
+- "Spin Now →" button
+
+Card 2: 🎫 Scratch & Win
+- Gradient: pink → orange
+- Scratch card preview (mini)
+- "Reveal hidden rewards!"
+- Remaining: "3 Cards Left"
+- VIP: "10 Cards/day"
+- "Scratch Now →" button
+
+Card 3: 📦 Mystery Box
+- Gradient: teal → green
+- Box with question mark (animated)
+- "Surprise rewards inside!"
+- Remaining: "1 Box Left"
+- VIP: "5 Boxes/day"
+- "Open Now →" button
+
+Card 4: 🎯 Daily Goals
+- Gradient: gold → yellow
+- Progress bar (overall)
+- "5/9 Goals Complete"
+- Total reward: "1,170 coins"
+- "View Goals →" button
+
+━━━ SECTION 4: QUICK EARN OPTIONS ━━━
+List of quick earn actions:
+
+1. 📺 Watch Rewarded Ad
+   - "+15 Coins per ad"
+   - Watch button
+   
+2. 📤 Share App
+   - "+50 Coins (3x daily)"
+   - Shares used: 1/3
+   - Share button
+
+3. ⭐ Rate App  
+   - "+300 Coins (one time)"
+   - Rate button → opens store
+   - Shows "Claimed" if done
+
+4. 👥 Invite Friend
+   - "+500 Coins per friend"
+   - Invite button → referral screen
+
+5. 📱 Follow on Social
+   - "+100 Coins each"
+   - YouTube, Instagram, TikTok buttons
+
+━━━ SECTION 5: VIP PROMO ━━━
+(For free users only)
+- Gold gradient card
+- "💎 Earn 5x-15x Faster!"
+- Comparison: Free vs VIP earnings
+- "Upgrade from $9.99" button
+
+━━━ SECTION 6: ACHIEVEMENTS PREVIEW ━━━
+- "Recent Achievements" title
+- Show 3 latest unlocked badges
+- "View All →" link
+
+BOTTOM: Banner Ad (hidden for VIP)
+
+═══════════════════════════════════════════════════
+SCREEN 2: lib/screens/earn/spin_wheel_screen.dart
+═══════════════════════════════════════════════════
+
+Create AMAZING spin wheel experience:
+
+DESIGN:
+- Full screen dark background
+- Stars/particles floating background
+- Center: The Wheel (large, takes 60% of screen)
+
+THE WHEEL:
+Using flutter_fortune_wheel package:
+- 8 segments with prizes:
+  * 5 Coins (grey, 25%)
+  * 10 Coins (blue, 20%)
+  * 25 Coins (cyan, 18%)
+  * 50 Coins (green, 15%)
+  * 100 Coins (purple, 10%)
+  * 200 Coins (pink, 7%)
+  * 500 Coins (gold, 4%)
+  * 1000 Coins JACKPOT (rainbow, 1%)
+
+WHEEL DESIGN:
+- Each segment has prize amount + coin icon
+- Alternating dark/light shades within color
+- Golden border around wheel
+- Center hub: WatchEarn logo (golden circle)
+- Arrow pointer: top center (golden triangle)
+- Neon glow effect around wheel
+
+ABOVE WHEEL:
+- Title: "🎰 Lucky Spin"
+- "Win up to 1,000 coins!"
+- Free spins badge: "1 Free Spin Available"
+
+BELOW WHEEL:
+- "SPIN" button:
+  * Large, gradient (gold)
+  * Pulsing glow animation
+  * "Watch Ad to Spin Extra" button below
+  * Shows remaining spins
+
+SPIN ANIMATION:
+1. Button pressed
+2. Show rewarded ad (for extra spins)
+3. OR use free spin
+4. Wheel spins fast then slows down
+5. Pointer bounces on each segment click sound placeholder
+6. Lands on prize
+7. RESULT POPUP:
+   - Confetti explosion
+   - Big coin icon + amount
+   - "You Won [X] Coins!"
+   - Gradient celebration card
+   - Coins added to balance (animated)
+   - "Spin Again" or "Collect & Go Home"
+
+FREE vs VIP:
+- Free: 1 spin per day
+- Silver VIP: 2 spins
+- Gold VIP: Unlimited
+- Platinum/Diamond/Lifetime: Unlimited + Extra prizes
+
+JACKPOT SPECIAL:
+- 1000 coins = JACKPOT mode
+- Screen flashes gold
+- Special jackpot animation
+- "JACKPOT! 🎉" text
+- Extra large confetti
+
+═══════════════════════════════════════════════════
+SCREEN 3: lib/screens/earn/scratch_card_screen.dart
+═══════════════════════════════════════════════════
+
+Create SATISFYING scratch card experience:
+
+DESIGN:
+- Dark background with subtle pattern
+- Title: "🎫 Scratch & Win"
+- Subtitle: "Scratch to reveal your reward"
+- Cards remaining indicator: "3 of 3 cards remaining"
+
+SCRATCH CARD WIDGET (Custom):
+Create ScratchCardWidget:
+- Size: 300x200px (centered)
+- Base layer: prize hidden underneath
+  * Dark gradient background
+  * Prize amount (large, gold text)
+  * Coin icon
+  * "YOU WON!" text
+- Top layer: silver scratch surface
+  * Silver gradient texture
+  * "Scratch Here" text with hand emoji
+  * WatchEarn logo pattern
+- GestureDetector for scratch movement
+- Custom painter that erases scratch layer
+- Reveal at 60% scratched
+- Smooth erasing effect
+
+CARD TYPES (randomly assigned):
+- Bronze Card (60%): 5-25 coins
+  * Silver/grey scratch surface
+- Silver Card (25%): 25-100 coins
+  * Shiny silver surface
+- Gold Card (12%): 100-500 coins
+  * Golden scratch surface
+- Diamond Card (3%): 500-2000 coins
+  * Blue/diamond scratch surface
+
+FLOW:
+1. Show locked card initially
+2. "Watch Ad to Reveal" button
+3. After ad: card becomes active/scratchy
+4. User scratches with finger
+5. Prize reveals underneath
+6. At 60% scratched → auto reveal
+7. CELEBRATION:
+   - Confetti
+   - Coin earned animation
+   - "You Scratched [X] Coins!"
+8. Next card button (if remaining)
+
+REMAINING CARDS:
+- Show 3 small card thumbnails below
+- Scratched: checkmark overlay
+- Current: highlighted
+- Locked: lock icon
+
+VIP DIFFERENCES:
+- Free: 3 cards/day (watch ad each)
+- Silver: 10 cards/day
+- Gold+: Unlimited cards
+- VIP cards have better prizes
+
+═══════════════════════════════════════════════════
+SCREEN 4: lib/screens/earn/mystery_box_screen.dart
+═══════════════════════════════════════════════════
+
+Create EXCITING mystery box experience:
+
+DESIGN:
+- Dark space-themed background
+- Stars twinkling animation
+- Title: "📦 Mystery Box"
+- Subtitle: "What's inside? Only one way to find out!"
+
+THE BOX (Center, large):
+- 3D-looking box illustration (using Container + decoration)
+- Box types (shown as different boxes):
+  * Common Box: dark wooden texture
+  * Rare Box: blue metallic
+  * Epic Box: purple with glow
+  * Legendary Box: gold animated glow (VIP only)
+  
+Box animation (idle):
+- Gentle floating up/down
+- Subtle glow pulsing
+- Question marks floating around
+- Stars/sparkles orbiting
+
+ABOVE BOX:
+- "Today's Box: [Common/Rare/Epic/Legendary]"
+- Box type badge
+- Prize range: "Contains: 10-50 coins"
+
+BELOW BOX:
+- "Open Box" button (gradient, large)
+- "Watch Ad to Open" text below
+- Boxes remaining: "1/1 boxes today"
+- VIP shows: "5/5 boxes today"
+
+OPEN ANIMATION:
+1. Button pressed → show ad
+2. After ad completes:
+3. Box shakes (left-right animation)
+4. Box glows brighter
+5. Lid flies open (animate)
+6. Light beam shoots up
+7. Coins/prize flies out
+8. RESULT:
+   - Prize amount (large, centered)
+   - "Mystery Box Revealed!"
+   - Coin animation
+   - Confetti
+
+BOX PRIZES:
+- Common Box: 10-50 coins (watch 1 ad)
+- Rare Box: 50-200 coins (watch 2 ads)
+- Epic Box: 200-1000 coins (watch 3 ads)
+- Legendary Box: 1000-5000 coins (VIP only, watch 1 ad)
+
+VIP BENEFITS:
+- Free: 1 common box/day
+- Silver: 2 rare boxes/day
+- Gold: 3 epic boxes/day
+- Platinum/Diamond: 5 epic boxes/day
+- Lifetime: 5 legendary boxes/day
+
+═══════════════════════════════════════════════════
+SCREEN 5: lib/screens/earn/daily_goals_screen.dart
+═══════════════════════════════════════════════════
+
+Create MOTIVATING daily goals screen:
+
+DESIGN:
+- Dark background
+- Title: "🎯 Daily Goals"
+- Date: "Today, [Day, Date]"
+- Reset countdown: "Resets in: 14:32:05"
+
+OVERALL PROGRESS:
+- Large circular progress indicator
+- Center: "5/9" (goals complete)
+- Around: "750/1170 coins earned"
+- Gradient arc (primary color)
+- Animated fill
+
+GOALS LIST:
+
+Each goal card:
+- Dark card with left colored border
+- Left: Goal icon (emoji, colored)
+- Center:
+  * Goal title (bold)
+  * Progress bar (animated)
+  * Progress text: "8/10 videos"
+- Right:
+  * Reward badge: "+120 🪙"
+  * Claim button (if complete)
+  * Checkmark (if claimed)
+
+Goals (from DailyGoalModel):
+1. ▶️ First Video (1 video, 20 coins)
+2. 🌅 Morning Viewer (3 videos, 40 coins)
+3. ⭐ Half Way (5 videos, 60 coins)
+4. 🔥 Dedicated (10 videos, 120 coins)
+5. 🏃 Marathon (20 videos, 250 coins)
+6. 🏆 Champion (30 videos, 500 coins)
+7. 📺 Ad Supporter (5 ads, 100 coins)
+8. 🦋 Social Butterfly (1 share, 30 coins)
+9. 🗺️ Explorer (3 categories, 50 coins)
+
+BONUS GOAL (at bottom, special):
+- ALL GOALS COMPLETE BONUS
+- Gold gradient card
+- "🎊 Complete all goals for bonus!"
+- "+300 Bonus Coins"
+- Shows progress: "5/9 goals complete"
+- Claim when all done
+
+CLAIM ANIMATION:
+- Button pressed → 
+- Coins fly from card to coin counter
+- Card shows green checkmark
+- Total counter updates
+- Celebration if all goals complete
+
+VIP MULTIPLIER:
+- Show note: "VIP: Earn [X]x more coins per goal"
+- VIP users see higher rewards
+
+═══════════════════════════════════════════════════
+WIDGET: 7-Day Streak Calendar
+═══════════════════════════════════════════════════
+
+Create lib/core/widgets/streak_calendar.dart:
+
+DESIGN:
+- 7 items in a row
+- Each day circle (50px):
+  * Completed: gradient fill + ✓ icon
+  * Today: pulsing glow border (current color)
+  * Future: dark circle, coin amount greyed
+- Below each circle: day name (Mon, Tue...)
+- Below day: coin amount
+- Active day: slightly larger
+
+ANIMATION:
+- On mount: each circle animates in
+- Completed circles: filled with scale animation
+- Today circle: continuous pulse glow
+
+STREAK BROKEN:
+- Show "Streak Reset" message
+- Animate all circles going dark
+- "Start Again Today!" message
+
+═══════════════════════════════════════════════════
+WIDGET: Daily Goal Card
+═══════════════════════════════════════════════════
+
+Create lib/core/widgets/daily_goal_card.dart:
+
+- Animated progress bar (linear)
+- Claim button with loading state
+- Completion animation
+- Different colors per goal type
+
+═══════════════════════════════════════════════════
+COMPLETE EARN LOGIC
+═══════════════════════════════════════════════════
+
+Implement in earn_provider.dart:
+
+SPIN WHEEL LOGIC:
+- Weighted random selection:
+  * Generate random 0-1
+  * Check against cumulative probabilities
+  * [0.25, 0.45, 0.63, 0.78, 0.88, 0.95, 0.99, 1.00]
+  * Return corresponding prize
+- Track daily spins in Firestore
+- Reset at midnight
+- VIP gets more spins
+
+SCRATCH CARD LOGIC:
+- Randomly assign card type based on probability
+- Bronze: 60%, Silver: 25%, Gold: 12%, Diamond: 3%
+- Within card type: random prize in range
+- Track daily scratches
+- VIP gets better cards + more
+
+MYSTERY BOX LOGIC:
+- Box type based on VIP status
+- Prize within box range: random
+- Track daily opens
+- VIP gets legendary boxes
+
+DAILY BONUS LOGIC:
+- Check if claimed today (date comparison)
+- Get current streak day
+- Award streak reward coins
+- Update streak in Firestore
+- If missed day: reset streak to 1
+- If claimed: show next claim time
+
+GOAL TRACKING:
+- Auto-update as user watches videos
+- Real-time progress bars
+- Claim = one time per day per goal
+- Store claimed goals in Firestore (by date)
+- Reset at midnight
+
+ANTI-ABUSE:
+- Daily limits enforced server-side
+- Timestamp all actions
+- Rate limiting
+- Flag suspicious patterns
+
+═══════════════════════════════════════════════════
+ANIMATIONS & EFFECTS
+═══════════════════════════════════════════════════
+
+Create these shared animation widgets:
+
+1. ConfettiWidget (using confetti package):
+- Multiple colors including gold, purple, pink
+- Trigger from top + corners
+- Auto-stop after 3 seconds
+- Configurable intensity
+
+2. CoinFlightAnimation:
+- Coins fly from source point to coin counter
+- Multiple coins (3-8) with random paths
+- Each coin: scale + fade + move
+- Duration: 1 second
+- Trigger callback when done
+
+3. GlowPulseWidget:
+- Wraps any widget
+- Animates box shadow in/out
+- Configurable color and intensity
+- Continuous loop
+
+4. CountUpAnimation:
+- Animates number from A to B
+- Duration configurable
+- Easing: easeOut
+- Format: comma separated (10,000)
+
+5. ShakeAnimation:
+- Shakes widget left-right
+- Used for mystery box
+- Also used for error states
+
+6. ParticleBackground:
+- Floating particles (coins, stars)
+- Random size, opacity, speed
+- Loop continuously
+- Performance optimized
+
+═══════════════════════════════════════════════════
+IMPORTANT REQUIREMENTS
+═══════════════════════════════════════════════════
+1. Earn screen must be ADDICTIVE and FUN
+2. Every animation must be smooth and delightful
+3. Spin wheel must feel REAL (proper physics)
+4. Scratch card must feel TACTILE (responsive)
+5. Mystery box must feel EXCITING
+6. All rewards must be accurate and saved to Firebase
+7. Anti-abuse measures must be in place
+8. VIP differences must be clear and motivating
+9. All timers must work correctly
+10. Handle edge cases (no internet, etc.)
+11. Loading states everywhere
+12. Generate EVERY file completely
+13. No TODO comments - complete code only
+14. Test all reward calculations
+15. Make user feel REWARDED and HAPPY
+```
+
+---
+
+## ✅ Prompt 5 Checklist:
+
+- [ ] Earn Center main screen complete?
+- [ ] Spin Wheel with flutter_fortune_wheel?
+- [ ] Scratch Card with custom painter?
+- [ ] Mystery Box with animations?
+- [ ] Daily Goals with progress bars?
+- [ ] 7-Day Streak Calendar?
+- [ ] All earn animations?
+- [ ] Anti-abuse logic?
+- [ ] VIP differences implemented?
+- [ ] Confetti + Coin animations?
+
+---
+
+## ⚠️ Common Issues & Fixes:
+
+**Scratch Card Not Working:**
+> "Fix scratch card custom painter. The GestureDetector should track pan movements and the CustomPainter should erase the top silver layer using BlendMode.clear"
+
+**Spin Wheel Import Error:**
+> "Fix flutter_fortune_wheel import and usage. Use FortuneWheel widget with FortuneItem list"
+
+**Animation Jank:**
+> "Optimize all animations. Use RepaintBoundary for heavy animations. Make sure AnimationControllers are properly disposed"
+
+---
+
+## ⏭️ Jab Prompt 5 Done Ho:
+
+Mujhe likho:
+> **"Prompt 5 Done"**
+
+Phir **Prompt 6** aayega:
+- 👥 Referral System (Complete)
+- 💎 VIP Plans Screen
+- 💰 Wallet + Withdraw Screen
+- 🏆 Leaderboard Screen
+- 🎖️ Achievements Screen
+
+**Yeh revenue generating part hai!** 💰🚀

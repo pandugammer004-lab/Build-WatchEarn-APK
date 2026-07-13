@@ -1,0 +1,347 @@
+## ✅ PROMPT 3 READY HAI BHAI!
+
+---
+
+## 🚀 PROMPT 3 (COPY FROM HERE)
+
+```
+You are an expert Flutter developer continuing the WatchEarn project.
+Now create ALL AUTHENTICATION SCREENS + SPLASH + ONBOARDING completely.
+
+═══════════════════════════════════════════════════
+SCREEN 1: lib/screens/splash/splash_screen.dart
+═══════════════════════════════════════════════════
+
+Create a premium animated splash screen:
+
+DESIGN:
+- Background: #0D0D1A (deep dark)
+- Center: WatchEarn logo (play button icon + dollar sign)
+- App name "WatchEarn" with gradient text (#6C63FF → #FF6B9D)
+- Tagline "Watch. Earn. Repeat." in subtle text
+- Bottom: Loading animation (animated dots or shimmer bar)
+- Floating coin particles animation in background
+- Subtle purple glow effect behind logo
+
+ANIMATIONS (must be smooth):
+- Logo: FadeIn + ScaleIn (0-800ms)
+- App name: FadeInDown (400-900ms)
+- Tagline: FadeIn (600-1100ms)
+- Loading bar: SlideIn from left (800-1200ms)
+- Background particles: continuous floating animation
+- Total duration: 3 seconds then navigate
+
+LOGIC:
+- Initialize app on splash
+- Check if first time user (show onboarding)
+- Check if logged in (go to home or login)
+- Check internet connection
+- Load initial app config from Firebase
+- If maintenance mode ON → show maintenance screen
+
+NAVIGATION:
+- First time user → OnboardingScreen
+- Logged in user → MainNavigation
+- Not logged in → LoginScreen
+
+═══════════════════════════════════════════════════
+SCREEN 2: lib/screens/onboarding/onboarding_screen.dart
+═══════════════════════════════════════════════════
+
+Create premium 3-slide onboarding:
+
+SLIDE 1: "Watch Amazing Videos"
+- Large illustration area (use animated lottie placeholder or 
+  custom painted widget showing phone with video playing)
+- Gradient background hint: cyan (#00D9FF) accents
+- Title: "Watch Amazing Videos" (bold, white, 28px)
+- Description: "Discover thousands of satisfying and relaxing 
+  videos updated daily for your enjoyment."
+- Coin floating animation
+
+SLIDE 2: "Earn Real Rewards"  
+- Illustration: coins and money flying animation
+- Gradient hint: gold (#FFD700) accents
+- Title: "Earn Real Rewards"
+- Description: "Every video you watch earns you coins. 
+  Complete daily goals and challenges for bonus rewards."
+- Show coin counter ticking up animation
+
+SLIDE 3: "Cash Out Anytime"
+- Illustration: PayPal/Gift card icons
+- Gradient hint: green (#00E676) accents
+- Title: "Cash Out Anytime"
+- Description: "Convert your coins to real cash via PayPal, 
+  Amazon Gift Cards, and more payment methods."
+- Button: "Start Earning Now →" (gradient button)
+
+DESIGN DETAILS:
+- Background: #0D0D1A
+- Page indicator: smooth_page_indicator (dots style)
+- Skip button: top right (TextButton, white)
+- Next button: gradient rounded button
+- Last slide: "Get Started" button + "Already have account? Login"
+- Swipe gesture support
+- Smooth page transitions
+
+LOGIC:
+- Save onboarding seen in SharedPreferences
+- Skip button → LoginScreen
+- Get Started → SignupScreen
+
+═══════════════════════════════════════════════════
+SCREEN 3: lib/screens/auth/login_screen.dart
+═══════════════════════════════════════════════════
+
+Create premium login screen:
+
+DESIGN:
+- Background: #0D0D1A with subtle gradient top
+- Top: WatchEarn logo + "Welcome Back" title
+- Subtitle: "Sign in to continue earning"
+- Form fields (dark glassmorphism style):
+  * Email field (with email icon)
+  * Password field (with lock icon + show/hide toggle)
+- "Forgot Password?" link (right aligned, accent color)
+- "Sign In" gradient button (full width, rounded)
+- Divider with "Or continue with" text
+- Google Sign In button (white background, Google logo + text)
+- Apple Sign In button (black background, Apple logo + text)
+- Bottom: "Don't have an account? Sign Up" link
+
+GLASSMORPHISM STYLE for form:
+- Container with blur effect
+- Semi-transparent white border
+- Rounded corners 20px
+- Subtle shadow
+
+ANIMATIONS:
+- FadeInUp for each element (staggered)
+- Button press animation (scale)
+- Loading state on sign in button
+
+ERROR HANDLING:
+- Show error below each field
+- Show general error snackbar
+- Disable button while loading
+
+LOGIC:
+- Email/Password login via AuthProvider
+- Google Sign In via AuthProvider
+- Apple Sign In via AuthProvider
+- Navigate to MainNavigation on success
+- Navigate to SignupScreen
+- Navigate to ForgotPasswordScreen
+
+═══════════════════════════════════════════════════
+SCREEN 4: lib/screens/auth/signup_screen.dart
+═══════════════════════════════════════════════════
+
+Create premium signup screen:
+
+DESIGN (same dark glassmorphism style):
+- Top: "Create Account" title
+- Subtitle: "Join millions earning with WatchEarn"
+- Form fields:
+  * Full Name field (with person icon)
+  * Email field (with email icon)  
+  * Password field (with lock icon + toggle)
+  * Confirm Password field (with lock icon + toggle)
+  * Referral Code field (OPTIONAL - with gift icon)
+    → Show "Optional" hint
+    → Show green checkmark when valid code entered
+    → Show "Invalid code" if wrong
+- Terms checkbox: "I agree to Terms of Service and Privacy Policy"
+- "Create Account" gradient button
+- Divider "Or sign up with"
+- Google Sign Up button
+- Bottom: "Already have account? Sign In"
+
+SPECIAL FEATURES:
+- Password strength indicator (weak/medium/strong)
+- Real-time validation as user types
+- Referral code auto-validate (check Firebase)
+- Show referral bonus preview: "+500 coins bonus!"
+- Smooth scroll (SingleChildScrollView)
+
+LOGIC:
+- Validate all fields
+- Check referral code validity
+- Create account via AuthProvider
+- Apply referral code if valid
+- Navigate to MainNavigation on success
+
+═══════════════════════════════════════════════════
+SCREEN 5: lib/screens/auth/forgot_password_screen.dart
+═══════════════════════════════════════════════════
+
+DESIGN:
+- Clean simple screen
+- Back button (top left)
+- Lock icon with glow (center top)
+- Title: "Forgot Password?"
+- Subtitle: "Enter your email and we'll send you a reset link"
+- Email field
+- "Send Reset Link" gradient button
+- Success state: show green checkmark + "Check your email" message
+- Back to Login link
+
+LOGIC:
+- Send password reset email via Firebase Auth
+- Show success/error states
+- Auto navigate back after 3 seconds on success
+
+═══════════════════════════════════════════════════
+COMMON REQUIREMENTS FOR ALL SCREENS
+═══════════════════════════════════════════════════
+
+1. GLASSMORPHISM EFFECT (reusable widget):
+Create GlassContainer widget:
+- BackdropFilter with blur 10
+- Container with white 5% opacity
+- Border: white 10% opacity, 1px
+- BorderRadius: 20px
+- BoxShadow: subtle dark shadow
+
+2. GRADIENT TEXT (reusable widget):
+Create GradientText widget:
+- ShaderMask with primaryGradient
+- Applies gradient to any text widget
+
+3. SOCIAL BUTTON (reusable):
+Create SocialAuthButton widget:
+- White/Black background options
+- Logo + Text centered
+- Rounded corners 12px
+- Shadow effect
+- Loading state
+
+4. FORM FIELD (already created, use CustomTextField):
+- Dark filled background (#1A1A2E)
+- Border: #2A2A4A normally, #6C63FF when focused
+- Prefix icon (colored)
+- Suffix icon support
+- Error text below
+- Smooth focus animation
+
+5. GRADIENT BUTTON (use CustomButton):
+- Full gradient background
+- White text + icon
+- Rounded 14px
+- Shadow: purple glow
+- Loading state: show CircularProgressIndicator
+- Disabled state: opacity 0.5
+
+═══════════════════════════════════════════════════
+ANIMATIONS LIBRARY (for all screens)
+═══════════════════════════════════════════════════
+
+Create lib/core/widgets/animations/
+- FadeInWidget (wrapper with fade animation)
+- SlideInWidget (slide from bottom/top/left/right)
+- ScaleInWidget (scale from 0 to 1)
+- CoinParticleWidget (floating coins background)
+- PulseWidget (continuous pulse animation)
+- ShimmerWidget (loading shimmer)
+
+Use animate_do package for most animations.
+Use custom AnimationController where needed.
+
+═══════════════════════════════════════════════════
+MAINTENANCE SCREEN
+═══════════════════════════════════════════════════
+
+Create simple maintenance screen:
+- Dark background
+- Wrench/tools icon (large, centered)
+- Title: "Under Maintenance"
+- Subtitle: "We're making WatchEarn better for you. Please check back soon."
+- Animated progress bar (looping)
+- App version at bottom
+
+═══════════════════════════════════════════════════
+NO INTERNET SCREEN
+═══════════════════════════════════════════════════
+
+Create no internet screen:
+- Dark background
+- WiFi off icon with animation
+- Title: "No Internet Connection"
+- Subtitle: "Please check your connection and try again"
+- "Retry" button (gradient)
+- Auto-retry logic (check every 5 seconds)
+
+═══════════════════════════════════════════════════
+IMPORTANT REQUIREMENTS
+═══════════════════════════════════════════════════
+1. ALL screens must be 100% complete
+2. Every animation must be smooth and professional
+3. ALL navigation must work correctly
+4. Form validation must be complete
+5. Error handling must be perfect
+6. Loading states must be shown everywhere
+7. NO placeholder comments
+8. Code must be production-ready
+9. Make it look like a TOP 10 app on Play Store
+10. Every pixel must look premium and intentional
+11. Use proper keyboard handling (avoid overflow)
+12. Handle safe area properly (top/bottom padding)
+13. Support different screen sizes
+14. All text must use Poppins font
+15. Generate EVERY file completely without stopping
+```
+
+---
+
+## ✅ Prompt 3 Checklist:
+
+Jab output aaye toh check karo:
+
+- [ ] Splash Screen with animations complete?
+- [ ] Onboarding 3 slides working?
+- [ ] Login Screen with Google Sign In?
+- [ ] Signup Screen with referral code?
+- [ ] Forgot Password Screen?
+- [ ] GlassContainer widget?
+- [ ] GradientText widget?
+- [ ] No Internet Screen?
+- [ ] Maintenance Screen?
+- [ ] All animations smooth?
+
+---
+
+## ⚠️ Common Issues & Fixes:
+
+**Agar yeh error aaye:**
+```
+"BackdropFilter not working"
+```
+**Fix prompt:**
+> "Fix the glassmorphism effect. Make sure BackdropFilter is properly wrapped with ClipRRect and the parent has a background color"
+
+**Agar yeh error aaye:**
+```
+"Google Sign In not working"
+```
+**Fix prompt:**
+> "Add proper google-services.json setup instructions and fix Google Sign In implementation"
+
+**Agar incomplete ho:**
+> "Continue generating. Start from where you stopped"
+
+---
+
+## 📝 Mere Paas Report Karo:
+
+Jab done ho jaye mujhe likho:
+
+> **"Prompt 3 Done"**
+
+Phir main **Prompt 4** dunga jo banayega:
+- 🏠 Home Screen (Main UI)
+- 📱 Bottom Navigation
+- 🎥 Video Player Screen
+- 💰 Complete Coin Earning System
+- 📢 Ad Integration
+
+**Yeh sabse exciting part hoga!** 🔥🚀

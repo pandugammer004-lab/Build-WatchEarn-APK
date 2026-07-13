@@ -1,0 +1,686 @@
+## ✅ PROMPT 7 READY HAI BHAI!
+
+---
+
+## 🚀 PROMPT 7 (COPY FROM HERE)
+
+```
+You are an expert Flutter developer continuing the WatchEarn project.
+Now create PROFILE + SETTINGS + NOTIFICATIONS + 
+ALL REMAINING SCREENS completely.
+
+═══════════════════════════════════════════════════
+SCREEN 1: lib/screens/profile/profile_screen.dart
+═══════════════════════════════════════════════════
+
+Create PREMIUM profile screen:
+
+LAYOUT:
+
+━━━ HEADER SECTION ━━━
+Gradient background (primary → secondary):
+- Height: 280px
+- Back button (if pushed) or just title
+
+Profile Picture:
+- Circle avatar (100px diameter)
+- Cached network image
+- Default: gradient circle with name initial
+- Gold border (3px) if VIP user
+- Camera icon overlay (bottom right, edit)
+- Tap → Edit Profile or Image picker
+
+User Info:
+- Name (bold, 22sp, white)
+- Email (14sp, white 70%)
+- VIP Badge (if VIP):
+  * Icon + "Gold VIP" text
+  * Gradient badge background
+  * Expiry: "Valid till May 2025"
+- Member since: "Member since Jan 2025"
+
+Referral Code (small):
+- "Your Code: JOHN123"
+- Copy icon
+
+━━━ SECTION 1: STATS CARDS ━━━
+4 animated stat cards in 2x2 grid:
+
+Card 1: 🪙 Total Coins
+- Current balance
+- "Lifetime: [X] earned"
+- Gold color
+
+Card 2: 📺 Videos Watched
+- Total count
+- "Today: [X]"
+- Purple color
+
+Card 3: ⏱️ Watch Time
+- Formatted: "12h 30m"
+- "Avg: 45min/day"
+- Cyan color
+
+Card 4: 🔥 Best Streak
+- Current streak days
+- "Best ever: [X] days"
+- Orange color
+
+━━━ SECTION 2: EARNINGS SUMMARY ━━━
+Card with chart:
+- Title: "Earnings Overview"
+- Tab: [This Week] [This Month] [All Time]
+- Bar chart (fl_chart):
+  * X axis: days/dates
+  * Y axis: coins earned
+  * Gradient bars (primary color)
+  * Animated on load
+- Below chart:
+  * Total earned: "[X] coins"
+  * Cash value: "$[X]"
+  * Best day: "[Date]: [X] coins"
+
+━━━ SECTION 3: RECENT BADGES ━━━
+Title: "Recent Achievements"
+Horizontal scroll of last 5 badges:
+- Emoji + name
+- "View All →" link
+
+━━━ SECTION 4: QUICK ACTIONS ━━━
+List of action items:
+
+1. 💎 Upgrade to VIP
+   (Show only if not VIP or VIP expiring soon)
+   - Gradient background
+   - "Earn faster, withdraw more!"
+   - "Upgrade →"
+
+2. 💰 Withdraw Earnings
+   - Current balance
+   - "Withdraw →"
+   - Arrow icon
+
+3. 👥 Referral Program
+   - "Earn 10% commission"
+   - "[X] active referrals"
+   - Arrow icon
+
+4. 🏆 Leaderboard
+   - "Your rank: #42"
+   - Arrow icon
+
+5. 🎖️ Achievements
+   - "12/20 unlocked"
+   - Arrow icon
+
+━━━ SECTION 5: ACCOUNT SECTION ━━━
+List items:
+
+- ✏️ Edit Profile → EditProfileScreen
+- 🔔 Notifications → NotificationsScreen
+- ⚙️ Settings → SettingsScreen
+- ❓ Help & FAQ → HelpScreen
+- 📜 Privacy Policy → WebView
+- 📋 Terms of Service → WebView
+- ⭐ Rate Us → App Store
+- 📤 Share App → share_plus
+- 🚪 Log Out → Confirmation dialog
+
+Each item:
+- Icon (colored)
+- Label
+- Arrow (right)
+- Subtle divider
+
+━━━ SECTION 6: DANGER ZONE ━━━
+- Delete Account (red text)
+- Confirmation: type "DELETE" to confirm
+- Firebase: delete all user data
+
+━━━ FOOTER ━━━
+- App version: "WatchEarn v1.0.0"
+- Made with ❤️
+
+═══════════════════════════════════════════════════
+SCREEN 2: lib/screens/profile/edit_profile_screen.dart
+═══════════════════════════════════════════════════
+
+LAYOUT:
+- AppBar: "Edit Profile" + Save button
+- Profile picture (large, editable)
+- Image picker (gallery + camera)
+- Firebase Storage upload
+- Form fields:
+  * Full Name (required)
+  * Username (optional)
+  * Bio (optional, 150 chars)
+- Save button (gradient)
+- Loading state during save
+- Success toast
+
+LOGIC:
+- image_picker for photo selection
+- Firebase Storage for upload
+- Firestore update on save
+- Real-time validation
+
+═══════════════════════════════════════════════════
+SCREEN 3: lib/screens/settings/settings_screen.dart
+═══════════════════════════════════════════════════
+
+Create comprehensive settings screen:
+
+LAYOUT:
+AppBar: "⚙️ Settings"
+
+━━━ SECTION 1: APP PREFERENCES ━━━
+Settings group card:
+
+1. 🔔 Push Notifications
+   - Toggle switch
+   - Subtitle: "Daily reminders & rewards"
+   - onChange: update Firebase + local
+
+2. 🎬 Autoplay Videos
+   - Toggle switch
+   - Subtitle: "Auto-play next video"
+   - Save to SharedPreferences
+
+3. 📱 Video Quality
+   - Dropdown/bottom sheet selector
+   - Options: [Auto, 144p, 240p, 360p, 480p, 720p, 1080p]
+   - Default: Auto
+   - Save to SharedPreferences
+
+4. 🌙 Dark Mode
+   - Toggle (always dark for now)
+   - Subtitle: "Dark theme (default)"
+   - Disabled: "More themes coming soon"
+
+5. 🔊 Sound Effects
+   - Toggle switch
+   - Subtitle: "Coin earn & spin sounds"
+   - Save preference
+
+━━━ SECTION 2: ACCOUNT SETTINGS ━━━
+Settings group:
+
+1. 🔐 Change Password
+   - For email users only
+   - Opens change password bottom sheet
+   - Current pass + new pass + confirm
+
+2. 📧 Email Address
+   - Show current email
+   - "Not changeable" subtitle (or allow change)
+
+3. 🔗 Connected Accounts
+   - Google: Connected/Connect button
+   - Apple: Connected/Connect button
+
+4. 📱 Device Sessions
+   - "Manage active sessions"
+
+━━━ SECTION 3: NOTIFICATIONS SETTINGS ━━━
+Granular notification controls:
+
+- 🎁 Daily Bonus Reminder: Toggle
+- 🔥 Streak Warning: Toggle
+- 🎬 New Videos: Toggle
+- 💎 VIP Offers: Toggle
+- 👥 Referral Updates: Toggle
+- 🏆 Leaderboard Updates: Toggle
+- 💰 Withdrawal Updates: Toggle (always on)
+
+━━━ SECTION 4: PAYMENT SETTINGS ━━━
+- Default Payment Method selector
+- Saved payment emails
+- Add/remove PayPal email
+- Transaction PIN setup
+
+━━━ SECTION 5: SUPPORT ━━━
+- 📞 Contact Support
+  * Opens email compose
+  * To: support@watchearn.app
+  
+- 💬 Live Chat
+  * "Coming soon" badge
+  
+- ❓ FAQ
+  * Expandable FAQ list
+  
+- 🐛 Report Bug
+  * Form: description + screenshot
+  
+- 💡 Suggest Feature
+  * Simple text form
+
+━━━ SECTION 6: ABOUT ━━━
+- App Version: "1.0.0 (Build 1)"
+- Terms of Service link
+- Privacy Policy link
+- Open Source Licenses
+- Follow us: YouTube, Instagram, TikTok links
+
+━━━ SECTION 7: DANGER ━━━
+- 🗑️ Clear Cache
+  * Show cache size
+  * Confirm + clear
+  
+- 🚪 Log Out
+  * Confirmation dialog
+  
+- ❌ Delete Account
+  * Warning dialog
+  * Type "DELETE" to confirm
+
+═══════════════════════════════════════════════════
+SCREEN 4: lib/screens/notifications/notifications_screen.dart
+═══════════════════════════════════════════════════
+
+LAYOUT:
+AppBar: "🔔 Notifications" + "Mark All Read" button
+
+Filter tabs:
+[All] [Rewards] [Videos] [VIP] [Referrals]
+
+Notification list:
+
+Each notification item:
+- Left: Colored icon circle
+  * 🎁 Daily bonus: gold
+  * 🎬 New video: purple
+  * 💎 VIP offer: gradient
+  * 👥 Referral: cyan
+  * 🏆 Achievement: orange
+  * 💰 Withdrawal: green
+  
+- Center:
+  * Title (bold if unread)
+  * Body text (2 lines)
+  * Time ago
+  
+- Right:
+  * Unread dot (blue, 8px)
+  * Arrow icon
+
+Unread notifications:
+- Slightly highlighted background
+- Bold text
+
+Tap notification:
+- Mark as read
+- Navigate to relevant screen
+
+Empty state:
+- Bell icon
+- "No notifications yet"
+- "We'll notify you about rewards"
+
+Swipe to delete gesture
+
+Pagination (load more)
+
+═══════════════════════════════════════════════════
+SCREEN 5: Help & FAQ Screen
+═══════════════════════════════════════════════════
+
+Create lib/screens/help/help_screen.dart:
+
+LAYOUT:
+- Search bar (search FAQ)
+- Categories: [Earning] [Withdrawal] [VIP] [Technical] [Account]
+
+FAQ List (Expandable):
+
+EARNING:
+Q: How do I earn coins?
+A: Watch videos to earn 10+ coins each. 
+   Complete daily goals, spin the wheel, 
+   scratch cards, and open mystery boxes 
+   for bonus coins!
+
+Q: How much can I earn per day?
+A: Free users can earn up to 1,000 coins 
+   per day from videos. VIP users earn 
+   3x-15x more with no daily limits!
+
+Q: Why didn't I get coins for a video?
+A: You need to watch at least 30 seconds. 
+   Make sure your internet is connected.
+
+WITHDRAWAL:
+Q: What is the minimum withdrawal?
+A: $5.00 for free users (50,000 coins).
+   $2.00 for VIP users (20,000 coins).
+
+Q: How long does withdrawal take?
+A: 3-5 business days for free users.
+   1-24 hours for VIP users.
+
+Q: Which payment methods are available?
+A: PayPal, Amazon Gift Card, Google Play 
+   Credit, Apple Gift Card, Visa Prepaid.
+
+VIP:
+Q: What is VIP membership?
+A: VIP gives you 3x-15x faster earning,
+   more daily spins/scratches, less ads,
+   lower withdrawal minimum, and more!
+
+Q: Can I cancel VIP?
+A: Yes! Cancel anytime from your 
+   Play Store or App Store settings.
+
+Q: Is Lifetime VIP really lifetime?
+A: Yes! One payment, benefits forever.
+
+TECHNICAL:
+Q: The app is crashing. What do I do?
+A: Clear cache, restart app, or 
+   reinstall. Contact support if persists.
+
+Q: Videos won't play. Help?
+A: Check internet connection and 
+   video quality settings.
+
+ACCOUNT:
+Q: Can I have multiple accounts?
+A: No, one account per person/device.
+
+Q: How do I delete my account?
+A: Settings → Delete Account. 
+   Note: All coins will be lost!
+
+Contact Support button (bottom)
+
+═══════════════════════════════════════════════════
+SCREEN 6: Privacy Policy & Terms (WebView)
+═══════════════════════════════════════════════════
+
+Create lib/screens/legal/legal_screen.dart:
+- AppBar with title (Privacy Policy / Terms)
+- WebView loading URL
+- Loading indicator
+- Error handling
+- Share button in AppBar
+
+For now use placeholder HTML content
+(admin can update URL from Firebase config)
+
+═══════════════════════════════════════════════════
+WIDGET: Complete App Navigation Setup
+═══════════════════════════════════════════════════
+
+Update lib/screens/home/main_navigation.dart:
+
+COMPLETE NAVIGATION ROUTES:
+Set up all named routes:
+
+routes: {
+  '/splash': SplashScreen,
+  '/onboarding': OnboardingScreen,
+  '/login': LoginScreen,
+  '/signup': SignupScreen,
+  '/forgot-password': ForgotPasswordScreen,
+  '/home': MainNavigation,
+  '/player': VideoPlayerScreen,
+  '/category-videos': CategoryVideosScreen,
+  '/earn': EarnScreen,
+  '/spin': SpinWheelScreen,
+  '/scratch': ScratchCardScreen,
+  '/mystery': MysteryBoxScreen,
+  '/daily-goals': DailyGoalsScreen,
+  '/referral': ReferralScreen,
+  '/vip': VipPlansScreen,
+  '/wallet': WalletScreen,
+  '/withdraw': WithdrawScreen,
+  '/leaderboard': LeaderboardScreen,
+  '/achievements': AchievementsScreen,
+  '/profile': ProfileScreen,
+  '/edit-profile': EditProfileScreen,
+  '/settings': SettingsScreen,
+  '/notifications': NotificationsScreen,
+  '/help': HelpScreen,
+  '/legal': LegalScreen,
+}
+
+Add route transitions:
+- Fade transition for tabs
+- Slide transition for push screens
+- Scale transition for dialogs
+
+═══════════════════════════════════════════════════
+GLOBAL WIDGETS (Complete)
+═══════════════════════════════════════════════════
+
+━━━ 1. App Lifecycle Handler ━━━
+lib/core/widgets/app_lifecycle_handler.dart:
+- Pause video on background
+- Resume on foreground
+- Check streak on resume
+- Refresh ads on resume
+- Update FCM token if changed
+
+━━━ 2. Internet Connection Handler ━━━
+lib/core/widgets/connectivity_handler.dart:
+- Wrap entire app
+- Show no-internet banner (top)
+- Auto-retry on reconnect
+- Queue offline actions
+
+━━━ 3. Update Dialog ━━━
+lib/core/widgets/update_dialog.dart:
+- Check Firebase for latest version
+- Show update dialog if outdated
+- Force update option (admin controlled)
+- "Update Now" → App Store
+
+━━━ 4. Rate Us Dialog ━━━
+lib/core/widgets/rate_us_dialog.dart:
+- Show after 7 days of use
+- "Are you enjoying WatchEarn?"
+- Yes → Rate on store
+- No → Feedback form
+- Never show again option
+- Award 300 coins for rating
+
+━━━ 5. Coin Earned Toast ━━━
+lib/core/widgets/coin_toast.dart:
+- Small toast at top
+- "+[X] 🪙 [Source]"
+- Slide in from top
+- Auto dismiss after 2s
+- Queue multiple toasts
+- Gold color with animation
+
+━━━ 6. VIP Expired Dialog ━━━
+lib/core/widgets/vip_expired_dialog.dart:
+- Show when VIP expires
+- "Your Gold VIP has expired"
+- "Renew Now" button → VIP screen
+- "Maybe Later" option
+
+━━━ 7. Daily Bonus Popup ━━━
+lib/core/widgets/daily_bonus_popup.dart:
+- Show on first open each day
+- Animated gift box opening
+- "Day [X] Bonus: [X] Coins!"
+- Claim button with animation
+- Confetti on claim
+
+━━━ 8. Loading Overlay ━━━
+lib/core/widgets/loading_overlay.dart:
+- Full screen semi-transparent
+- Centered spinner
+- Optional message
+- Prevent background taps
+- Show/hide programmatically
+
+━━━ 9. Empty State Widget ━━━
+lib/core/widgets/empty_state.dart:
+- Configurable icon + title + subtitle
+- Optional action button
+- Animated (slight bounce)
+- Used across all empty lists
+
+━━━ 10. Error State Widget ━━━
+lib/core/widgets/error_state.dart:
+- Error icon
+- Error message
+- Retry button
+- Used across all error states
+
+═══════════════════════════════════════════════════
+COMPLETE APP POLISH
+═══════════════════════════════════════════════════
+
+━━━ 1. App Bar (Consistent) ━━━
+Custom AppBar for all screens:
+- Transparent background
+- WatchEarn logo (home screen only)
+- Screen title (other screens)
+- Right: notification bell + VIP crown
+- Coin balance (compact, top right)
+- Back button custom (dark circle)
+
+━━━ 2. Loading States ━━━
+Shimmer loading for:
+- Video cards (grid + list)
+- Profile stats
+- Transaction list
+- Notification list
+- Referral list
+- Leaderboard
+
+━━━ 3. Error Handling ━━━
+Global error handler:
+- Catch all unhandled exceptions
+- Log to Firebase Analytics
+- Show user-friendly message
+- Option to report error
+
+━━━ 4. Performance ━━━
+- Image caching (cached_network_image)
+- Lazy loading lists (pagination)
+- Dispose all controllers
+- Use const constructors
+- RepaintBoundary on animations
+- Avoid rebuilds (selector pattern)
+
+━━━ 5. Accessibility ━━━
+- Semantic labels on icons
+- Minimum tap target 48px
+- Sufficient color contrast
+- Screen reader support basics
+
+━━━ 6. Deep Linking ━━━
+Handle deep links:
+- watchearn://invite/[code] → Signup with referral
+- watchearn://video/[id] → Open video player
+- watchearn://vip → Open VIP screen
+
+━━━ 7. App Review Request ━━━
+- After 7 days + 10 videos watched
+- Use in_app_review package
+- Or manual rate us dialog
+
+━━━ 8. Crash Analytics ━━━
+- Firebase Crashlytics setup
+- Log important user actions
+- Track screen views
+- Log revenue events
+
+━━━ 9. Share App Function ━━━
+"Hey! Check out WatchEarn - Watch videos 
+& earn real cash! I've already earned $[X]! 
+Download: [store link]"
+Share via share_plus
+
+━━━ 10. Onboarding Completion ━━━
+After signup:
+- Welcome animation
+- "Welcome to WatchEarn, [Name]!"
+- Initial 100 welcome bonus coins
+- Show first video recommendation
+- Guide tooltip on first use
+
+═══════════════════════════════════════════════════
+IMPORTANT REQUIREMENTS
+═══════════════════════════════════════════════════
+1. Profile must look PREMIUM and personal
+2. Settings must be COMPLETE and functional
+3. Notifications must be REAL-TIME
+4. FAQ must be HELPFUL and complete
+5. All navigation must work PERFECTLY
+6. Global widgets must work EVERYWHERE
+7. Performance must be OPTIMIZED
+8. Error handling must be GRACEFUL
+9. Loading states EVERYWHERE
+10. Empty states for ALL lists
+11. Animations must be SMOOTH
+12. Make user feel VALUED and ENGAGED
+13. Generate ALL files completely
+14. No TODO comments
+15. Production ready code only
+```
+
+---
+
+## ✅ Prompt 7 Checklist:
+
+- [ ] Profile Screen with stats + chart?
+- [ ] Edit Profile with image upload?
+- [ ] Settings Screen complete?
+- [ ] Notifications Screen?
+- [ ] Help & FAQ Screen?
+- [ ] Legal Screen (WebView)?
+- [ ] All Navigation Routes setup?
+- [ ] 10 Global Widgets?
+- [ ] App Polish complete?
+- [ ] Deep linking setup?
+
+---
+
+## ⚠️ Common Issues & Fixes:
+
+**Image Upload Error:**
+> "Fix Firebase Storage image upload.
+Make sure firebase_storage is initialized
+and storage rules allow authenticated users
+to upload to users/[uid]/profile/"
+
+**Chart Not Showing:**
+> "Fix fl_chart BarChart implementation.
+Use BarChartGroupData with proper
+BarChartRodData list and axis titles"
+
+**WebView Error:**
+> "Add webview_flutter package to pubspec.yaml
+and fix legal screen WebView implementation"
+
+**Navigation Error:**
+> "Fix named routes. Make sure all route
+names match exactly and onGenerateRoute
+handles arguments properly"
+
+---
+
+## ⏭️ Jab Prompt 7 Done Ho:
+
+Mujhe likho:
+> **"Prompt 7 Done"**
+
+Phir **FINAL Prompt 8** aayega:
+
+### **🔥 ADMIN PANEL (MOST IMPORTANT)**
+- Complete Web Admin Panel
+- Video Management (Add/Edit/Delete)
+- User Management
+- Withdrawal Approval System
+- Push Notifications Sender
+- Analytics Dashboard
+- Revenue Charts
+- App Config Control
+
+**Yeh last aur sabse powerful part hai!** 👑🚀

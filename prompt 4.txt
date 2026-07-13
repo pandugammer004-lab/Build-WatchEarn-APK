@@ -1,0 +1,473 @@
+## ✅ PROMPT 4 READY HAI BHAI!
+
+---
+
+## 🚀 PROMPT 4 (COPY FROM HERE)
+
+```
+You are an expert Flutter developer continuing the WatchEarn project.
+Now create HOME SCREEN + BOTTOM NAVIGATION + VIDEO PLAYER + COIN SYSTEM completely.
+
+═══════════════════════════════════════════════════
+SCREEN 1: lib/screens/home/main_navigation.dart
+═══════════════════════════════════════════════════
+
+Create the main bottom navigation container:
+
+DESIGN:
+- Bottom Navigation Bar style: Custom floating nav bar
+- Background: #1A1A2E with top border glow
+- 5 tabs with icons + labels:
+  1. Home 🏠 (house icon)
+  2. Explore 🔍 (search/compass icon)
+  3. Earn 💰 (coin/dollar icon) ← CENTER (bigger, gradient)
+  4. Referrals 👥 (people icon)
+  5. Profile 👤 (person icon)
+
+SPECIAL DESIGN:
+- Center "Earn" button:
+  * Bigger than others (60px height)
+  * Gradient background (#6C63FF → #FF6B9D)
+  * Slightly elevated above others
+  * Coin icon with glow effect
+  * Subtle bounce animation on tap
+
+- Selected tab:
+  * Primary color (#6C63FF)
+  * Animated indicator dot below icon
+  * Label becomes bold
+
+- Unselected tab:
+  * #7A7A9A color
+  * No label shown (only on selected)
+
+COIN DISPLAY (top of navigation):
+- Floating coin balance widget
+- Shows current coins: "🪙 12,450"
+- Tap opens wallet screen
+- Animated when coins change (count up)
+- Gold color with glow
+
+LOGIC:
+- IndexedStack to preserve state
+- Each tab maintains its scroll position
+- Show badge on Referrals tab (new referrals count)
+- Show badge on notification icon
+
+PAGES:
+- index 0: HomeScreen
+- index 1: ExploreScreen  
+- index 2: EarnScreen
+- index 3: ReferralScreen
+- index 4: ProfileScreen
+
+AppBar (shared):
+- Left: WatchEarn logo + name
+- Right: 
+  * Notification bell icon (with badge)
+  * VIP crown icon (if VIP user, golden)
+  * Settings icon
+
+═══════════════════════════════════════════════════
+SCREEN 2: lib/screens/home/home_screen.dart
+═══════════════════════════════════════════════════
+
+Create the main home screen (like TikTok meets YouTube):
+
+LAYOUT (ScrollView - no AppBar overlap):
+
+━━━ SECTION 1: GREETING HEADER ━━━
+- "Good Morning, [Name]! 👋" (dynamic greeting)
+- Subtitle: "You've earned [X] coins today"
+- Coins earned today with small coin icon
+- VIP badge if user is VIP
+
+━━━ SECTION 2: DAILY BONUS BANNER ━━━
+(Show only if not claimed today)
+- Gradient card (#6C63FF → #FF6B9D)
+- "🎁 Daily Bonus Available!"
+- "Claim your Day [X] streak reward"
+- Coin amount preview (e.g., "50 Coins")
+- "Claim Now →" button
+- Dismiss option
+
+━━━ SECTION 3: STATS ROW ━━━
+4 mini stat cards in horizontal row:
+1. 🪙 Total Coins (animated number)
+2. 📺 Videos Today
+3. 🔥 Day Streak  
+4. 👥 Referrals
+
+Each card:
+- Dark card background (#1A1A2E)
+- Colored icon (each different color)
+- Number (bold, white)
+- Label (small, secondary text)
+- Subtle gradient border
+
+━━━ SECTION 4: CATEGORIES ━━━
+- Section title: "Browse Categories"
+- Horizontal scrollable list
+- Category chips with emoji + name
+- "All" chip selected by default
+- Selected chip: gradient background
+- Unselected: dark with border
+
+━━━ SECTION 5: FEATURED VIDEO ━━━
+(Only show if isFeatured video exists)
+- Large banner card (16:9 ratio)
+- YouTube thumbnail as background
+- Gradient overlay (bottom dark)
+- Play button (center, semi-transparent)
+- "FEATURED" badge (top left, gradient)
+- Video title (bottom, white bold)
+- Duration badge (bottom right)
+- Tap → VideoPlayerScreen
+
+━━━ SECTION 6: TRENDING NOW ━━━
+- Section title: "🔥 Trending Now" + "See All →"
+- Horizontal scrollable list
+- VideoCard (vertical style):
+  * Thumbnail (16:9)
+  * Title (2 lines max)
+  * Category + Duration
+  * Views count
+  * "TRENDING" red badge
+
+━━━ SECTION 7: FOR YOU (Main Feed) ━━━
+- Section title: "⭐ For You"
+- Grid layout (2 columns)
+- VideoCard (grid style):
+  * Square thumbnail
+  * Title (1 line)
+  * Duration overlay
+  * Coins badge: "+10 🪙"
+
+━━━ SECTION 8: VIP PROMO BANNER ━━━
+(Show only to free users)
+- Gradient gold card
+- "💎 Earn 5x Faster with VIP!"
+- "Starting from $9.99/month"
+- "Upgrade Now →" button
+- Crown icon animation
+
+━━━ SECTION 9: MOST POPULAR ━━━
+- Section title: "🏆 Most Popular"
+- Vertical list (3 items)
+- VideoCard (horizontal style):
+  * Thumbnail (left, 120x80)
+  * Title + category + views (right)
+  * Duration badge
+
+━━━ SECTION 10: RECENTLY ADDED ━━━
+- Section title: "🆕 Just Added"
+- Grid (2 columns)
+
+PULL TO REFRESH:
+- Custom refresh indicator
+- Coin animation during refresh
+- Reload all data
+
+LOADING STATE:
+- Shimmer loading for all sections
+- Smooth transition to content
+
+═══════════════════════════════════════════════════
+SCREEN 3: lib/screens/player/video_player_screen.dart
+═══════════════════════════════════════════════════
+
+Create premium video player screen:
+
+LAYOUT:
+━━━ PART 1: VIDEO PLAYER (TOP) ━━━
+
+YouTube Player Configuration:
+- youtube_player_flutter package
+- Auto-play on open
+- Show controls (play/pause, progress, fullscreen)
+- Quality: based on user settings
+- Aspect ratio: 16:9
+- Custom overlay when paused
+
+COIN EARNING SYSTEM (MOST IMPORTANT):
+When user watches video:
+- Track watch progress
+- At 30% watched: show "+[X] 🪙 Keep watching!" toast
+- At 100% watched (or 80%+ for longer videos):
+  * Mark video as completed
+  * Award coins: 10 × VIP multiplier
+  * Show COIN EARNED ANIMATION:
+    → Big coin icon bursts from center
+    → Coins fly up and into coin counter
+    → Counter ticks up with sound effect placeholder
+    → "+10 Coins Earned! 🎉" popup
+    → Confetti animation (confetti package)
+  * Update Firestore
+  * Check daily goals progress
+  * Check badge unlocks
+
+AD SYSTEM:
+- Track video count
+- After every 4th video (free) / 8th (VIP):
+  * Show InterstitialAd
+  * Brief "Loading next video..." screen
+  
+- REWARDED AD BUTTON (always visible):
+  * "Watch Ad = +15 🪙" button
+  * Below the video player
+  * Only one per video
+  * Show RewardedAd
+  * Award 15 coins on completion
+
+━━━ PART 2: VIDEO INFO ━━━
+- Title (bold, 2 lines max)
+- Category chip + Duration + Views
+- Published time ago
+- Like button with count (animate on tap)
+- Share button
+- Favorite button (heart, animate)
+- VIP badge if VipOnly video
+
+━━━ PART 3: ACTION BUTTONS ROW ━━━
+[❤️ Like] [🔖 Favorite] [📤 Share] [+15🪙 Watch Ad]
+
+━━━ PART 4: COINS EARNED TODAY BAR ━━━
+- Progress bar showing daily goal progress
+- "You've earned X coins today"
+- Tap → EarnScreen
+
+━━━ PART 5: RELATED VIDEOS ━━━
+- "Related Videos" title
+- Vertical list of VideoCards (horizontal style)
+- Same category videos
+- Tap → Replace current video (smooth transition)
+
+━━━ PART 6: COMMENTS PLACEHOLDER ━━━
+- Simple "Comments coming soon" placeholder
+- Clean design matching theme
+
+FULLSCREEN:
+- Auto-rotate on fullscreen
+- Hide all UI, show only player
+- Custom fullscreen controls
+
+BACK BUTTON:
+- Custom back with exit animation
+- Save video to "Continue Watching"
+- Pause video on navigate away
+
+═══════════════════════════════════════════════════
+WIDGET: Coin Earned Animation
+═══════════════════════════════════════════════════
+
+Create lib/core/widgets/coin_earned_animation.dart:
+
+- Overlay widget (shows on top of everything)
+- Large coin icon (animated, spinning)
+- "+[X] Coins!" text with gradient
+- Coins particle effect (small coins flying up)
+- Confetti from top corners
+- Auto dismiss after 2.5 seconds
+- Can be triggered from anywhere
+
+Usage:
+CoinEarnedAnimation.show(context, coins: 10, source: 'Video Watched');
+
+═══════════════════════════════════════════════════
+WIDGET: Video Card (Complete)
+═══════════════════════════════════════════════════
+
+Create lib/core/widgets/video_card.dart with 4 variants:
+
+1. VideoCardVertical (for trending horizontal list):
+- Width: 180px
+- Thumbnail: 180x100 (with shimmer loading)
+- Gradient overlay on thumbnail
+- Duration badge (bottom right of thumbnail)
+- Trending/New badge (top left if applicable)
+- Coin badge "+10 🪙" (top right)
+- Title: 2 lines, 13sp
+- Category: small colored chip
+- Views + time ago
+
+2. VideoCardGrid (for grid layout):
+- Square thumbnail
+- Duration overlay
+- Coin badge
+- Title: 1 line
+- Category small text
+
+3. VideoCardHorizontal (for lists):
+- Left: thumbnail 120x80 rounded
+- Right: title (2 lines) + category + views + time
+- Duration badge on thumbnail
+- VIP lock overlay if VipOnly and not VIP
+
+4. VideoCardFeatured (for featured banner):
+- Full width
+- 200px height
+- Full thumbnail background
+- Dark gradient overlay
+- Featured badge
+- Title + category at bottom
+- Play button center
+
+ALL cards:
+- Tap animation (scale 0.98)
+- Cached network image
+- Shimmer placeholder
+- VIP lock overlay when needed
+- Smooth rounded corners (12px)
+
+═══════════════════════════════════════════════════
+WIDGET: Banner Ad Widget
+═══════════════════════════════════════════════════
+
+Create lib/core/widgets/banner_ad_widget.dart:
+- Load banner ad automatically
+- Show "Advertisement" label above
+- Proper sizing (320x50 or adaptive)
+- Hide for VIP users
+- Loading placeholder
+- Error handling (hide if fails)
+
+═══════════════════════════════════════════════════
+SCREEN: Explore Screen
+═══════════════════════════════════════════════════
+
+Create lib/screens/explore/explore_screen.dart:
+
+LAYOUT:
+- Search bar at top (dark, rounded)
+- Categories grid (2 columns):
+  * Each category card with:
+    → Emoji icon (large, centered)
+    → Category name
+    → Video count
+    → Gradient background (category color)
+    → Rounded corners 16px
+    → Tap animation
+
+- Below categories: "All Videos" grid
+- Filter by tapped category
+- Search results (real-time)
+
+SEARCH:
+- Search through titles
+- Show results as user types
+- "No results" empty state
+- Recent searches (local storage)
+- Clear search button
+
+Create lib/screens/explore/category_videos_screen.dart:
+- AppBar with category name + icon
+- Grid of videos for that category
+- Pull to refresh
+- Pagination (load more on scroll)
+
+═══════════════════════════════════════════════════
+COMPLETE COIN SYSTEM LOGIC
+═══════════════════════════════════════════════════
+
+Implement in coin_provider.dart:
+
+VIDEO COIN EARNING:
+- Base coins: 10
+- Apply VIP multiplier
+- Silver VIP: 10 × 3 = 30 coins
+- Gold VIP: 10 × 5 = 50 coins
+- Platinum VIP: 10 × 7 = 70 coins
+- Diamond VIP: 10 × 10 = 100 coins
+- Lifetime VIP: 10 × 15 = 150 coins
+
+DAILY LIMITS (prevent abuse):
+- Max videos per day: 100
+- Max coins from videos per day: 1000 (free), unlimited (VIP)
+- Track in Firestore with daily reset
+
+ANTI-CHEAT:
+- Minimum watch time: 30 seconds
+- Track actual watch time via player
+- Server-side validation via Firebase Functions
+- Flag suspicious activity
+
+UPDATE FLOW:
+1. User finishes video
+2. Check min watch time (30 seconds)
+3. Calculate coins (base × multiplier)
+4. Check daily limits
+5. Update user coins in Firestore
+6. Add transaction record
+7. Update daily stats
+8. Check goals completion
+9. Check badge unlocks
+10. Show coin animation
+11. Check if ad should show
+
+═══════════════════════════════════════════════════
+IMPORTANT REQUIREMENTS
+═══════════════════════════════════════════════════
+1. Home screen must be BEAUTIFUL - world class design
+2. Video player must work perfectly with YouTube
+3. Coin animation must be satisfying and delightful
+4. Ad integration must be seamless (not disruptive)
+5. All loading states must use shimmer
+6. Pull to refresh must work everywhere
+7. Navigation must be smooth (no jank)
+8. Memory management: dispose controllers properly
+9. Handle video player lifecycle (pause on navigate)
+10. All tap animations must feel responsive
+11. Banner ad must hide for VIP users
+12. Coin earning must be accurate and cheat-proof
+13. Generate EVERY file completely
+14. No TODO comments
+15. Production ready code only
+```
+
+---
+
+## ✅ Prompt 4 Checklist:
+
+- [ ] Main Navigation (5 tabs) complete?
+- [ ] Home Screen all 10 sections?
+- [ ] Video Player with YouTube working?
+- [ ] Coin earning animation?
+- [ ] Ad system (interstitial + rewarded)?
+- [ ] All 4 VideoCard variants?
+- [ ] Explore Screen + Search?
+- [ ] Banner Ad Widget?
+- [ ] Coin system anti-cheat?
+
+---
+
+## ⚠️ Common Issues & Fixes:
+
+**YouTube Player Error:**
+```
+"PlatformException: YouTubePlayer"
+```
+**Fix prompt:**
+> "Fix YouTube player. Make sure youtube_player_flutter is properly initialized with YoutubePlayerController and disposed on screen exit"
+
+**Coin Animation Not Showing:**
+> "Fix coin earned animation overlay. Make sure it uses Overlay.of(context).insert() method properly"
+
+**AdMob Error:**
+> "Fix AdMob initialization. Make sure MobileAds.instance.initialize() is called before loading any ads"
+
+---
+
+## ⏭️ Jab Prompt 4 Done Ho:
+
+Mujhe likho:
+> **"Prompt 4 Done"**
+
+Phir **Prompt 5** aayega:
+- 🎰 Spin Wheel Screen
+- 🎫 Scratch Card Screen
+- 📦 Mystery Box Screen
+- 🎯 Daily Goals Screen
+- 📅 7-Day Streak Calendar
+- 💫 All Earn Animations
+
+**Yeh sabse fun part hoga!** 🎉🚀

@@ -1,0 +1,697 @@
+## ✅ PROMPT 6 READY HAI BHAI!
+
+---
+
+## 🚀 PROMPT 6 (COPY FROM HERE)
+
+```
+You are an expert Flutter developer continuing the WatchEarn project.
+Now create REFERRAL SYSTEM + VIP PLANS + WALLET + 
+LEADERBOARD + ACHIEVEMENTS completely.
+
+═══════════════════════════════════════════════════
+SCREEN 1: lib/screens/referral/referral_screen.dart
+═══════════════════════════════════════════════════
+
+Create POWERFUL referral system screen:
+
+LAYOUT:
+
+━━━ HEADER ━━━
+- Title: "👥 Invite & Earn"
+- Subtitle: "Earn lifetime 10% commission!"
+- Background: gradient banner (purple → pink)
+- Total referral earnings: "Total Earned: 5,200 🪙"
+
+━━━ SECTION 1: YOUR REFERRAL CODE ━━━
+Premium card design:
+- Dark card with gold border
+- Title: "Your Referral Code"
+- Code display: Large bold text
+  * Font: monospace, 28sp
+  * Gold color with glow
+  * Background: dark with border
+  * Example: "JOHN123"
+- Below code:
+  * Full link: "watchearn.app/invite/JOHN123"
+  * Small, copyable
+
+Action buttons row:
+[📋 Copy Code] [🔗 Copy Link] [📱 QR Code]
+
+Each button:
+- Icon + label
+- Dark card style
+- Tap animation
+- Toast on copy: "Copied!"
+
+━━━ SECTION 2: SHARE BUTTONS ━━━
+Title: "Share with Friends"
+6 share buttons in 2x3 grid:
+
+1. WhatsApp (green)
+   - WhatsApp icon
+   - "Share on WhatsApp"
+   
+2. Instagram (gradient purple-pink)
+   - Instagram icon
+   - "Share Story"
+   
+3. Facebook (blue)
+   - Facebook icon
+   - "Share on Facebook"
+   
+4. Twitter/X (black)
+   - X icon
+   - "Post on X"
+   
+5. SMS (green)
+   - Message icon
+   - "Send SMS"
+   
+6. More Options (grey)
+   - Share icon
+   - "More..."
+
+Share Message Template:
+"🎬 Watch videos & earn real cash with WatchEarn! 
+I've already earned $[X]! 
+Join using my code [CODE] and get 500 bonus coins!
+Download: watchearn.app/invite/[CODE]"
+
+━━━ SECTION 3: HOW IT WORKS ━━━
+Step-by-step cards:
+
+Step 1 → Step 2 → Step 3 → Step 4
+
+Step 1: "Share your code"
+- Icon: 📤
+- "Share your unique referral code with friends"
+
+Step 2: "Friend joins"  
+- Icon: 👤
+- "Friend downloads app & signs up with your code"
+- Reward: "+500 coins instantly!"
+
+Step 3: "Friend watches"
+- Icon: ▶️
+- "Friend watches 10 videos"
+- Reward: "+200 coins!"
+
+Step 4: "Lifetime commission"
+- Icon: ♾️
+- "Earn 10% of all coins your friend earns forever!"
+
+━━━ SECTION 4: QR CODE ━━━
+(Show when QR button tapped - bottom sheet)
+- Large QR code (using qr_flutter)
+- WatchEarn logo in center of QR
+- "Scan to Join WatchEarn"
+- Referral code below
+- Download/Share QR button
+
+━━━ SECTION 5: REFERRAL STATS ━━━
+Stats grid (2x2):
+1. 👥 Total Referrals: [X]
+2. ✅ Active Referrals: [X]
+3. 🪙 Coins Earned: [X]
+4. 💰 Cash Value: $[X]
+
+━━━ SECTION 6: MILESTONE REWARDS ━━━
+Progress through milestones:
+
+Timeline design:
+● 5 refs → 5,000 coins [CLAIMED/LOCKED]
+● 10 refs → 15,000 coins + Bronze Badge
+● 25 refs → 50,000 coins + Silver Badge
+● 50 refs → 150,000 coins + Gold Badge
+● 100 refs → 500,000 coins + Diamond Badge + Free VIP
+
+Each milestone:
+- Circle indicator (filled=done, current=glowing, future=empty)
+- Connecting line between circles
+- Reward label above/below
+- Claim button if reached
+
+━━━ SECTION 7: MY REFERRALS LIST ━━━
+Title: "My Referrals ([count])"
+List of referred users:
+
+Each referral card:
+- Profile picture (circle, cached)
+- Name + join date
+- Videos watched: "[X] videos"
+- VIP status badge (if VIP)
+- Coins earned from them: "+[X] 🪙"
+- Status: Active/Inactive badge
+
+Empty state:
+- People icon
+- "No referrals yet"
+- "Share your code and start earning!"
+- Share button
+
+━━━ SECTION 8: COMMISSION HISTORY ━━━
+Recent commission transactions:
+Each item:
+- Coin icon (gold)
+- "[Name] watched a video"
+- "+[X] coins (10%)"
+- Time ago
+
+═══════════════════════════════════════════════════
+SCREEN 2: lib/screens/vip/vip_plans_screen.dart
+═══════════════════════════════════════════════════
+
+Create STUNNING VIP plans screen that CONVERTS:
+
+LAYOUT:
+
+━━━ HEADER ━━━
+- Close button (X) top left
+- Title: "💎 VIP Membership"
+- Subtitle: "Earn coins up to 15x faster"
+- Current plan badge (if already VIP)
+
+━━━ SECTION 1: EARN COMPARISON ━━━
+Visual comparison card:
+
+"In 1 hour of watching:"
+Free User: 60 coins
+Silver VIP: 180 coins (3x)
+Gold VIP: 300 coins (5x) ← highlighted
+Diamond VIP: 600 coins (10x)
+Lifetime VIP: 900 coins (15x)
+
+Animated bar chart showing difference
+Color coded bars
+
+━━━ SECTION 2: VIP PLAN CARDS ━━━
+Horizontal scrollable or vertical list
+5 plan cards:
+
+SILVER CARD ($9.99/month):
+- Gradient: silver (#C0C0C0 → #808080)
+- Badge: 🥈 Silver VIP
+- Price: "$9.99" (large) + "/30 days" (small)
+- Multiplier badge: "3x FASTER"
+- Features list:
+  ✓ 3x Coin Earning Speed
+  ✓ Extra Daily Spin
+  ✓ 10 Scratch Cards/day
+  ✓ Fast Withdrawal (24h)
+  ✓ Lower Min Withdrawal ($2)
+  ✓ Silver VIP Badge
+
+GOLD CARD ($19.99/month): ← MOST POPULAR
+- Gradient: gold (#FFD700 → #FFA000)
+- "MOST POPULAR" ribbon (top right)
+- Badge: 🥇 Gold VIP
+- Price: "$19.99" + "/30 days"
+- Multiplier: "5x FASTER"
+- Features:
+  ✓ 5x Coin Earning Speed
+  ✓ Unlimited Daily Spins
+  ✓ Unlimited Scratch Cards
+  ✓ Extra Mystery Boxes (5/day)
+  ✓ Priority Withdrawal
+  ✓ Less Ads (every 8th video)
+  ✓ Gold VIP Badge
+
+PLATINUM CARD ($34.99/60 days):
+- Gradient: platinum (#E5E4E2 → #BDBDBD)
+- Badge: 💠 Platinum VIP
+- Price: "$34.99" + "/60 days"
+- Multiplier: "7x FASTER"
+- Features:
+  ✓ All Gold Features
+  ✓ 7x Coin Speed
+  ✓ Exclusive VIP Videos
+  ✓ No Banner Ads
+  ✓ Priority Support
+  ✓ Platinum Badge
+
+DIAMOND CARD ($49.99/90 days):
+- Gradient: diamond (#B9F2FF → #81D4FA)
+- Badge: 💎 Diamond VIP
+- Price: "$49.99" + "/90 days"
+- Multiplier: "10x FASTER"
+- Features:
+  ✓ All Platinum Features
+  ✓ 10x Coin Speed
+  ✓ Direct Bank Transfer
+  ✓ Instant Withdrawal
+  ✓ Personal Support Agent
+  ✓ Diamond Badge
+
+LIFETIME CARD ($99.99 one-time): ← BEST VALUE
+- Gradient: purple → pink (primaryGradient)
+- "BEST VALUE" ribbon
+- 👑 Crown icon (animated glow)
+- Price: "$99.99" + "One-time payment"
+- Multiplier: "15x FASTER"
+- "Pay once, earn forever!"
+- Features:
+  ✓ Everything Included
+  ✓ 15x Coin Speed
+  ✓ Never Pay Again
+  ✓ Founding Member Badge
+  ✓ All Future Features Free
+  ✓ Instant Withdrawal Forever
+
+Each card:
+- Tap to select (highlight border)
+- Current plan: "Current Plan" badge
+- Subscribe/Buy button at bottom of card
+- Loading state on purchase
+
+━━━ SECTION 3: PURCHASE BUTTON ━━━
+(Sticky bottom or within each card)
+- Large gradient button
+- Selected plan name + price
+- "Subscribe Now" / "Buy Now"
+- Loading state
+- Terms text below:
+  "Subscription auto-renews. Cancel anytime."
+- "Restore Purchases" link
+
+━━━ SECTION 4: FAQ ━━━
+Expandable FAQ cards:
+Q: Can I cancel anytime?
+A: Yes, cancel from Play Store/App Store settings.
+
+Q: How does the multiplier work?
+A: Every coin you earn is multiplied. 
+   10 base coins × 5 (Gold) = 50 coins!
+
+Q: When does VIP activate?
+A: Immediately after purchase!
+
+Q: What if I upgrade plans?
+A: New plan starts immediately, old plan ends.
+
+━━━ SECTION 5: REVIEWS ━━━
+3 fake-realistic user reviews:
+- Profile pic (avatar placeholder)
+- Name + country flag
+- Stars (⭐⭐⭐⭐⭐)
+- Review text (authentic sounding)
+
+Review 1 (US):
+"Gold VIP is amazing! I earn so much more now. 
+Cashed out $15 in just 2 weeks!"
+- Michael T. 🇺🇸
+
+Review 2 (UK):
+"The lifetime plan is the best investment. 
+Already earned my money back in month 1!"
+- Sarah K. 🇬🇧
+
+Review 3 (Canada):
+"Best earning app I've used. VIP makes 
+it so much better!"
+- David M. 🇨🇦
+
+═══════════════════════════════════════════════════
+SCREEN 3: lib/screens/wallet/wallet_screen.dart
+═══════════════════════════════════════════════════
+
+Create comprehensive wallet screen:
+
+LAYOUT:
+
+━━━ HEADER BALANCE CARD ━━━
+Large premium card (gradient background):
+- "My Wallet" title
+- Coin balance: "🪙 125,400"
+- Cash value: "= $12.54 USD"
+- Animated coin icon
+- "Withdraw Now" button (gold)
+- Progress bar: "50,000 / 125,400 to next milestone"
+
+━━━ SECTION 1: QUICK STATS ━━━
+Row of 3 stats:
+1. Total Earned: "256,000 🪙"
+2. Total Withdrawn: "$5.00"
+3. Pending: "$0.00"
+
+━━━ SECTION 2: WITHDRAWAL OPTIONS ━━━
+Title: "Cash Out Methods"
+Cards for each method:
+
+1. 💳 PayPal
+   - Logo + "PayPal"
+   - "Instant transfer"
+   - Most popular badge
+   - "Withdraw →"
+
+2. 🛍️ Amazon Gift Card
+   - Logo + "Amazon"
+   - "Email delivery"
+   - "Withdraw →"
+
+3. 🎮 Google Play Credit
+   - Logo + "Google Play"
+   - "App credit"
+   - "Withdraw →"
+
+4. 🍎 Apple Gift Card
+   - Logo + "Apple"
+   - "iTunes credit"
+   - "Withdraw →"
+
+5. 💳 Visa Prepaid Card
+   - Logo + "Visa"
+   - "Physical card"
+   - "Withdraw →"
+
+━━━ SECTION 3: MINIMUM WITHDRAWAL ━━━
+Info card:
+- Free users: "Minimum: $5.00 (50,000 coins)"
+- VIP users: "Minimum: $2.00 (20,000 coins)"
+- Processing: "3-5 business days (1 day for VIP)"
+
+━━━ SECTION 4: TRANSACTION HISTORY ━━━
+Filter tabs: [All] [Earnings] [Withdrawals] [VIP]
+
+Each transaction item:
+- Left: colored icon (📺 🎰 💸 etc)
+- Center: 
+  * Description (e.g. "Video Watched")
+  * Time ago
+- Right:
+  * Amount (+green or -red)
+  * Status badge
+
+Load more pagination
+
+━━━ VIP PROMO (if not VIP) ━━━
+"Withdraw from just $2 with VIP!"
+
+═══════════════════════════════════════════════════
+SCREEN 4: lib/screens/wallet/withdraw_screen.dart
+═══════════════════════════════════════════════════
+
+Create complete withdrawal flow:
+
+STEP 1: SELECT AMOUNT
+- Available balance shown
+- Amount input field (in USD)
+- Coin equivalent shown: "= [X] coins"
+- Quick amount buttons: [$5] [$10] [$25] [$50]
+- Min/max labels
+- "Continue" button
+
+STEP 2: SELECT METHOD
+- Payment method selection (cards)
+- Each shows logo + name + processing time
+- Select with radio button
+
+STEP 3: ENTER DETAILS
+- PayPal: Email address field
+- Amazon: Email address field
+- Google Play: Email field
+- Apple: Apple ID field
+- Visa: Address form
+
+STEP 4: CONFIRM
+- Summary card:
+  * Amount: $10.00
+  * Method: PayPal
+  * Email: john@gmail.com
+  * Processing: 3-5 days
+  * Coins to deduct: 100,000
+- "Confirm Withdrawal" button
+
+SUCCESS SCREEN:
+- Green checkmark animation
+- "Withdrawal Submitted!"
+- "Your $10.00 will arrive in 3-5 business days"
+- Transaction ID
+- "Back to Wallet" button
+
+VALIDATION:
+- Check minimum amount
+- Check sufficient coins
+- Validate email format
+- Confirm step with biometric option
+
+═══════════════════════════════════════════════════
+SCREEN 5: lib/screens/leaderboard/leaderboard_screen.dart
+═══════════════════════════════════════════════════
+
+Create COMPETITIVE leaderboard:
+
+LAYOUT:
+
+━━━ HEADER ━━━
+- Title: "🏆 Leaderboard"
+- Tab bar: [Weekly] [All Time]
+- Prize pool info: "Weekly Prize Pool: 500,000 🪙"
+
+━━━ TOP 3 PODIUM ━━━
+Visual podium design:
+- Center (1st): tallest podium, gold
+  * Crown icon on top
+  * Profile picture (large circle)
+  * Name
+  * Coins: bold
+  * Prize: "50,000 🪙"
+  
+- Left (2nd): medium, silver
+  * Profile picture
+  * Name
+  * Prize: "30,000 🪙"
+  
+- Right (3rd): shortest, bronze
+  * Profile picture
+  * Name
+  * Prize: "20,000 🪙"
+
+━━━ MY RANK CARD ━━━
+Highlighted card (gradient border):
+- "Your Rank: #42"
+- Your profile + coins
+- Coins needed for next rank:
+  "Need 2,400 more coins to reach #41"
+- Progress bar to next rank
+
+━━━ FULL RANKINGS LIST ━━━
+Starting from #4:
+Each row:
+- Rank number (colored for top 10)
+- Profile picture
+- Name + VIP badge
+- Coins (weekly/total)
+- Prize amount (if in prize zone)
+- Arrow: ↑↓ rank change
+
+Prize zones highlighted:
+- #1-3: Gold background
+- #4-10: Purple tint
+- #11-50: Blue tint
+- #51-100: Subtle tint
+
+━━━ PRIZES TABLE ━━━
+Bottom expandable:
+#1: 50,000 coins
+#2: 30,000 coins
+#3: 20,000 coins
+#4-10: 10,000 coins each
+#11-50: 5,000 coins each
+#51-100: 2,000 coins each
+
+Reset countdown: "Resets in: 2d 14h 32m"
+
+═══════════════════════════════════════════════════
+SCREEN 6: lib/screens/achievements/achievements_screen.dart
+═══════════════════════════════════════════════════
+
+Create REWARDING achievements screen:
+
+LAYOUT:
+
+━━━ HEADER ━━━
+- Title: "🎖️ Achievements"
+- Progress: "12/20 Unlocked"
+- Total earned from badges: "25,000 🪙 from badges"
+- Large circular progress
+
+━━━ CATEGORIES FILTER ━━━
+Filter chips:
+[All] [Watching] [Streaks] [Referrals] [Special]
+
+━━━ BADGES GRID (3 columns) ━━━
+Each badge card:
+
+UNLOCKED:
+- Bright emoji icon (large)
+- Badge name
+- Reward earned: "+500 🪙"
+- Unlock date: "Earned Mar 15"
+- Gold border
+- Slight glow
+
+LOCKED:
+- Greyed out emoji (50% opacity)
+- Badge name (greyed)
+- Requirement: "Watch 50 videos (23/50)"
+- Progress bar (thin)
+- Lock icon overlay
+- No glow
+
+BADGE DETAIL (bottom sheet on tap):
+- Large emoji (80px)
+- Name + description
+- Requirement progress
+- Reward coins
+- Unlock date (if unlocked)
+- Confetti if just unlocked
+
+━━━ RECENT UNLOCKS ━━━
+Horizontal scroll:
+"Recently Unlocked" section
+Cards with gradient background
+
+━━━ NEXT TO UNLOCK ━━━
+"Almost There!" section
+Badges closest to completion
+With progress bars
+
+═══════════════════════════════════════════════════
+REFERRAL PROVIDER COMPLETE LOGIC
+═══════════════════════════════════════════════════
+
+lib/data/providers/referral_provider.dart:
+
+REFERRAL CODE VALIDATION:
+- Query Firestore: users where referralCode == code
+- Check if user exists
+- Check not self-referral
+- Return valid/invalid
+
+APPLY REFERRAL:
+1. Find referrer by code
+2. Create referral document
+3. Add 500 coins to new user
+4. Add 500 coins to referrer
+5. Add transaction records for both
+6. Update referrer totalReferrals
+
+COMMISSION SYSTEM:
+- When referred user earns coins:
+  * Calculate 10% commission
+  * Add to referrer coins
+  * Add commission transaction
+  * Update referral document
+
+MILESTONE CHECKING:
+- After each referral added:
+  * Check against milestones [5,10,25,50,100]
+  * If reached: award milestone coins
+  * Send notification to user
+  * Unlock corresponding badge
+
+SHARE FUNCTIONS:
+- WhatsApp: wa.me/?text=[message]
+- Copy: Clipboard.setData
+- QR: Generate with qr_flutter
+- General share: share_plus package
+
+═══════════════════════════════════════════════════
+VIP PURCHASE LOGIC
+═══════════════════════════════════════════════════
+
+lib/data/providers/vip_provider.dart:
+
+PURCHASE FLOW:
+1. Load products from store
+2. User selects plan
+3. Initiate purchase (in_app_purchase)
+4. Listen to purchase stream
+5. Verify purchase
+6. Update user vipPlan + vipExpiry
+7. Award VIP badge (5000 coins bonus)
+8. Show success animation
+9. Add transaction record
+
+RESTORE PURCHASES:
+- Query previous purchases
+- Re-apply active subscriptions
+- Update Firebase accordingly
+
+VIP EXPIRY CHECK:
+- On app open: check vipExpiry
+- If expired: revert to free
+- Send "VIP Expired" notification
+- Show renewal prompt
+
+═══════════════════════════════════════════════════
+IMPORTANT REQUIREMENTS
+═══════════════════════════════════════════════════
+1. Referral screen must make sharing EASY
+2. VIP screen must CONVERT users to buyers
+3. Wallet must be CLEAR and trustworthy
+4. Withdrawal flow must be SMOOTH and secure
+5. Leaderboard must feel COMPETITIVE
+6. Achievements must feel REWARDING
+7. All Firebase operations must have error handling
+8. Loading states everywhere
+9. Empty states for all lists
+10. All animations smooth
+11. In-app purchase must be properly implemented
+12. Referral commission must be accurate
+13. Generate ALL files completely
+14. No TODO comments
+15. Production ready code
+```
+
+---
+
+## ✅ Prompt 6 Checklist:
+
+- [ ] Referral Screen with QR code?
+- [ ] Share buttons (WhatsApp, Instagram etc)?
+- [ ] Milestone rewards system?
+- [ ] VIP Plans with all 5 cards?
+- [ ] In-app purchase integration?
+- [ ] Wallet Screen complete?
+- [ ] Withdrawal 4-step flow?
+- [ ] Leaderboard with podium?
+- [ ] Achievements with 20 badges?
+- [ ] Referral commission logic?
+
+---
+
+## ⚠️ Common Issues & Fixes:
+
+**In-App Purchase Error:**
+> "Fix in_app_purchase implementation. 
+Make sure InAppPurchase.instance.isAvailable() 
+is checked first and purchaseStream is 
+properly listened to"
+
+**QR Code Not Showing:**
+> "Fix qr_flutter implementation. 
+Use QrImageView widget with correct data parameter"
+
+**Leaderboard Not Loading:**
+> "Fix leaderboard Firestore query. 
+Order by weeklyCoins descending with limit 100"
+
+---
+
+## ⏭️ Jab Prompt 6 Done Ho:
+
+Mujhe likho:
+> **"Prompt 6 Done"**
+
+Phir **Prompt 7** aayega:
+- 👤 Profile Screen
+- ⚙️ Settings Screen
+- 🔔 Notifications Screen
+- ✏️ Edit Profile
+- 🔒 Privacy + Terms
+- 🌟 Complete Polish
+
+**Almost done bhai!** 💪🔥

@@ -1,0 +1,424 @@
+## ✅ BHAI PROMPT 1 START!
+
+Yeh **FINAL POLISHED VERSION** hai Prompt 1 ka. Isko **EXACTLY** copy karo aur Google Antigravity mein paste karo.
+
+---
+
+## 🚀 PROMPT 1 (COPY FROM HERE)
+
+```
+You are an expert Flutter developer with 10+ years of experience. 
+Create a complete, production-ready Flutter project foundation for 
+"WatchEarn" - a premium watch-and-earn mobile application.
+
+═══════════════════════════════════════════════════
+APP OVERVIEW
+═══════════════════════════════════════════════════
+App Name: WatchEarn
+Package Name: com.watchearn.app
+Tagline: Watch. Earn. Repeat.
+Version: 1.0.0+1
+Target: Android & iOS
+Platforms: Mobile (Primary) + Web (Admin Panel only)
+
+═══════════════════════════════════════════════════
+DESIGN SYSTEM
+═══════════════════════════════════════════════════
+Theme: Premium Dark Theme (Like Cash App + TikTok fusion)
+Font: Poppins (via google_fonts)
+
+Colors:
+- Primary: #6C63FF (Soft Purple)
+- Secondary: #FF6B9D (Soft Pink)
+- Accent: #00D9FF (Cyan)
+- Gold: #FFD700 (Coins)
+- Background: #0D0D1A (Deep Dark)
+- Surface: #1A1A2E (Card Background)
+- SurfaceLight: #252542
+- CardBorder: #2A2A4A
+- TextPrimary: #FFFFFF
+- TextSecondary: #B8B8D0
+- TextTertiary: #7A7A9A
+- Success: #00E676
+- Warning: #FFB300
+- Error: #FF5252
+
+Gradients:
+- Primary Gradient: #6C63FF → #FF6B9D (topLeft to bottomRight)
+- Gold Gradient: #FFD700 → #FFA000
+- Accent Gradient: #00D9FF → #6C63FF
+- Silver Gradient: #C0C0C0 → #808080
+- Platinum Gradient: #E5E4E2 → #BDBDBD
+- Diamond Gradient: #B9F2FF → #81D4FA
+
+═══════════════════════════════════════════════════
+COMPLETE PUBSPEC.YAML
+═══════════════════════════════════════════════════
+Generate complete pubspec.yaml with these exact dependencies:
+
+dependencies:
+  flutter:
+    sdk: flutter
+  
+  # Firebase
+  firebase_core: ^2.24.2
+  firebase_auth: ^4.16.0
+  cloud_firestore: ^4.14.0
+  firebase_storage: ^11.6.0
+  firebase_messaging: ^14.7.9
+  firebase_analytics: ^10.8.0
+  
+  # Google Sign In
+  google_sign_in: ^6.2.1
+  
+  # UI Components
+  google_fonts: ^6.1.0
+  cached_network_image: ^3.3.0
+  shimmer: ^3.0.0
+  animate_do: ^3.1.2
+  flutter_spinkit: ^5.2.0
+  percent_indicator: ^4.2.3
+  smooth_page_indicator: ^1.1.0
+  confetti: ^0.7.0
+  fl_chart: ^0.66.0
+  flutter_fortune_wheel: ^1.3.1
+  lottie: ^2.7.0
+  
+  # YouTube
+  youtube_player_flutter: ^8.1.2
+  
+  # Ads
+  google_mobile_ads: ^4.0.0
+  
+  # State Management
+  provider: ^6.1.1
+  
+  # In-App Purchase
+  in_app_purchase: ^3.1.13
+  
+  # Storage
+  shared_preferences: ^2.2.2
+  hive: ^2.2.3
+  hive_flutter: ^1.1.0
+  
+  # Utils
+  connectivity_plus: ^5.0.2
+  share_plus: ^7.2.1
+  url_launcher: ^6.2.1
+  package_info_plus: ^5.0.1
+  intl: ^0.19.0
+  uuid: ^4.2.2
+  clipboard: ^0.1.3
+  flutter_local_notifications: ^17.0.0
+  path_provider: ^2.1.2
+  qr_flutter: ^4.1.0
+  image_picker: ^1.0.7
+
+═══════════════════════════════════════════════════
+COMPLETE FOLDER STRUCTURE
+═══════════════════════════════════════════════════
+Create EXACTLY this folder structure with all files:
+
+lib/
+├── main.dart
+├── app/
+│   ├── app.dart
+│   └── theme.dart
+├── core/
+│   ├── constants/
+│   │   ├── app_colors.dart
+│   │   ├── app_strings.dart
+│   │   ├── app_config.dart
+│   │   └── ad_ids.dart
+│   ├── services/
+│   │   ├── auth_service.dart
+│   │   ├── firestore_service.dart
+│   │   ├── ad_service.dart
+│   │   ├── notification_service.dart
+│   │   └── purchase_service.dart
+│   ├── utils/
+│   │   ├── helpers.dart
+│   │   └── validators.dart
+│   └── widgets/
+│       ├── custom_button.dart
+│       ├── custom_textfield.dart
+│       ├── loading_widget.dart
+│       ├── coin_display.dart
+│       ├── video_card.dart
+│       ├── category_chip.dart
+│       ├── vip_badge.dart
+│       └── shimmer_loading.dart
+├── data/
+│   ├── models/
+│   │   ├── user_model.dart
+│   │   ├── video_model.dart
+│   │   ├── category_model.dart
+│   │   ├── transaction_model.dart
+│   │   ├── referral_model.dart
+│   │   ├── vip_plan_model.dart
+│   │   ├── daily_goal_model.dart
+│   │   ├── badge_model.dart
+│   │   ├── notification_model.dart
+│   │   └── leaderboard_model.dart
+│   └── providers/
+│       ├── auth_provider.dart
+│       ├── user_provider.dart
+│       ├── video_provider.dart
+│       ├── coin_provider.dart
+│       ├── referral_provider.dart
+│       ├── vip_provider.dart
+│       ├── earn_provider.dart
+│       └── ad_provider.dart
+├── screens/
+│   ├── splash/
+│   │   └── splash_screen.dart
+│   ├── onboarding/
+│   │   └── onboarding_screen.dart
+│   ├── auth/
+│   │   ├── login_screen.dart
+│   │   ├── signup_screen.dart
+│   │   └── forgot_password_screen.dart
+│   ├── home/
+│   │   ├── home_screen.dart
+│   │   └── main_navigation.dart
+│   ├── player/
+│   │   └── video_player_screen.dart
+│   ├── explore/
+│   │   ├── explore_screen.dart
+│   │   └── category_videos_screen.dart
+│   ├── earn/
+│   │   ├── earn_screen.dart
+│   │   ├── spin_wheel_screen.dart
+│   │   ├── scratch_card_screen.dart
+│   │   ├── mystery_box_screen.dart
+│   │   └── daily_goals_screen.dart
+│   ├── referral/
+│   │   └── referral_screen.dart
+│   ├── vip/
+│   │   └── vip_plans_screen.dart
+│   ├── wallet/
+│   │   ├── wallet_screen.dart
+│   │   └── withdraw_screen.dart
+│   ├── leaderboard/
+│   │   └── leaderboard_screen.dart
+│   ├── achievements/
+│   │   └── achievements_screen.dart
+│   ├── profile/
+│   │   ├── profile_screen.dart
+│   │   └── edit_profile_screen.dart
+│   ├── settings/
+│   │   └── settings_screen.dart
+│   └── notifications/
+│       └── notifications_screen.dart
+└── admin/
+    ├── admin_app.dart
+    ├── admin_login.dart
+    ├── admin_dashboard.dart
+    ├── admin_videos.dart
+    ├── admin_users.dart
+    ├── admin_categories.dart
+    ├── admin_withdrawals.dart
+    ├── admin_notifications.dart
+    └── admin_analytics.dart
+
+assets/
+├── images/
+│   ├── logo.png (placeholder)
+│   ├── onboarding_1.png (placeholder)
+│   ├── onboarding_2.png (placeholder)
+│   └── onboarding_3.png (placeholder)
+├── icons/
+└── animations/
+
+═══════════════════════════════════════════════════
+MAIN.DART REQUIREMENTS
+═══════════════════════════════════════════════════
+Generate complete main.dart that:
+- Initializes Firebase
+- Initializes Hive
+- Initializes Mobile Ads SDK
+- Sets portrait orientation only
+- Sets system UI overlay style (dark status bar)
+- Sets up MultiProvider with all 8 providers
+- Runs SatisfyMeApp
+
+═══════════════════════════════════════════════════
+APP.DART REQUIREMENTS
+═══════════════════════════════════════════════════
+- MaterialApp with dark theme
+- No debug banner
+- Route to SplashScreen
+- Handle navigation smoothly
+
+═══════════════════════════════════════════════════
+THEME.DART REQUIREMENTS
+═══════════════════════════════════════════════════
+Create complete AppTheme.darkTheme with:
+- ColorScheme (dark)
+- AppBarTheme (transparent, no elevation)
+- TextTheme (all Poppins variants)
+- CardTheme (rounded corners 16px)
+- ElevatedButtonTheme (gradient-like)
+- InputDecorationTheme (dark filled)
+- BottomNavigationBarTheme
+- ChipTheme
+- DialogTheme
+- SnackBarTheme
+- SliderTheme
+- SwitchTheme
+
+═══════════════════════════════════════════════════
+APP_COLORS.DART REQUIREMENTS
+═══════════════════════════════════════════════════
+Create complete AppColors class with:
+- All single colors as const Color
+- All gradients as const LinearGradient
+- Shadow helpers as static List<BoxShadow>
+- VIP colors (silver, gold, platinum, diamond)
+- Coin color (#FFD700)
+
+═══════════════════════════════════════════════════
+APP_STRINGS.DART REQUIREMENTS
+═══════════════════════════════════════════════════
+Create ALL strings used in app:
+- App info
+- Onboarding (3 slides)
+- Auth (login, signup, forgot password)
+- Navigation labels
+- Screen titles
+- Button labels
+- Error messages
+- Success messages
+- Empty state messages
+
+═══════════════════════════════════════════════════
+APP_CONFIG.DART REQUIREMENTS
+═══════════════════════════════════════════════════
+Create AppConfig with ALL these values:
+
+COIN SYSTEM:
+- coinsPerVideo: 10
+- coinsPerAd: 15
+- coinsPerReferral: 500
+- coinsPerReferralWatch: 200
+- coinsPerRateApp: 300
+- coinsPerShare: 50
+- coinsPerDollar: 10000.0
+
+STREAK REWARDS (7 days):
+- [25, 35, 50, 65, 80, 100, 200]
+
+DAILY GOALS:
+- video goals: 1, 3, 5, 10, 20, 30
+- ads goal: 5
+- share goal: 1
+- categories goal: 3
+
+ADS:
+- adsAfterVideos: 4 (free users)
+- vipAdsAfterVideos: 8 (VIP users)
+
+DAILY LIMITS:
+- maxDailySpinsFree: 1
+- maxDailyScratchFree: 3
+- maxDailyMysteryFree: 1
+
+WITHDRAWAL:
+- minWithdrawal: 5.0
+- vipMinWithdrawal: 2.0
+
+REFERRAL:
+- referralCommission: 0.10 (10%)
+- milestones: [5, 10, 25, 50, 100]
+- milestoneRewards: [5000, 15000, 50000, 150000, 500000]
+
+VIP MULTIPLIERS:
+- silver: 3x, gold: 5x, platinum: 7x, diamond: 10x, lifetime: 15x
+
+VIP PRICES:
+- silver: $9.99, gold: $19.99, platinum: $34.99, 
+  diamond: $49.99, lifetime: $99.99
+
+SPIN WHEEL:
+- prizes: [5, 10, 25, 50, 100, 200, 500, 1000]
+- probabilities: [0.25, 0.20, 0.18, 0.15, 0.10, 0.07, 0.04, 0.01]
+
+═══════════════════════════════════════════════════
+AD_IDS.DART REQUIREMENTS
+═══════════════════════════════════════════════════
+Create AdIds class with test IDs for:
+- bannerId (Android + iOS)
+- interstitialId (Android + iOS)
+- rewardedId (Android + iOS)
+- rewardedInterstitialId (Android + iOS)
+- nativeId (Android + iOS)
+
+═══════════════════════════════════════════════════
+CUSTOM WIDGETS REQUIREMENTS
+═══════════════════════════════════════════════════
+Create these reusable widgets:
+
+1. CustomButton - Gradient button, outline button, text button variants
+2. CustomTextField - Dark themed with prefix/suffix icons
+3. LoadingWidget - Animated loading with WatchEarn branding
+4. CoinDisplay - Shows coin amount with golden coin icon and animation
+5. VideoCard - Two variants (horizontal + vertical) with thumbnail, title, duration, views
+6. CategoryChip - Colorful chip with emoji icon
+7. VipBadge - Shows VIP tier with appropriate color and icon
+8. ShimmerLoading - Loading skeleton for video cards
+
+═══════════════════════════════════════════════════
+IMPORTANT REQUIREMENTS
+═══════════════════════════════════════════════════
+1. Every file must have proper imports
+2. No placeholder "TODO" comments - write actual code
+3. Every widget must be complete and working
+4. Use const constructors wherever possible
+5. Follow Material 3 design guidelines
+6. All animations must be smooth (60fps)
+7. Code must be null-safe
+8. Handle all error states
+9. Make it look PREMIUM - not cheap
+10. DO NOT leave any file incomplete
+11. Generate ALL files listed in folder structure
+12. Make it look like it was built by a senior developer at Google
+
+Generate EVERY single file completely. Start from pubspec.yaml and end with the last widget file.
+```
+
+---
+
+## ✅ Prompt 1 Paste Karne Ke Baad:
+
+Jab Antigravity output dena shuru kare toh **yeh check karo:**
+
+### Checklist:
+- [ ] pubspec.yaml complete hai?
+- [ ] main.dart properly Firebase initialize kar raha hai?
+- [ ] Folder structure bani hai?
+- [ ] AppColors, AppStrings, AppConfig sab hain?
+- [ ] Custom widgets complete hain?
+- [ ] Koi error toh nahi?
+
+---
+
+## ⚠️ Agar Antigravity Yeh Kahe:
+
+**"Code too long"** → Yeh likho:
+> "Continue from where you stopped. Generate remaining files."
+
+**"I cannot create files"** → Yeh likho:
+> "Show me the complete code for each file one by one starting from pubspec.yaml"
+
+**Koi error aaye** → Woh error mujhe yahan paste karo, main fix kar dunga.
+
+---
+
+## ⏭️ Jab Prompt 1 Complete Ho Jaye:
+
+Mujhe yahan likhna:
+> **"Prompt 1 Done - Prompt 2 Ready Do"**
+
+Main turant **Prompt 2** ready kar ke dunga!
+
+**Ab jao aur paste karo!** 🔥🚀

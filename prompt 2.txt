@@ -1,0 +1,655 @@
+## ✅ PROMPT 2 READY HAI BHAI!
+
+Yeh paste karo Google Antigravity mein:
+
+---
+
+## 🚀 PROMPT 2 (COPY FROM HERE)
+
+```
+You are an expert Flutter developer continuing the WatchEarn project.
+Now create ALL DATA MODELS and ALL SERVICES completely.
+
+═══════════════════════════════════════════════════
+PART A: ALL DATA MODELS
+═══════════════════════════════════════════════════
+
+Create these 10 complete model files:
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+1. lib/data/models/user_model.dart
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+Fields:
+- String uid
+- String name
+- String email
+- String profilePic
+- int coins
+- int totalEarned
+- double totalWithdrawn
+- String vipPlan (free/silver/gold/platinum/diamond/lifetime)
+- DateTime? vipExpiry
+- String referralCode
+- String referredBy
+- int totalReferrals
+- int streak
+- DateTime lastLogin
+- int videosWatched
+- int totalWatchTimeSeconds
+- DateTime joinDate
+- List<String> badges
+- List<String> favorites
+- List<String> watchedVideoIds
+- bool notificationsEnabled
+- bool autoplayEnabled
+- String videoQuality
+- int dailyVideosWatched
+- int dailyAdsWatched
+- int dailyShares
+- int dailyCategoriesWatched
+- DateTime lastDailyReset
+- int totalSpins
+- int totalScratchCards
+- String fcmToken
+
+Helper Methods (implement all):
+- bool get isVip
+- int get coinMultiplier
+- String get formattedCoins
+- double get cashValue
+- String get formattedCashValue
+- String get formattedWatchTime
+- String get memberSince
+- String get vipBadgeIcon
+- String get vipDisplayName
+- bool get canWithdraw
+- double get minWithdrawal
+- bool get needsDailyReset
+- factory fromFirestore(DocumentSnapshot doc)
+- Map<String,dynamic> toFirestore()
+- UserModel copyWith(...)
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+2. lib/data/models/video_model.dart
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+Fields:
+- String id
+- String youtubeId
+- String title
+- String description
+- String categoryId
+- String categoryName
+- String categoryIcon
+- int duration (seconds)
+- int views
+- int likes
+- DateTime publishedAt
+- bool isTrending
+- bool isFeatured
+- bool isVipOnly
+- bool isActive
+- int order
+- List<String> tags
+
+Helper Methods:
+- String get thumbnailHQ (maxresdefault)
+- String get thumbnailMQ (hqdefault)
+- String get thumbnailSQ (mqdefault)
+- String get formattedDuration
+- String get formattedViews
+- String get formattedLikes
+- String get timeAgo
+- factory fromFirestore(DocumentSnapshot doc)
+- Map<String,dynamic> toFirestore()
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+3. lib/data/models/category_model.dart
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+Fields:
+- String id
+- String name
+- String icon (emoji)
+- String colorHex
+- int videoCount
+- int order
+- bool isActive
+
+Helper Methods:
+- Color get color
+- factory fromFirestore(DocumentSnapshot doc)
+- Map<String,dynamic> toFirestore()
+
+Default categories (implement as static):
+1. All (✨, #6C63FF)
+2. Sand Cutting (🏖️, #FF6B9D)
+3. Soap Cutting (🧼, #00D9FF)
+4. Slime (🟢, #00E676)
+5. Pressure Wash (💦, #2196F3)
+6. Paint Mixing (🎨, #9C27B0)
+7. Cake Art (🎂, #E91E63)
+8. Hydraulic Press (🔨, #795548)
+9. 3D Printing (🖨️, #607D8B)
+10. ASMR (🎧, #6C63FF)
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+4. lib/data/models/transaction_model.dart
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+Fields:
+- String id
+- String userId
+- String type (earning/withdrawal/vip_purchase/referral_bonus)
+- String source (video/ad/spin/scratch/mystery/referral/streak/goal/milestone/vip)
+- int coins
+- double amount
+- String status (completed/pending/rejected)
+- String paymentMethod (paypal/amazon/google_play/apple/visa)
+- String paymentEmail
+- String description
+- DateTime timestamp
+
+Helper Methods:
+- String get statusIcon
+- String get typeIcon
+- String get formattedAmount
+- String get timeAgo
+- bool get isEarning
+- bool get isWithdrawal
+- factory fromFirestore(DocumentSnapshot doc)
+- Map<String,dynamic> toFirestore()
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+5. lib/data/models/referral_model.dart
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+Fields:
+- String id
+- String referrerUserId
+- String referredUserId
+- String referredName
+- String referredProfilePic
+- String referredEmail
+- int coinsEarned
+- int referredVideosWatched
+- bool hasPurchasedVip
+- String status (active/inactive)
+- DateTime timestamp
+- DateTime? lastActivityAt
+
+Helper Methods:
+- String get timeAgo
+- String get statusBadge
+- factory fromFirestore(DocumentSnapshot doc)
+- Map<String,dynamic> toFirestore()
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+6. lib/data/models/vip_plan_model.dart
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+Fields:
+- String id
+- String name
+- String badge (emoji)
+- double price
+- int durationDays
+- int multiplier
+- List<String> features
+- LinearGradient gradient
+- Color color
+- bool isPopular
+- String productId (for in-app purchase)
+
+Helper Methods:
+- String get durationText
+- String get priceText
+- static List<VipPlanModel> getAllPlans()
+
+Plans:
+- Silver: $9.99, 30 days, 3x
+- Gold: $19.99, 30 days, 5x (MOST POPULAR)
+- Platinum: $34.99, 60 days, 7x
+- Diamond: $49.99, 90 days, 10x
+- Lifetime: $99.99, forever, 15x
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+7. lib/data/models/daily_goal_model.dart
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+Fields:
+- String id
+- String title
+- String description
+- String icon (emoji)
+- int target
+- int current
+- int reward
+- bool isClaimed
+- String type (videos/ads/shares/categories)
+
+Helper Methods:
+- bool get isCompleted
+- double get progress
+- String get progressText
+- static List<DailyGoalModel> getGoals(int videos, int ads, int shares, int categories, List<String> claimedGoals)
+
+Goals:
+1. First Video (1 video, 20 coins)
+2. Morning Viewer (3 videos, 40 coins)
+3. Half Way (5 videos, 60 coins)
+4. Dedicated Watcher (10 videos, 120 coins)
+5. Video Marathon (20 videos, 250 coins)
+6. Daily Champion (30 videos, 500 coins)
+7. Ad Supporter (5 ads, 100 coins)
+8. Social Butterfly (1 share, 30 coins)
+9. Explorer (3 categories, 50 coins)
+10. All Goals Complete BONUS (300 extra coins)
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+8. lib/data/models/badge_model.dart
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+Fields:
+- String id
+- String name
+- String icon
+- String description
+- String requirement
+- int reward
+- bool isUnlocked
+- DateTime? unlockedAt
+
+20 badges:
+1. Newbie 🐣 (first video, 100)
+2. On Fire 🔥 (3 day streak, 300)
+3. Unstoppable ⚡ (7 day streak, 1000)
+4. Dedicated 🌟 (14 day streak, 2500)
+5. Legend 💎 (30 day streak, 10000)
+6. Curious 👀 (10 videos, 500)
+7. Binge Watcher 📺 (50 videos, 2000)
+8. Movie Buff 🎬 (100 videos, 5000)
+9. Champion 🏆 (500 videos, 25000)
+10. King 👑 (1000 videos, 100000)
+11. Social Star 👥 (5 referrals, 5000)
+12. Influencer 🌍 (25 referrals, 50000)
+13. First Cash 💰 (first withdrawal, 1000)
+14. VIP Member 💎 (buy any VIP, 5000)
+15. Lucky Spinner 🎰 (win 500 on spin, 2000)
+16. Collector ❤️ (50 favorites, 3000)
+17. Explorer 🗂️ (all categories, 5000)
+18. Reviewer 📱 (rate app, 3000)
+19. Loyal 🔔 (enable notifications, 500)
+20. Anniversary 🎂 (1 year, 10000)
+
+static List<BadgeModel> getAllBadges(List<String> unlockedBadges)
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+9. lib/data/models/notification_model.dart
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+Fields:
+- String id
+- String title
+- String body
+- String type (daily_bonus/new_video/vip_offer/referral/milestone/withdrawal/streak)
+- String icon
+- bool isRead
+- DateTime timestamp
+- Map<String,dynamic>? data
+
+Helper Methods:
+- String get timeAgo
+- Color get typeColor
+- factory fromFirestore(DocumentSnapshot doc)
+- Map<String,dynamic> toFirestore()
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+10. lib/data/models/leaderboard_model.dart
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+Fields:
+- int rank
+- String userId
+- String name
+- String profilePic
+- int weeklyCoins
+- int totalCoins
+- String vipPlan
+
+Helper Methods:
+- String get rankBadge
+- String get rankTitle
+- int get weeklyPrize
+- Color get rankColor
+- factory fromFirestore(DocumentSnapshot doc)
+
+═══════════════════════════════════════════════════
+PART B: ALL PROVIDERS
+═══════════════════════════════════════════════════
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+1. lib/data/providers/auth_provider.dart
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+State:
+- User? firebaseUser
+- UserModel? userModel
+- bool isLoading
+- String? errorMessage
+- bool isLoggedIn
+
+Methods:
+- Future<void> signInWithGoogle()
+- Future<void> signInWithEmail(email, password)
+- Future<void> signUpWithEmail(name, email, password, referralCode)
+- Future<void> sendPasswordReset(email)
+- Future<void> signOut()
+- Future<void> deleteAccount()
+- void clearError()
+- Stream<User?> get authStateChanges
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+2. lib/data/providers/user_provider.dart
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+State:
+- UserModel? user
+- bool isLoading
+- List<TransactionModel> transactions
+- List<NotificationModel> notifications
+- int unreadNotifications
+
+Methods:
+- Future<void> loadUser(String uid)
+- Future<void> updateCoins(int amount, String source)
+- Future<void> checkAndUpdateStreak()
+- Future<void> updateProfile(String name, String? profilePic)
+- Future<void> toggleFavorite(String videoId)
+- Future<void> markVideoWatched(String videoId)
+- Future<void> updateDailyStats(String type)
+- Future<void> checkAndResetDaily()
+- Future<void> checkBadges()
+- Future<void> loadTransactions()
+- Future<void> loadNotifications()
+- Future<void> markNotificationRead(String id)
+- Stream<UserModel> userStream(String uid)
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+3. lib/data/providers/video_provider.dart
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+State:
+- List<VideoModel> allVideos
+- List<VideoModel> trendingVideos
+- List<VideoModel> featuredVideos
+- List<VideoModel> filteredVideos
+- List<VideoModel> favoriteVideos
+- List<CategoryModel> categories
+- String selectedCategory
+- bool isLoading
+- String searchQuery
+- VideoModel? currentVideo
+
+Methods:
+- Future<void> loadVideos()
+- Future<void> loadCategories()
+- Future<void> loadFavorites(List<String> favoriteIds)
+- void filterByCategory(String categoryId)
+- void searchVideos(String query)
+- Future<void> incrementViews(String videoId)
+- Future<void> incrementLikes(String videoId)
+- List<VideoModel> getRelatedVideos(VideoModel video)
+- void setCurrentVideo(VideoModel video)
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+4. lib/data/providers/coin_provider.dart
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+State:
+- int videoCount (for ad tracking)
+- bool showCoinAnimation
+- int lastEarnedCoins
+- String lastEarnedSource
+
+Methods:
+- Future<int> earnFromVideo(UserModel user)
+- Future<int> earnFromAd(UserModel user)
+- Future<int> claimDailyBonus(UserModel user)
+- Future<int> claimGoalReward(DailyGoalModel goal, UserModel user)
+- Future<int> claimBadgeReward(BadgeModel badge, UserModel user)
+- Future<int> claimMilestoneReward(int milestone, UserModel user)
+- Future<bool> processWithdrawal(UserModel user, double amount, String method, String email)
+- void incrementVideoCount()
+- bool shouldShowAd(UserModel user)
+- void triggerCoinAnimation(int coins, String source)
+- void clearAnimation()
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+5. lib/data/providers/earn_provider.dart
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+State:
+- bool isSpinning
+- int? spinResult
+- bool isScratchRevealed
+- int? scratchResult
+- bool isMysteryOpened
+- int? mysteryResult
+- int dailySpinsUsed
+- int dailyScratchUsed
+- int dailyMysteryUsed
+- List<DailyGoalModel> dailyGoals
+- int streakDay
+- bool dailyBonusClaimed
+
+Methods:
+- Future<int> spinWheel(UserModel user)
+- Future<int> scratchCard(UserModel user)
+- Future<int> openMysteryBox(UserModel user)
+- Future<bool> claimDailyBonus(UserModel user)
+- Future<void> loadDailyGoals(UserModel user)
+- Future<bool> claimGoal(String goalId, UserModel user)
+- int getSpinPrize()
+- int getScratchPrize(UserModel user)
+- int getMysteryPrize(UserModel user)
+- bool canSpin(UserModel user)
+- bool canScratch(UserModel user)
+- bool canOpenMystery(UserModel user)
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+6. lib/data/providers/referral_provider.dart
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+State:
+- List<ReferralModel> referrals
+- int totalReferrals
+- int totalReferralCoins
+- bool isLoading
+- List<LeaderboardModel> leaderboard
+
+Methods:
+- Future<void> loadReferrals(String userId)
+- Future<void> loadLeaderboard()
+- Future<bool> applyReferralCode(String code, UserModel user)
+- Future<void> processReferralCommission(String referrerCode, int coinsEarned)
+- String generateShareText(String referralCode)
+- Future<void> shareReferralLink(String referralCode)
+- Future<void> copyReferralLink(String referralCode)
+- Future<void> shareToWhatsApp(String referralCode)
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+7. lib/data/providers/vip_provider.dart
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+State:
+- List<VipPlanModel> plans
+- bool isPurchasing
+- bool isLoading
+- String? errorMessage
+
+Methods:
+- Future<void> loadPlans()
+- Future<bool> purchaseVip(String planId, UserModel user)
+- Future<void> restorePurchases()
+- bool isVipActive(UserModel user)
+- VipPlanModel? getCurrentPlan(UserModel user)
+- String getRemainingDays(UserModel user)
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+8. lib/data/providers/ad_provider.dart
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+State:
+- BannerAd? bannerAd
+- InterstitialAd? interstitialAd
+- RewardedAd? rewardedAd
+- bool isBannerLoaded
+- bool isInterstitialLoaded
+- bool isRewardedLoaded
+- int videoCountForAd
+
+Methods:
+- Future<void> loadBannerAd()
+- Future<void> loadInterstitialAd()
+- Future<void> loadRewardedAd()
+- Future<void> showInterstitialAd()
+- Future<int> showRewardedAd()
+- void disposeBannerAd()
+- void incrementVideoCount()
+- bool shouldShowInterstitial(bool isVip)
+- Widget buildBannerAdWidget()
+
+═══════════════════════════════════════════════════
+PART C: ALL SERVICES
+═══════════════════════════════════════════════════
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+1. lib/core/services/auth_service.dart
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+- Firebase Auth integration
+- Google Sign In
+- Email/Password auth
+- Password reset
+- Sign out
+- Delete account
+- Error handling with proper messages
+- Generate unique referral code on signup
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+2. lib/core/services/firestore_service.dart
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+Complete Firestore CRUD operations:
+- createUser(UserModel user)
+- getUser(String uid) → UserModel
+- updateUser(String uid, Map data)
+- streamUser(String uid) → Stream<UserModel>
+- getVideos({String? category, bool? trending, int? limit})
+- getCategories()
+- addTransaction(TransactionModel t)
+- getTransactions(String userId)
+- addReferral(ReferralModel r)
+- getReferrals(String userId)
+- getLeaderboard({bool weekly})
+- createWithdrawal(Map data)
+- getUserByReferralCode(String code)
+- incrementVideoViews(String videoId)
+- sendNotificationToAll(String title, String body)
+- getUserNotifications(String userId)
+- markNotificationRead(String notifId)
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+3. lib/core/services/ad_service.dart
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+- Initialize AdMob
+- Banner Ad (load, show, dispose)
+- Interstitial Ad (load, show with callback)
+- Rewarded Ad (load, show with reward callback)
+- Auto-reload after show
+- Error handling
+- Ad request with test device IDs
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+4. lib/core/services/notification_service.dart
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+- Firebase Messaging setup
+- Request permissions
+- Get FCM token
+- Handle foreground messages
+- Handle background messages
+- Show local notifications
+- Schedule daily reminder
+- Handle notification tap
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+5. lib/core/services/purchase_service.dart
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+- Initialize in_app_purchase
+- Load products (5 VIP plans)
+- Buy product
+- Restore purchases
+- Verify purchase
+- Handle purchase updates stream
+- Error handling
+
+═══════════════════════════════════════════════════
+FIREBASE RULES
+═══════════════════════════════════════════════════
+Create firestore.rules file:
+- Users can only read/write their own data
+- Videos are publicly readable
+- Categories are publicly readable
+- Transactions: user can read own only
+- Referrals: user can read own only
+- Admin has full access
+- Leaderboard is publicly readable
+- Notifications: user can read own only
+
+═══════════════════════════════════════════════════
+HELPERS & VALIDATORS
+═══════════════════════════════════════════════════
+
+lib/core/utils/helpers.dart:
+- generateReferralCode(String uid) → String (6 char unique code)
+- formatCoins(int coins) → String
+- formatCash(double amount) → String
+- formatDuration(int seconds) → String
+- formatTimeAgo(DateTime date) → String
+- formatDate(DateTime date) → String
+- getGreeting() → String (Good Morning/Afternoon/Evening)
+- showSuccessSnackbar(context, message)
+- showErrorSnackbar(context, message)
+- showCoinEarnedDialog(context, int coins, String source)
+- openUrl(String url)
+- shareText(String text)
+
+lib/core/utils/validators.dart:
+- validateEmail(String? email) → String?
+- validatePassword(String? password) → String?
+- validateName(String? name) → String?
+- validateReferralCode(String? code) → String?
+- validatePaypalEmail(String? email) → String?
+- validateAmount(String? amount, double min) → String?
+
+═══════════════════════════════════════════════════
+IMPORTANT NOTES
+═══════════════════════════════════════════════════
+1. Every file must be 100% complete - no TODOs
+2. All imports must be correct
+3. Use proper error handling (try-catch everywhere)
+4. Use proper null safety
+5. Every provider must extend ChangeNotifier
+6. Services must be singleton pattern
+7. Generate EVERY file completely
+8. Code quality must be production-level
+9. No placeholder code - everything must work
+```
+
+---
+
+## ✅ Prompt 2 Paste Karne Ke Baad Checklist:
+
+- [ ] 10 Models complete hain?
+- [ ] 8 Providers complete hain?
+- [ ] 5 Services complete hain?
+- [ ] Firebase rules bani hain?
+- [ ] Helpers aur Validators complete hain?
+
+---
+
+## ⚠️ Agar Antigravity Rok Jaye:
+
+Yeh likho:
+> **"Continue generating remaining files from where you stopped"**
+
+---
+
+## ⏭️ Jab Prompt 2 Done Ho Jaye:
+
+Mujhe likho:
+> **"Prompt 2 Done - Prompt 3 Ready Do"**
+
+Main turant **Prompt 3** (Splash + Onboarding + Auth Screens) ready kar dunga! 🚀
