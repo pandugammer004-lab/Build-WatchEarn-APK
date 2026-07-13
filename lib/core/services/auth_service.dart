@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import '../utils/helpers.dart';
@@ -9,14 +10,28 @@ class AuthService {
   factory AuthService() => _instance;
   AuthService._internal();
 
-  final FirebaseAuth _auth = FirebaseAuth.instance;
+  // Safely get FirebaseAuth instance (not available on web without init)
+  FirebaseAuth? get _auth {
+    if (kIsWeb) return null;
+    try {
+      return FirebaseAuth.instance;
+    } catch (e) {
+      return null;
+    }
+  }
+
   final GoogleSignIn _googleSignIn = GoogleSignIn();
   final FirestoreService _firestoreService = FirestoreService();
 
-  Stream<User?> get authStateChanges => _auth.authStateChanges();
-  User? get currentUser => _auth.currentUser;
+  Stream<User?> get authStateChanges {
+    if (kIsWeb || _auth == null) return const Stream.empty();
+    return _auth!.authStateChanges();
+  }
+
+  User? get currentUser => kIsWeb ? null : _auth?.currentUser;
 
   Future<UserCredential?> signInWithGoogle() async {
+    if (kIsWeb) throw Exception('Google Sign-In not available on web preview.');
     try {
       final GoogleSignInAccount? googleUser = await _googleSignIn.signIn();
       if (googleUser == null) return null;
@@ -27,7 +42,7 @@ class AuthService {
         idToken: googleAuth.idToken,
       );
 
-      final userCredential = await _auth.signInWithCredential(credential);
+      final userCredential = await _auth!.signInWithCredential(credential);
       await _checkAndCreateUserDocument(userCredential.user);
       return userCredential;
     } catch (e) {
@@ -36,8 +51,9 @@ class AuthService {
   }
 
   Future<UserCredential> signInWithEmail(String email, String password) async {
+    if (kIsWeb) throw Exception('Login requires Firebase setup. Use the mobile app.');
     try {
-      final userCredential = await _auth.signInWithEmailAndPassword(
+      final userCredential = await _auth!.signInWithEmailAndPassword(
         email: email,
         password: password,
       );
@@ -48,8 +64,9 @@ class AuthService {
   }
 
   Future<UserCredential> signUpWithEmail(String name, String email, String password, String? referralCode) async {
+    if (kIsWeb) throw Exception('Signup requires Firebase setup. Use the mobile app.');
     try {
-      final userCredential = await _auth.createUserWithEmailAndPassword(
+      final userCredential = await _auth!.createUserWithEmailAndPassword(
         email: email,
         password: password,
       );
@@ -64,7 +81,7 @@ class AuthService {
   }
 
   Future<void> _checkAndCreateUserDocument(User? user, {String? name, String? referredBy}) async {
-    if (user == null) return;
+    if (user == null || kIsWeb) return;
     
     final existingUser = await _firestoreService.getUser(user.uid);
     if (existingUser == null) {
@@ -105,17 +122,19 @@ class AuthService {
   }
 
   Future<void> sendPasswordReset(String email) async {
+    if (kIsWeb) throw Exception('Password reset requires Firebase setup.');
     try {
-      await _auth.sendPasswordResetEmail(email: email);
+      await _auth!.sendPasswordResetEmail(email: email);
     } catch (e) {
       throw Exception(_handleAuthError(e.toString()));
     }
   }
 
   Future<void> signOut() async {
+    if (kIsWeb) return;
     try {
       await Future.wait([
-        _auth.signOut(),
+        _auth!.signOut(),
         _googleSignIn.signOut(),
       ]);
     } catch (e) {
@@ -124,6 +143,7 @@ class AuthService {
   }
 
   Future<void> deleteAccount() async {
+    if (kIsWeb) return;
     try {
       await currentUser?.delete();
     } catch (e) {
