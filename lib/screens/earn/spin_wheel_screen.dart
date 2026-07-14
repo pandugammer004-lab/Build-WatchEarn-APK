@@ -19,6 +19,8 @@ class SpinWheelScreen extends StatefulWidget {
 class _SpinWheelScreenState extends State<SpinWheelScreen> {
   StreamController<int> selected = StreamController<int>();
   bool _isSpinning = false;
+  int _spinsAvailable = 1; // Default 1 free spin per session
+  int _currentPrize = 0;
   
   final List<int> _prizes = [5, 10, 25, 50, 100, 200, 500, 1000];
   final List<Color> _colors = [
@@ -38,38 +40,47 @@ class _SpinWheelScreenState extends State<SpinWheelScreen> {
     super.dispose();
   }
 
-  void _spin(BuildContext context) async {
+  void _spin(BuildContext context) {
     if (_isSpinning) return;
+    if (_spinsAvailable <= 0) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('No spins available! Watch an ad to get more.')),
+      );
+      return;
+    }
     
-    final userProvider = Provider.of<UserProvider>(context, listen: false);
     final earnProvider = Provider.of<EarnProvider>(context, listen: false);
-    
-    // Check spins remaining logic here
-    // For demo, assuming they have spins
     
     setState(() {
       _isSpinning = true;
+      _spinsAvailable -= 1;
     });
 
-    final prize = earnProvider.getSpinWheelPrize();
-    final index = earnProvider.getSpinIndexForPrize(prize);
+    _currentPrize = earnProvider.getSpinWheelPrize();
+    final index = earnProvider.getSpinIndexForPrize(_currentPrize);
     
     selected.add(index);
-    
-    // Wait for spin to finish (usually 5 seconds in flutter_fortune_wheel)
-    await Future.delayed(const Duration(seconds: 5));
-    
+  }
+
+  void _onAnimationEnd() async {
     if (!mounted) return;
     
     setState(() {
       _isSpinning = false;
     });
 
+    final userProvider = Provider.of<UserProvider>(context, listen: false);
+    final earnProvider = Provider.of<EarnProvider>(context, listen: false);
+
     // Award Prize
-    await earnProvider.logSpin(userProvider.user!, prize);
-    await userProvider.updateCoins(prize, 'Lucky Spin');
+    if (userProvider.user != null) {
+      await earnProvider.logSpin(userProvider.user!, _currentPrize);
+      await userProvider.updateCoins(_currentPrize, 'Lucky Spin');
+    }
     
-    CoinEarnedAnimation.show(context, coins: prize, source: 'Lucky Spin');
+    if (mounted) {
+      CoinEarnedAnimation.show(context, coins: _currentPrize, source: 'Lucky Spin');
+    }
   }
 
   @override
@@ -102,9 +113,9 @@ class _SpinWheelScreenState extends State<SpinWheelScreen> {
               color: Colors.white10,
               borderRadius: BorderRadius.circular(20),
             ),
-            child: const Text(
-              '1 Free Spin Available',
-              style: TextStyle(color: Colors.amber, fontWeight: FontWeight.bold),
+            child: Text(
+              '$_spinsAvailable Free Spin${_spinsAvailable == 1 ? '' : 's'} Available',
+              style: const TextStyle(color: Colors.amber, fontWeight: FontWeight.bold),
             ),
           ),
           const SizedBox(height: 40),
@@ -132,6 +143,7 @@ class _SpinWheelScreenState extends State<SpinWheelScreen> {
                   child: FortuneWheel(
                     selected: selected.stream,
                     animateFirst: false,
+                    onAnimationEnd: _onAnimationEnd,
                     physics: CircularPanPhysics(
                       duration: const Duration(seconds: 1),
                       curve: Curves.decelerate,
@@ -178,7 +190,7 @@ class _SpinWheelScreenState extends State<SpinWheelScreen> {
             child: ElevatedButton(
               onPressed: _isSpinning ? null : () => _spin(context),
               style: ElevatedButton.styleFrom(
-                backgroundColor: Colors.amber,
+                backgroundColor: _spinsAvailable > 0 ? Colors.amber : Colors.grey,
                 foregroundColor: Colors.black,
                 minimumSize: const Size(double.infinity, 60),
                 shape: RoundedRectangleBorder(
@@ -188,7 +200,7 @@ class _SpinWheelScreenState extends State<SpinWheelScreen> {
                 shadowColor: Colors.amber.withOpacity(0.5),
               ),
               child: Text(
-                _isSpinning ? 'SPINNING...' : 'SPIN NOW',
+                _isSpinning ? 'SPINNING...' : (_spinsAvailable > 0 ? 'SPIN NOW' : 'OUT OF SPINS'),
                 style: GoogleFonts.poppins(
                   fontSize: 20,
                   fontWeight: FontWeight.bold,
@@ -199,7 +211,13 @@ class _SpinWheelScreenState extends State<SpinWheelScreen> {
           const SizedBox(height: 16),
           TextButton(
             onPressed: () {
-              // Show Ad for extra spin
+              // Simulating watching an ad for a free spin
+              setState(() {
+                _spinsAvailable += 1;
+              });
+              ScaffoldMessenger.of(context).showSnackBar(
+                const SnackBar(content: Text('You watched an ad! +1 Spin granted.')),
+              );
             },
             child: const Text(
               'Watch Ad to Spin Extra',
