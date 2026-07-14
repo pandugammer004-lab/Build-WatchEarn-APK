@@ -38,7 +38,7 @@ class DefaultFirebaseOptions {
 
   static const FirebaseOptions web = FirebaseOptions(
     apiKey: 'AIzaSyA9xQfWbNc1Ht99KXx5GMLIuk_wfItw9BA',
-    appId: '1:461764093304:web:8651c6cbe624a08024d48d', // generic web appId, but we can use the android one if we don't have it, or just use the android one. Let's use android one if no web app exists in firebase.
+    appId: '1:461764093304:android:61891c996e598d1624d48d', // using android app id
     messagingSenderId: '461764093304',
     projectId: 'mobile-app-f270c',
     authDomain: 'mobile-app-f270c.firebaseapp.com',

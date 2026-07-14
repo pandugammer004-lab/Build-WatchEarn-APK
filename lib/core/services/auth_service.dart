@@ -150,6 +150,7 @@ class AuthService {
     if (error.contains('email-already-in-use')) return 'The account already exists for that email.';
     if (error.contains('invalid-email')) return 'The email address is badly formatted.';
     if (error.contains('weak-password')) return 'The password provided is too weak.';
-    return 'Authentication failed. Please try again.';
+    // Include the actual error for debugging
+    return 'Auth failed: $error';
   }
 }
