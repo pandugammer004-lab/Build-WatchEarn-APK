@@ -38,7 +38,7 @@ class DefaultFirebaseOptions {
 
   static const FirebaseOptions web = FirebaseOptions(
     apiKey: 'AIzaSyA9xQfWbNc1Ht99KXx5GMLIuk_wfItw9BA',
-    appId: '1:461764093304:android:61891c996e598d1624d48d', // using android app id
+    appId: '1:461764093304:web:8651c6cbe624a08024d48d', // MUST use a web-format app ID to prevent network request failures
     messagingSenderId: '461764093304',
     projectId: 'mobile-app-f270c',
     authDomain: 'mobile-app-f270c.firebaseapp.com',
