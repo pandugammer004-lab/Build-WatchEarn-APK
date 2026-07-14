@@ -106746,7 +106746,7 @@ if(B.d.p(a,"wrong-password"))return"Wrong password provided."
 if(B.d.p(a,"email-already-in-use"))return"The account already exists for that email."
 if(B.d.p(a,"invalid-email"))return"The email address is badly formatted."
 if(B.d.p(a,"weak-password"))return"The password provided is too weak."
-return"Authentication failed. Please try again."}}
+return"Auth failed: "+a}}
 A.ahc.prototype={
 DO(a){return this.axI(a)},
 axI(a){var s=0,r=A.w(t.H),q=this,p,o
@@ -114913,7 +114913,7 @@ B.ir=new A.rB(3,"high")
 B.lG=new A.wA(0,"topLeft")
 B.qD=new A.wA(1,"topRight")
 B.lH=new A.wA(2,"bottomLeft")
-B.MN=new A.wF("AIzaSyA9xQfWbNc1Ht99KXx5GMLIuk_wfItw9BA","1:461764093304:web:8651c6cbe624a08024d48d","461764093304","mobile-app-f270c","mobile-app-f270c.firebaseapp.com",null,"mobile-app-f270c.firebasestorage.app",null,null,null,null,null,null,null)
+B.MN=new A.wF("AIzaSyA9xQfWbNc1Ht99KXx5GMLIuk_wfItw9BA","1:461764093304:android:61891c996e598d1624d48d","461764093304","mobile-app-f270c","mobile-app-f270c.firebaseapp.com",null,"mobile-app-f270c.firebasestorage.app",null,null,null,null,null,null,null)
 B.v=new A.L(0,0)
 B.MO=new A.Ru(B.v,B.v)
 B.lI=new A.Rv(1,"loose")
