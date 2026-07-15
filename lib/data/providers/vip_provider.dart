@@ -14,7 +14,7 @@ class VipProvider extends ChangeNotifier {
     notifyListeners();
 
     try {
-      await _firestore.firestore.collection('vip_requests').add({
+      await FirebaseFirestore.instance.collection('vip_requests').add({
         'userId': user.uid,
         'userEmail': user.email,
         'planId': planId,
