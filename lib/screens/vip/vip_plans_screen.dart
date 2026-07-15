@@ -363,10 +363,10 @@ class _VipPlansScreenState extends State<VipPlansScreen> {
   }
 
   void _showPaymentDialog(BuildContext context, Map<String, dynamic> plan) {
-    final nameController = TextEditingController();
-    final trIdController = TextEditingController();
-    final phoneController = TextEditingController();
+    final trxCtrl = TextEditingController();
+    String selectedMethod = 'USDT (TRC20)';
     final vipProvider = Provider.of<VipProvider>(context, listen: false);
+    final userProvider = Provider.of<UserProvider>(context, listen: false);
     
     // Hardcoded TRC20 Crypto Address provided by user
     final String cryptoAddress = 'TXFVm81MyfzS4M1gYmMedGBzdzQ26f6bub';
@@ -451,9 +451,10 @@ class _VipPlansScreenState extends State<VipPlansScreen> {
                 ElevatedButton(
                   onPressed: () async {
                     if (trxCtrl.text.isEmpty) return;
+                    if (userProvider.user == null) return;
                     Navigator.pop(context); 
                     
-                    final success = await vipProvider.purchasePlan(user, plan['id'], trxCtrl.text, selectedMethod);
+                    final success = await vipProvider.purchasePlan(userProvider.user!, plan['id'], trxCtrl.text, selectedMethod);
                     if (success && mounted) {
                       Helpers.showSuccessSnackbar(context, 'Request Submitted! Admin will verify and activate your VIP shortly.');
                     } else if (mounted) {
