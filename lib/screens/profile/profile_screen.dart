@@ -312,7 +312,8 @@ class ProfileScreen extends StatelessWidget {
   }
 
   Widget _buildAccountSection(BuildContext context, dynamic user) {
-    final bool isAdmin = user != null && AppConfig.adminEmails.contains(user.email);
+    final bool isAdmin = user != null && 
+        AppConfig.adminEmails.any((email) => email.toLowerCase() == user.email.toString().toLowerCase());
     
     return Container(
       decoration: BoxDecoration(color: AppColors.cardColor, borderRadius: BorderRadius.circular(16)),
