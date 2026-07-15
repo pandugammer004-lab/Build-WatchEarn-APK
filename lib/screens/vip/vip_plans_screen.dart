@@ -336,7 +336,7 @@ class _VipPlansScreenState extends State<VipPlansScreen> {
                 children: [
                   ElevatedButton(
                     onPressed: vipProvider.isPurchasing ? null : () {
-                      _showPaymentDialog(context, userProvider.user!, plan, vipProvider);
+                      _showPaymentDialog(context, plan);
                     },
                     style: ElevatedButton.styleFrom(
                       backgroundColor: Colors.white,

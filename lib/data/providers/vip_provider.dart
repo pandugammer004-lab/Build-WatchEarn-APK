@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import '../models/user_model.dart';
 import '../../core/services/firestore_service.dart';
 
@@ -14,7 +15,7 @@ class VipProvider extends ChangeNotifier {
 
     try {
       await _firestore.firestore.collection('vip_requests').add({
-        'userId': user.id,
+        'userId': user.uid,
         'userEmail': user.email,
         'planId': planId,
         'trxId': trxId,
