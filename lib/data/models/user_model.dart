@@ -37,6 +37,7 @@ class UserModel {
   final DateTime? lastScratchDate;
   final int premiumSpins;
   final int dailyEarned;
+  final DateTime? lastDailyBonusClaim;
 
   UserModel({
     required this.uid,
@@ -74,6 +75,7 @@ class UserModel {
     this.lastScratchDate,
     this.premiumSpins = 0,
     this.dailyEarned = 0,
+    this.lastDailyBonusClaim,
   });
 
   bool get isVip => vipPlan != 'free' && (vipExpiry == null || vipExpiry!.isAfter(DateTime.now()));
@@ -158,6 +160,7 @@ class UserModel {
       lastScratchDate: data['lastScratchDate'] != null ? (data['lastScratchDate'] as Timestamp).toDate() : null,
       premiumSpins: data['premiumSpins'] ?? 0,
       dailyEarned: data['dailyEarned'] ?? 0,
+      lastDailyBonusClaim: data['lastDailyBonusClaim'] != null ? (data['lastDailyBonusClaim'] as Timestamp).toDate() : null,
     );
   }
 
@@ -197,6 +200,7 @@ class UserModel {
       'lastScratchDate': lastScratchDate != null ? Timestamp.fromDate(lastScratchDate!) : null,
       'premiumSpins': premiumSpins,
       'dailyEarned': dailyEarned,
+      'lastDailyBonusClaim': lastDailyBonusClaim != null ? Timestamp.fromDate(lastDailyBonusClaim!) : null,
     };
   }
 
@@ -231,6 +235,7 @@ class UserModel {
     DateTime? lastScratchDate,
     int? premiumSpins,
     int? dailyEarned,
+    DateTime? lastDailyBonusClaim,
   }) {
     return UserModel(
       uid: uid,
@@ -268,6 +273,7 @@ class UserModel {
       lastScratchDate: lastScratchDate ?? this.lastScratchDate,
       premiumSpins: premiumSpins ?? this.premiumSpins,
       dailyEarned: dailyEarned ?? this.dailyEarned,
+      lastDailyBonusClaim: lastDailyBonusClaim ?? this.lastDailyBonusClaim,
     );
   }
 }

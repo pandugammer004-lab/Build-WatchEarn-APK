@@ -34,7 +34,7 @@ class ProfileScreen extends StatelessWidget {
                     children: [
                       _buildStatsGrid(user),
                       const SizedBox(height: 24),
-                      _buildEarningsSummary(),
+                      _buildEarningsSummary(user),
                       const SizedBox(height: 24),
                       _buildRecentBadges(context),
                       const SizedBox(height: 24),
@@ -142,6 +142,11 @@ class ProfileScreen extends StatelessWidget {
   }
 
   Widget _buildStatsGrid(dynamic user) {
+    final int watchTimeMin = user?.totalWatchTimeSeconds != null ? user!.totalWatchTimeSeconds ~/ 60 : 0;
+    final int h = watchTimeMin ~/ 60;
+    final int m = watchTimeMin % 60;
+    final String watchTimeStr = h > 0 ? '${h}h ${m}m' : '${m}m';
+
     return GridView.count(
       crossAxisCount: 2,
       shrinkWrap: true,
@@ -150,10 +155,10 @@ class ProfileScreen extends StatelessWidget {
       mainAxisSpacing: 12,
       childAspectRatio: 1.5,
       children: [
-        _buildStatCard('🪙', 'Total Coins', Helpers.formatCoins(user?.coins ?? 0), 'Lifetime: 120K earned', Colors.amber),
-        _buildStatCard('📺', 'Videos Watched', '${user?.videosWatched ?? 0}', 'Today: ${user?.dailyVideosWatched ?? 0}', Colors.purple),
-        _buildStatCard('⏱️', 'Watch Time', '12h 30m', 'Avg: 45min/day', Colors.cyan),
-        _buildStatCard('🔥', 'Best Streak', '7 Days', 'Best ever: 14 days', Colors.orange),
+        _buildStatCard('🪙', 'Total Coins', Helpers.formatCoins(user?.coins ?? 0), 'Lifetime: ${Helpers.formatCoins(user?.totalEarned ?? 0)}', Colors.amber),
+        _buildStatCard('📺', 'Videos', '${user?.videosWatched ?? 0}', 'Today: ${user?.dailyVideosWatched ?? 0}', Colors.purple),
+        _buildStatCard('⏱️', 'Watch Time', watchTimeStr, 'Active User', Colors.cyan),
+        _buildStatCard('🔥', 'Best Streak', '${user?.streak ?? 0} Days', 'Current Streak', Colors.orange),
       ],
     );
   }
@@ -181,7 +186,7 @@ class ProfileScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildEarningsSummary() {
+  Widget _buildEarningsSummary(dynamic user) {
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(color: AppColors.cardColor, borderRadius: BorderRadius.circular(16), border: Border.all(color: Colors.white12)),
@@ -195,7 +200,7 @@ class ProfileScreen extends StatelessWidget {
               Container(
                 padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
                 decoration: BoxDecoration(color: Colors.white10, borderRadius: BorderRadius.circular(12)),
-                child: const Text('This Week', style: TextStyle(color: Colors.white, fontSize: 10)),
+                child: const Text('Lifetime', style: TextStyle(color: Colors.white, fontSize: 10)),
               ),
             ],
           ),
@@ -205,15 +210,15 @@ class ProfileScreen extends StatelessWidget {
             height: 150,
             width: double.infinity,
             decoration: BoxDecoration(color: Colors.white.withOpacity(0.05), borderRadius: BorderRadius.circular(8)),
-            child: const Center(child: Text('fl_chart Placeholder\n(Requires fl_chart package)', textAlign: TextAlign.center, style: TextStyle(color: Colors.white38))),
+            child: const Center(child: Text('Add fl_chart package to view graphs', textAlign: TextAlign.center, style: TextStyle(color: Colors.white38))),
           ),
           const SizedBox(height: 24),
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              _buildSummaryItem('Total Earned', '15,400 🪙'),
-              _buildSummaryItem('Cash Value', '\$1.54'),
-              _buildSummaryItem('Best Day', 'Mon: 5,200'),
+              _buildSummaryItem('Total Earned', '${Helpers.formatCoins(user?.totalEarned ?? 0)} 🪙'),
+              _buildSummaryItem('Cash Value', '\$${((user?.coins ?? 0) / 10000).toStringAsFixed(2)}'),
+              _buildSummaryItem('Today', '${user?.dailyEarned ?? 0} 🪙'),
             ],
           ),
         ],

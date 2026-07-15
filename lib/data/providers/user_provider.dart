@@ -73,9 +73,17 @@ class UserProvider extends ChangeNotifier {
     if (_user == null) return;
     try {
       final now = DateTime.now();
-      // Simple check: if streak is updated today, they claimed it? 
-      // Actually, let's just add coins and we can add a 'lastBonusClaim' field later or just rely on UI state for now.
-      // Better yet, just give them 100 coins for the bonus!
+      if (_user!.lastDailyBonusClaim != null) {
+        final last = _user!.lastDailyBonusClaim!;
+        if (last.year == now.year && last.month == now.month && last.day == now.day) {
+          return; // Already claimed today
+        }
+      }
+      
+      _user = _user!.copyWith(lastDailyBonusClaim: now);
+      await _firestoreService.updateUser(_user!.uid, {
+        'lastDailyBonusClaim': FieldValue.serverTimestamp(),
+      });
       await updateCoins(100, 'Daily Bonus');
     } catch (e) {
       debugPrint("Error claiming daily bonus: $e");

@@ -90,6 +90,17 @@ class EarnScreen extends StatelessWidget {
   }
 
   Widget _buildDailyBonus(BuildContext context) {
+    final userProvider = Provider.of<UserProvider>(context);
+    final user = userProvider.user;
+    bool hasClaimed = false;
+    if (user != null && user.lastDailyBonusClaim != null) {
+      final last = user.lastDailyBonusClaim!;
+      final now = DateTime.now();
+      if (last.year == now.year && last.month == now.month && last.day == now.day) {
+        hasClaimed = true;
+      }
+    }
+
     return Container(
       padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
@@ -100,7 +111,7 @@ class EarnScreen extends StatelessWidget {
         children: [
           Container(
             padding: const EdgeInsets.all(12),
-            decoration: BoxDecoration(
+            decoration: const BoxDecoration(
               color: Colors.white24,
               shape: BoxShape.circle,
             ),
@@ -113,28 +124,31 @@ class EarnScreen extends StatelessWidget {
               children: [
                 Text('Daily Login Bonus', style: GoogleFonts.poppins(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 16)),
                 const SizedBox(height: 4),
-                const Text('🔥 Day 1 Streak!', style: TextStyle(color: Colors.amber, fontWeight: FontWeight.bold, fontSize: 12)),
+                Text('🔥 Day ${user?.streak ?? 1} Streak!', style: const TextStyle(color: Colors.amber, fontWeight: FontWeight.bold, fontSize: 12)),
               ],
             ),
           ),
-            ElevatedButton(
-              onPressed: () {
-                final userProvider = Provider.of<UserProvider>(context, listen: false);
-                userProvider.claimDailyBonus();
+          ElevatedButton(
+            onPressed: hasClaimed ? null : () async {
+              await userProvider.claimDailyBonus();
+              if (context.mounted) {
                 ScaffoldMessenger.of(context).showSnackBar(
                   const SnackBar(content: Text('Daily Bonus Claimed! +100 Coins')),
                 );
-              },
-              style: ElevatedButton.styleFrom(
-                backgroundColor: Colors.white,
-                foregroundColor: AppColors.primary,
-              ),
-              child: const Text('Claim'),
+              }
+            },
+            style: ElevatedButton.styleFrom(
+              backgroundColor: Colors.white,
+              foregroundColor: AppColors.primary,
+              disabledBackgroundColor: Colors.white54,
+              disabledForegroundColor: Colors.black54,
             ),
-          ],
-        ),
-      );
-    }
+            child: Text(hasClaimed ? 'Claimed' : 'Claim'),
+          ),
+        ],
+      ),
+    );
+  }
 
   Widget _buildStreakCalendar() {
     return Container(
