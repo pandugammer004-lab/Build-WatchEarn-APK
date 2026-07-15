@@ -165,6 +165,36 @@ class EarnScreen extends StatelessWidget {
   }
 
   Widget _buildEarnCardsGrid(BuildContext context) {
+    final userProvider = Provider.of<UserProvider>(context);
+    final user = userProvider.user;
+    
+    // Spin logic
+    bool hasSpin = true;
+    if (user != null && user.lastSpinDate != null) {
+      if (DateTime.now().difference(user.lastSpinDate!).inHours < 12) {
+        hasSpin = false;
+      }
+    }
+    String spinBadge = user?.premiumSpins != null && user!.premiumSpins > 0 ? '${user.premiumSpins} Premium' : (hasSpin ? '1 Free Spin' : '0 Spins Left');
+    
+    // Scratch logic
+    bool hasScratch = true;
+    if (user != null && user.lastScratchDate != null) {
+      if (DateTime.now().difference(user.lastScratchDate!).inHours < 12) {
+        hasScratch = false;
+      }
+    }
+    String scratchBadge = hasScratch ? '1 Card Left' : '0 Cards Left';
+    
+    // Mystery Box logic
+    bool hasBox = true;
+    if (user != null && user.lastMysteryBoxDate != null) {
+      if (DateTime.now().difference(user.lastMysteryBoxDate!).inHours < 12) {
+        hasBox = false;
+      }
+    }
+    String boxBadge = hasBox ? '1 Box Left' : '0 Boxes Left';
+
     return GridView.count(
       crossAxisCount: 2,
       crossAxisSpacing: 16,
@@ -177,7 +207,7 @@ class EarnScreen extends StatelessWidget {
           context: context,
           title: 'Lucky Spin',
           subtitle: 'Win up to 1000 coins!',
-          badgeText: '1 Free Spin',
+          badgeText: spinBadge,
           icon: Icons.casino,
           colors: [Colors.purple, Colors.blue],
           onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => const SpinWheelScreen())),
@@ -186,7 +216,7 @@ class EarnScreen extends StatelessWidget {
           context: context,
           title: 'Scratch & Win',
           subtitle: 'Reveal hidden rewards!',
-          badgeText: '3 Cards Left',
+          badgeText: scratchBadge,
           icon: Icons.style,
           colors: [Colors.pink, Colors.orange],
           onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => const ScratchCardScreen())),
@@ -195,7 +225,7 @@ class EarnScreen extends StatelessWidget {
           context: context,
           title: 'Mystery Box',
           subtitle: 'Surprise rewards inside!',
-          badgeText: '1 Box Left',
+          badgeText: boxBadge,
           icon: Icons.inventory_2,
           colors: [Colors.teal, Colors.green],
           onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => const MysteryBoxScreen())),
@@ -203,7 +233,7 @@ class EarnScreen extends StatelessWidget {
         _buildGameCard(
           context: context,
           title: 'Daily Goals',
-          subtitle: '1/9 Goals Complete',
+          subtitle: 'Complete goals for coins',
           badgeText: 'Earn up to 1170🪙',
           icon: Icons.track_changes,
           colors: [Colors.amber, Colors.orange],

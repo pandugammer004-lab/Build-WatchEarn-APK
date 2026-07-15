@@ -63,7 +63,7 @@ void main() async {
         ChangeNotifierProvider(create: (_) => ReferralProvider()),
         ChangeNotifierProvider(create: (_) => VipProvider()),
         ChangeNotifierProvider(create: (_) => EarnProvider()),
-        ChangeNotifierProvider(create: (_) => AdProvider()),
+        ChangeNotifierProvider(create: (_) => AdProvider(), lazy: false),
       ],
       child: const SatisfyMeApp(),
     ),

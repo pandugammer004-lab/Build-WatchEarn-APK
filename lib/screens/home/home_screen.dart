@@ -200,7 +200,16 @@ class _HomeScreenState extends State<HomeScreen> {
   Widget _buildDailyBonusBanner() {
     return Consumer<UserProvider>(
       builder: (context, userProvider, _) {
-        // Checking if already claimed in real scenario. Simplified here.
+        final user = userProvider.user;
+        bool hasClaimed = false;
+        if (user != null && user.lastDailyBonusClaim != null) {
+          final last = user.lastDailyBonusClaim!;
+          final now = DateTime.now();
+          if (last.year == now.year && last.month == now.month && last.day == now.day) {
+            hasClaimed = true;
+          }
+        }
+        
         return Container(
           margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
           padding: const EdgeInsets.all(16),
@@ -234,13 +243,22 @@ class _HomeScreenState extends State<HomeScreen> {
                 ),
               ),
               ElevatedButton(
-                onPressed: () {},
+                onPressed: hasClaimed ? null : () async {
+                  await userProvider.claimDailyBonus();
+                  if (context.mounted) {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      const SnackBar(content: Text('Daily Bonus Claimed! +100 Coins')),
+                    );
+                  }
+                },
                 style: ElevatedButton.styleFrom(
                   backgroundColor: Colors.white,
                   foregroundColor: AppColors.primary,
+                  disabledBackgroundColor: Colors.white54,
+                  disabledForegroundColor: Colors.black54,
                   shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
                 ),
-                child: const Text('Claim Now →', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 12)),
+                child: Text(hasClaimed ? 'Claimed' : 'Claim Now →', style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 12)),
               ),
             ],
           ),

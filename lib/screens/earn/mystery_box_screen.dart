@@ -20,15 +20,29 @@ class _MysteryBoxScreenState extends State<MysteryBoxScreen> {
   bool _isShaking = false;
   String _boxType = 'common';
   int _prize = 0;
+  Timer? _countdownTimer;
 
   @override
   void initState() {
     super.initState();
+    _startTimer();
     final userProvider = Provider.of<UserProvider>(context, listen: false);
     final earnProvider = Provider.of<EarnProvider>(context, listen: false);
     
     _boxType = earnProvider.getMysteryBoxType(userProvider.user!);
     _prize = earnProvider.getMysteryBoxPrize(_boxType);
+  }
+  
+  void _startTimer() {
+    _countdownTimer = Timer.periodic(const Duration(seconds: 1), (timer) {
+      if (mounted) setState(() {});
+    });
+  }
+  
+  @override
+  void dispose() {
+    _countdownTimer?.cancel();
+    super.dispose();
   }
 
   void _openBox() async {
@@ -36,8 +50,21 @@ class _MysteryBoxScreenState extends State<MysteryBoxScreen> {
     final userProvider = Provider.of<UserProvider>(context, listen: false);
     final earnProvider = Provider.of<EarnProvider>(context, listen: false);
 
-    // Assume ad is watched
-    // await adProvider.showRewardedAd();
+    final lastBox = userProvider.user?.lastMysteryBoxDate;
+    if (lastBox != null && DateTime.now().difference(lastBox).inHours < 12) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Wait for the timer to expire!')),
+      );
+      return;
+    }
+
+    // Play Rewarded Ad before opening
+    if (adProvider.isRewardedLoaded) {
+      await adProvider.showRewardedAd();
+    } else {
+      // If no ad loaded, try loading one and proceed or just proceed
+      adProvider.loadRewardedAd();
+    }
 
     setState(() {
       _isShaking = true;
@@ -54,8 +81,11 @@ class _MysteryBoxScreenState extends State<MysteryBoxScreen> {
 
     await earnProvider.logMysteryBox(userProvider.user!, _prize, _boxType);
     await userProvider.updateCoins(_prize, 'Mystery Box');
+    await userProvider.updateMysteryBoxState();
 
-    CoinEarnedAnimation.show(context, coins: _prize, source: 'Mystery Box');
+    if (mounted) {
+      CoinEarnedAnimation.show(context, coins: _prize, source: 'Mystery Box');
+    }
   }
 
   Color _getBoxColor() {
@@ -140,23 +170,65 @@ class _MysteryBoxScreenState extends State<MysteryBoxScreen> {
             ),
             
             const SizedBox(height: 60),
-            if (!_isOpen) ...[
-              ElevatedButton(
-                onPressed: _isShaking ? null : _openBox,
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: AppColors.primary,
-                  padding: const EdgeInsets.symmetric(horizontal: 40, vertical: 16),
-                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(30)),
-                  minimumSize: const Size(250, 60),
-                ),
-                child: Text(
-                  _isShaking ? 'OPENING...' : 'OPEN BOX',
-                  style: GoogleFonts.poppins(fontSize: 18, fontWeight: FontWeight.bold),
-                ),
-              ),
-              const SizedBox(height: 12),
-              const Text('Watch Ad to Open', style: TextStyle(color: Colors.white54)),
-            ],
+            Consumer<UserProvider>(
+              builder: (context, userProvider, _) {
+                final user = userProvider.user;
+                final lastBox = user?.lastMysteryBoxDate;
+                bool hasFreeBox = false;
+                String timeRemaining = '';
+                
+                if (lastBox == null) {
+                  hasFreeBox = true;
+                } else {
+                  final diff = DateTime.now().difference(lastBox);
+                  if (diff.inHours >= 12) {
+                    hasFreeBox = true;
+                  } else {
+                    final remaining = const Duration(hours: 12) - diff;
+                    final h = remaining.inHours.toString().padLeft(2, '0');
+                    final m = (remaining.inMinutes % 60).toString().padLeft(2, '0');
+                    final s = (remaining.inSeconds % 60).toString().padLeft(2, '0');
+                    timeRemaining = '$h:$m:$s';
+                  }
+                }
+                
+                return Column(
+                  children: [
+                    if (!_isOpen) ...[
+                      if (hasFreeBox)
+                        ElevatedButton(
+                          onPressed: _isShaking ? null : _openBox,
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: AppColors.primary,
+                            padding: const EdgeInsets.symmetric(horizontal: 40, vertical: 16),
+                            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(30)),
+                            minimumSize: const Size(250, 60),
+                          ),
+                          child: Text(
+                            _isShaking ? 'OPENING...' : 'OPEN BOX',
+                            style: GoogleFonts.poppins(fontSize: 18, fontWeight: FontWeight.bold),
+                          ),
+                        )
+                      else
+                        Container(
+                          padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 16),
+                          decoration: BoxDecoration(
+                            color: Colors.red.withOpacity(0.2),
+                            borderRadius: BorderRadius.circular(30),
+                            border: Border.all(color: Colors.redAccent),
+                          ),
+                          child: Text(
+                            'Next Box in: $timeRemaining',
+                            style: GoogleFonts.poppins(color: Colors.redAccent, fontSize: 18, fontWeight: FontWeight.bold),
+                          ),
+                        ),
+                      const SizedBox(height: 12),
+                      const Text('Watch Ad to Open', style: TextStyle(color: Colors.white54)),
+                    ],
+                  ],
+                );
+              },
+            ),
             if (_isOpen)
               ElevatedButton(
                 onPressed: () => Navigator.pop(context),

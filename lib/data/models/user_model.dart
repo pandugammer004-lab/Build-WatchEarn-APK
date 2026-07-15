@@ -35,6 +35,7 @@ class UserModel {
   final String fcmToken;
   final DateTime? lastSpinDate;
   final DateTime? lastScratchDate;
+  final DateTime? lastMysteryBoxDate;
   final int premiumSpins;
   final int dailyEarned;
   final DateTime? lastDailyBonusClaim;
@@ -75,6 +76,7 @@ class UserModel {
     required this.fcmToken,
     this.lastSpinDate,
     this.lastScratchDate,
+    this.lastMysteryBoxDate,
     this.premiumSpins = 0,
     this.dailyEarned = 0,
     this.lastDailyBonusClaim,
@@ -162,6 +164,7 @@ class UserModel {
       fcmToken: data['fcmToken'] ?? '',
       lastSpinDate: data['lastSpinDate'] != null ? (data['lastSpinDate'] as Timestamp).toDate() : null,
       lastScratchDate: data['lastScratchDate'] != null ? (data['lastScratchDate'] as Timestamp).toDate() : null,
+      lastMysteryBoxDate: data['lastMysteryBoxDate'] != null ? (data['lastMysteryBoxDate'] as Timestamp).toDate() : null,
       premiumSpins: data['premiumSpins'] ?? 0,
       dailyEarned: data['dailyEarned'] ?? 0,
       lastDailyBonusClaim: data['lastDailyBonusClaim'] != null ? (data['lastDailyBonusClaim'] as Timestamp).toDate() : null,
@@ -204,6 +207,7 @@ class UserModel {
       'fcmToken': fcmToken,
       'lastSpinDate': lastSpinDate != null ? Timestamp.fromDate(lastSpinDate!) : null,
       'lastScratchDate': lastScratchDate != null ? Timestamp.fromDate(lastScratchDate!) : null,
+      'lastMysteryBoxDate': lastMysteryBoxDate != null ? Timestamp.fromDate(lastMysteryBoxDate!) : null,
       'premiumSpins': premiumSpins,
       'dailyEarned': dailyEarned,
       'lastDailyBonusClaim': lastDailyBonusClaim != null ? Timestamp.fromDate(lastDailyBonusClaim!) : null,
@@ -241,6 +245,7 @@ class UserModel {
     String? fcmToken,
     DateTime? lastSpinDate,
     DateTime? lastScratchDate,
+    DateTime? lastMysteryBoxDate,
     int? premiumSpins,
     int? dailyEarned,
     DateTime? lastDailyBonusClaim,
@@ -281,6 +286,7 @@ class UserModel {
       fcmToken: fcmToken ?? this.fcmToken,
       lastSpinDate: lastSpinDate ?? this.lastSpinDate,
       lastScratchDate: lastScratchDate ?? this.lastScratchDate,
+      lastMysteryBoxDate: lastMysteryBoxDate ?? this.lastMysteryBoxDate,
       premiumSpins: premiumSpins ?? this.premiumSpins,
       dailyEarned: dailyEarned ?? this.dailyEarned,
       lastDailyBonusClaim: lastDailyBonusClaim ?? this.lastDailyBonusClaim,

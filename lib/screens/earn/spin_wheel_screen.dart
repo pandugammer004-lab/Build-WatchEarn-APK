@@ -133,9 +133,9 @@ class _SpinWheelScreenState extends State<SpinWheelScreen> {
                 hasFreeSpin = true;
               } else {
                 final diff = DateTime.now().difference(lastSpin);
-                if (diff.inHours >= 24) hasFreeSpin = true;
+                if (diff.inHours >= 12) hasFreeSpin = true;
                 else {
-                  final remaining = const Duration(hours: 24) - diff;
+                  final remaining = const Duration(hours: 12) - diff;
                   final h = remaining.inHours.toString().padLeft(2, '0');
                   final m = (remaining.inMinutes % 60).toString().padLeft(2, '0');
                   final s = (remaining.inSeconds % 60).toString().padLeft(2, '0');

@@ -144,40 +144,57 @@ class _AddVideoDialogState extends State<AddVideoDialog> {
         TextButton(onPressed: () => Navigator.pop(context), child: const Text('Cancel', style: TextStyle(color: Colors.white54))),
         ElevatedButton(
           onPressed: () async {
-            if (titleCtrl.text.isEmpty || urlCtrl.text.isEmpty) return;
+            if (titleCtrl.text.trim().isEmpty || urlCtrl.text.trim().isEmpty) {
+              ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Please enter Title and URL')));
+              return;
+            }
             
-            String yId = urlCtrl.text;
+            String yId = urlCtrl.text.trim();
+            // Handle different YouTube URL formats
             if (yId.contains('v=')) {
               yId = yId.split('v=')[1].split('&')[0];
             } else if (yId.contains('youtu.be/')) {
               yId = yId.split('youtu.be/')[1].split('?')[0];
+            } else if (yId.contains('shorts/')) {
+              yId = yId.split('shorts/')[1].split('?')[0];
+            } else if (!yId.contains('http') && yId.length == 11) {
+              // It's likely just the ID itself
+              yId = yId; 
             }
             
-            final newVideo = VideoModel(
-              id: FirebaseFirestore.instance.collection('videos').doc().id,
-              youtubeId: yId,
-              title: titleCtrl.text,
-              description: 'No description',
-              categoryId: 'all',
-              categoryName: 'All',
-              categoryIcon: '🎬',
-              duration: 60,
-              views: 0,
-              likes: 0,
-              publishedAt: DateTime.now(),
-              isTrending: false,
-              isFeatured: false,
-              isVipOnly: false,
-              isActive: true,
-              order: 0,
-              tags: [],
-            );
-            
-            await FirebaseFirestore.instance.collection('videos').doc(newVideo.id).set(newVideo.toFirestore());
-            
-            if (context.mounted) {
-              Navigator.pop(context);
-              Provider.of<VideoProvider>(context, listen: false).loadVideos();
+            try {
+              final docRef = FirebaseFirestore.instance.collection('videos').doc();
+              final newVideo = VideoModel(
+                id: docRef.id,
+                youtubeId: yId,
+                title: titleCtrl.text.trim(),
+                description: 'No description',
+                categoryId: 'all',
+                categoryName: 'All',
+                categoryIcon: '🎬',
+                duration: 60, // Default 60s, will be updated if needed
+                views: 0,
+                likes: 0,
+                publishedAt: DateTime.now(),
+                isTrending: false,
+                isFeatured: false,
+                isVipOnly: false,
+                isActive: true,
+                order: 0,
+                tags: [],
+              );
+              
+              await docRef.set(newVideo.toFirestore());
+              
+              if (context.mounted) {
+                Navigator.pop(context);
+                ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Video Added Successfully!'), backgroundColor: Colors.green));
+                Provider.of<VideoProvider>(context, listen: false).loadVideos();
+              }
+            } catch (e) {
+              if (context.mounted) {
+                ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Error: $e'), backgroundColor: Colors.red));
+              }
             }
           },
           child: const Text('Add'),

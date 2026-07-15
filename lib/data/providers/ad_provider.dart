@@ -22,7 +22,11 @@ class AdProvider extends ChangeNotifier {
   int get videoCountForAd => _videoCountForAd;
 
   AdProvider() {
-    _adService.initialize();
+    _adService.initialize().then((_) {
+      loadBannerAd();
+      loadInterstitialAd();
+      loadRewardedAd();
+    });
   }
 
   Future<void> loadBannerAd() async {

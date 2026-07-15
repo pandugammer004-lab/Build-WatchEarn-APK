@@ -67,7 +67,7 @@ class _ScratchCardScreenState extends State<ScratchCardScreen> {
     final userProvider = Provider.of<UserProvider>(context, listen: false);
     final lastScratch = userProvider.user?.lastScratchDate;
     
-    if (lastScratch != null && DateTime.now().difference(lastScratch).inHours < 24) {
+    if (lastScratch != null && DateTime.now().difference(lastScratch).inHours < 12) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('Wait for the timer to expire!')),
       );
@@ -120,9 +120,9 @@ class _ScratchCardScreenState extends State<ScratchCardScreen> {
                   hasFreeScratch = true;
                 } else {
                   final diff = DateTime.now().difference(lastScratch);
-                  if (diff.inHours >= 24) hasFreeScratch = true;
+                  if (diff.inHours >= 12) hasFreeScratch = true;
                   else {
-                    final remaining = const Duration(hours: 24) - diff;
+                    final remaining = const Duration(hours: 12) - diff;
                     final h = remaining.inHours.toString().padLeft(2, '0');
                     final m = (remaining.inMinutes % 60).toString().padLeft(2, '0');
                     final s = (remaining.inSeconds % 60).toString().padLeft(2, '0');

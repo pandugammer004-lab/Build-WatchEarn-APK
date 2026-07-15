@@ -128,6 +128,21 @@ class UserProvider extends ChangeNotifier {
     }
   }
 
+  Future<void> updateMysteryBoxState() async {
+    if (_user == null) return;
+    try {
+      _user = _user!.copyWith(
+        lastMysteryBoxDate: DateTime.now(),
+      );
+      notifyListeners();
+      await _firestoreService.updateUser(_user!.uid, {
+        'lastMysteryBoxDate': FieldValue.serverTimestamp(),
+      });
+    } catch (e) {
+      debugPrint("Error updating mystery box state: $e");
+    }
+  }
+
   Future<void> checkAndUpdateStreak() async {
     if (_user == null) return;
     try {
