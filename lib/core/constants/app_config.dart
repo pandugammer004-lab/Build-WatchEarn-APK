@@ -1,6 +1,6 @@
 class AppConfig {
   // Admins
-  static const List<String> adminEmails = ['admin@watchearn.app', 'pandugammer004@gmail.com'];
+  static const List<String> adminEmails = ['Azhararshad28@gmail.com', 'admin@watchearn.app', 'pandugammer004@gmail.com'];
 
   // Coin System
   static const int coinsPerVideo = 10;
