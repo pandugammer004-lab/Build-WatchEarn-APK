@@ -64,20 +64,61 @@ class _ManageUsersTabState extends State<ManageUsersTab> {
                     final email = data['email'] ?? 'No Email';
                     final coins = data['coins'] ?? 0;
                     final isVip = data['vipPlan'] != 'free';
-                    
+                    final isBlocked = data['isBlocked'] ?? false;
+                    final userId = docs[index].id;
+                      
                     return ListTile(
                       leading: CircleAvatar(
-                        backgroundColor: isVip ? Colors.amber : Colors.blueGrey,
+                        backgroundColor: isBlocked ? Colors.red : (isVip ? Colors.amber : Colors.blueGrey),
                         child: Text(name[0].toUpperCase(), style: const TextStyle(color: Colors.white)),
                       ),
-                      title: Text(name, style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
+                      title: Text(name, style: TextStyle(color: isBlocked ? Colors.redAccent : Colors.white, fontWeight: FontWeight.bold, decoration: isBlocked ? TextDecoration.lineThrough : null)),
                       subtitle: Text(email, style: const TextStyle(color: Colors.white54, fontSize: 12)),
-                      trailing: Column(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        crossAxisAlignment: CrossAxisAlignment.end,
+                      trailing: Row(
+                        mainAxisSize: MainAxisSize.min,
                         children: [
-                          Text('${Helpers.formatCoins(coins)} 🪙', style: const TextStyle(color: Colors.amber, fontWeight: FontWeight.bold)),
-                          Text('\$${(coins / 10000).toStringAsFixed(2)}', style: const TextStyle(color: Colors.green, fontSize: 10)),
+                          Column(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            crossAxisAlignment: CrossAxisAlignment.end,
+                            children: [
+                              Text('${Helpers.formatCoins(coins)} 🪙', style: const TextStyle(color: Colors.amber, fontWeight: FontWeight.bold)),
+                              Text('\$${(coins / 10000).toStringAsFixed(2)}', style: const TextStyle(color: Colors.green, fontSize: 10)),
+                            ],
+                          ),
+                          PopupMenuButton<String>(
+                            icon: const Icon(Icons.more_vert, color: Colors.white54),
+                            color: AppColors.cardColor,
+                            onSelected: (value) async {
+                              if (value == 'block') {
+                                await FirebaseFirestore.instance.collection('users').doc(userId).update({'isBlocked': !isBlocked});
+                              } else if (value == 'delete') {
+                                // Show confirm dialog
+                                showDialog(
+                                  context: context,
+                                  builder: (context) => AlertDialog(
+                                    backgroundColor: AppColors.cardColor,
+                                    title: const Text('Delete User', style: TextStyle(color: Colors.white)),
+                                    content: Text('Are you sure you want to delete $name?', style: const TextStyle(color: Colors.white70)),
+                                    actions: [
+                                      TextButton(onPressed: () => Navigator.pop(context), child: const Text('Cancel')),
+                                      ElevatedButton(
+                                        style: ElevatedButton.styleFrom(backgroundColor: Colors.red),
+                                        onPressed: () async {
+                                          await FirebaseFirestore.instance.collection('users').doc(userId).delete();
+                                          if (context.mounted) Navigator.pop(context);
+                                        },
+                                        child: const Text('Delete'),
+                                      ),
+                                    ],
+                                  )
+                                );
+                              }
+                            },
+                            itemBuilder: (context) => [
+                              PopupMenuItem(value: 'block', child: Text(isBlocked ? 'Unblock User' : 'Block User', style: TextStyle(color: isBlocked ? Colors.green : Colors.orange))),
+                              const PopupMenuItem(value: 'delete', child: Text('Delete User', style: TextStyle(color: Colors.red))),
+                            ],
+                          ),
                         ],
                       ),
                     );

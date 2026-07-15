@@ -66,6 +66,34 @@ class _AuthWrapperState extends State<AuthWrapper> {
           ),
         );
       }
+      
+      if (userProvider.user!.isBlocked) {
+        return Scaffold(
+          backgroundColor: const Color(0xFF0D0D1A),
+          body: Center(
+            child: Padding(
+              padding: const EdgeInsets.all(24.0),
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  const Icon(Icons.block, color: Colors.redAccent, size: 80),
+                  const SizedBox(height: 24),
+                  const Text('Account Suspended', style: TextStyle(color: Colors.white, fontSize: 24, fontWeight: FontWeight.bold)),
+                  const SizedBox(height: 12),
+                  const Text('Your account has been blocked by the administrator.', textAlign: TextAlign.center, style: TextStyle(color: Colors.white70)),
+                  const SizedBox(height: 32),
+                  ElevatedButton(
+                    style: ElevatedButton.styleFrom(backgroundColor: Colors.redAccent),
+                    onPressed: () => authProvider.signOut(),
+                    child: const Text('Logout'),
+                  )
+                ],
+              ),
+            ),
+          ),
+        );
+      }
+      
       return const MainNavigation();
     } else {
       return const OnboardingScreen();

@@ -4,6 +4,8 @@ import '../../core/constants/app_colors.dart';
 import 'tabs/manage_videos_tab.dart';
 import 'tabs/manage_withdrawals_tab.dart';
 import 'tabs/manage_users_tab.dart';
+import 'tabs/manage_categories_tab.dart';
+import 'tabs/vip_requests_tab.dart';
 
 class AdminDashboardScreen extends StatefulWidget {
   const AdminDashboardScreen({Key? key}) : super(key: key);
@@ -19,6 +21,8 @@ class _AdminDashboardScreenState extends State<AdminDashboardScreen> {
     const ManageVideosTab(),
     const ManageWithdrawalsTab(),
     const ManageUsersTab(),
+    const ManageCategoriesTab(),
+    const VipRequestsTab(),
   ];
 
   @override
@@ -26,7 +30,8 @@ class _AdminDashboardScreenState extends State<AdminDashboardScreen> {
     return Scaffold(
       backgroundColor: AppColors.background,
       appBar: AppBar(
-        backgroundColor: AppColors.primary,
+        backgroundColor: AppColors.cardColor,
+        elevation: 0,
         title: Text('Admin Dashboard', style: GoogleFonts.poppins(fontWeight: FontWeight.bold, color: Colors.white)),
         iconTheme: const IconThemeData(color: Colors.white),
       ),
@@ -35,6 +40,7 @@ class _AdminDashboardScreenState extends State<AdminDashboardScreen> {
         backgroundColor: AppColors.cardColor,
         selectedItemColor: AppColors.primary,
         unselectedItemColor: Colors.white54,
+        type: BottomNavigationBarType.fixed,
         currentIndex: _currentIndex,
         onTap: (index) {
           setState(() {
@@ -45,6 +51,8 @@ class _AdminDashboardScreenState extends State<AdminDashboardScreen> {
           BottomNavigationBarItem(icon: Icon(Icons.video_library), label: 'Videos'),
           BottomNavigationBarItem(icon: Icon(Icons.attach_money), label: 'Withdraw'),
           BottomNavigationBarItem(icon: Icon(Icons.people), label: 'Users'),
+          BottomNavigationBarItem(icon: Icon(Icons.category), label: 'Category'),
+          BottomNavigationBarItem(icon: Icon(Icons.diamond), label: 'VIP Req'),
         ],
       ),
     );

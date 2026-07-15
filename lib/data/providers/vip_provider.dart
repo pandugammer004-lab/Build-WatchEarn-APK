@@ -8,21 +8,29 @@ class VipProvider extends ChangeNotifier {
 
   bool get isPurchasing => _isPurchasing;
 
-  Future<bool> purchasePlan(UserModel user, String planId) async {
+  Future<bool> purchasePlan(UserModel user, String planId, String trxId, String paymentMethod) async {
     _isPurchasing = true;
     notifyListeners();
 
-    // 1. Initiate purchase (in_app_purchase)
-    // Simulating delay for purchase flow
-    await Future.delayed(const Duration(seconds: 3));
-
-    // 2. Verify purchase
-    // 3. Update user vipPlan + vipExpiry
-    // 4. Award VIP badge (5000 coins bonus)
-
-    _isPurchasing = false;
-    notifyListeners();
-    return true; // Simulate success
+    try {
+      await _firestore.firestore.collection('vip_requests').add({
+        'userId': user.id,
+        'userEmail': user.email,
+        'planId': planId,
+        'trxId': trxId,
+        'paymentMethod': paymentMethod,
+        'status': 'pending', // pending, approved, rejected
+        'createdAt': FieldValue.serverTimestamp(),
+      });
+      _isPurchasing = false;
+      notifyListeners();
+      return true; 
+    } catch (e) {
+      debugPrint("Error submitting VIP request: $e");
+      _isPurchasing = false;
+      notifyListeners();
+      return false;
+    }
   }
 
   Future<bool> restorePurchases(UserModel user) async {

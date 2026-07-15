@@ -332,13 +332,8 @@ class _VipPlansScreenState extends State<VipPlansScreen> {
                 mainAxisSize: MainAxisSize.min,
                 children: [
                   ElevatedButton(
-                    onPressed: vipProvider.isPurchasing ? null : () async {
-                      if (userProvider.user == null) return;
-                      final success = await vipProvider.purchasePlan(userProvider.user!, plan['id']);
-                      if (success && mounted) {
-                        Helpers.showSuccessSnackbar(context, 'Welcome to ${plan['name']}!');
-                        Navigator.pop(context);
-                      }
+                    onPressed: vipProvider.isPurchasing ? null : () {
+                      _showPaymentDialog(context, userProvider.user!, plan, vipProvider);
                     },
                     style: ElevatedButton.styleFrom(
                       backgroundColor: Colors.white,
@@ -354,19 +349,90 @@ class _VipPlansScreenState extends State<VipPlansScreen> {
                           ),
                   ),
                   const SizedBox(height: 12),
-                  const Text('Subscription auto-renews. Cancel anytime.', style: TextStyle(color: Colors.white54, fontSize: 10)),
-                  TextButton(
-                    onPressed: () {
-                      vipProvider.restorePurchases(userProvider.user!);
-                    },
-                    child: const Text('Restore Purchases', style: TextStyle(color: AppColors.primary, fontSize: 12)),
-                  ),
+                  const Text('Manual payment verification required.', style: TextStyle(color: Colors.white54, fontSize: 10)),
                 ],
               );
             },
           ),
         ),
       ),
+    );
+  }
+
+  void _showPaymentDialog(BuildContext context, UserModel user, Map<String, dynamic> plan, VipProvider vipProvider) {
+    final trxCtrl = TextEditingController();
+    String selectedMethod = 'EasyPaisa';
+    
+    showDialog(
+      context: context,
+      builder: (context) {
+        return StatefulBuilder(
+          builder: (context, setDialogState) {
+            return AlertDialog(
+              backgroundColor: AppColors.cardColor,
+              title: Text('Complete Payment', style: GoogleFonts.poppins(color: Colors.white)),
+              content: SingleChildScrollView(
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text('Send ${plan['price']} to:', style: const TextStyle(color: Colors.white70)),
+                    const SizedBox(height: 8),
+                    Container(
+                      padding: const EdgeInsets.all(12),
+                      decoration: BoxDecoration(color: Colors.black26, borderRadius: BorderRadius.circular(8)),
+                      child: const Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text('Title: Admin Name', style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
+                          Text('Account: 0300-0000000', style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
+                        ],
+                      ),
+                    ),
+                    const SizedBox(height: 16),
+                    DropdownButtonFormField<String>(
+                      value: selectedMethod,
+                      dropdownColor: AppColors.cardColor,
+                      style: const TextStyle(color: Colors.white),
+                      decoration: const InputDecoration(labelText: 'Payment Method', labelStyle: TextStyle(color: Colors.white54)),
+                      items: ['EasyPaisa', 'JazzCash', 'SadaPay', 'NayaPay'].map((e) => DropdownMenuItem(value: e, child: Text(e))).toList(),
+                      onChanged: (val) => setDialogState(() => selectedMethod = val!),
+                    ),
+                    const SizedBox(height: 12),
+                    TextField(
+                      controller: trxCtrl,
+                      style: const TextStyle(color: Colors.white),
+                      decoration: const InputDecoration(
+                        labelText: 'Transaction ID (TrxID)',
+                        labelStyle: TextStyle(color: Colors.white54),
+                        hintText: 'Enter TrxID from SMS',
+                        hintStyle: TextStyle(color: Colors.white30),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              actions: [
+                TextButton(onPressed: () => Navigator.pop(context), child: const Text('Cancel', style: TextStyle(color: Colors.white54))),
+                ElevatedButton(
+                  onPressed: () async {
+                    if (trxCtrl.text.isEmpty) return;
+                    Navigator.pop(context); // Close dialog
+                    
+                    final success = await vipProvider.purchasePlan(user, plan['id'], trxCtrl.text, selectedMethod);
+                    if (success && mounted) {
+                      Helpers.showSuccessSnackbar(context, 'Request Submitted! Admin will verify and activate your VIP shortly.');
+                    } else if (mounted) {
+                      Helpers.showErrorSnackbar(context, 'Failed to submit request.');
+                    }
+                  },
+                  child: const Text('Submit Request'),
+                ),
+              ],
+            );
+          }
+        );
+      }
     );
   }
 
