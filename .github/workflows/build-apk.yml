@@ -114,7 +114,7 @@ jobs:
               with open(manifest, 'r') as f: c = f.read()
               ad_tag = '<meta-data android:name="com.google.android.gms.ads.APPLICATION_ID" android:value="ca-app-pub-3940256099942544~3347511713"/>'
               if 'com.google.android.gms.ads.APPLICATION_ID' not in c:
-                  c = c.replace('<application', f'<application\n        {ad_tag}')
+                  c = c.replace('<activity', f'{ad_tag}\n        <activity')
                   with open(manifest, 'w') as f: f.write(c)
 
       - name: Get Dependencies
