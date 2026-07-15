@@ -95,8 +95,7 @@ class _SignupScreenState extends State<SignupScreen> {
       if (authProvider.errorMessage != null && mounted) {
         Helpers.showErrorSnackbar(context, authProvider.errorMessage!);
       } else if (mounted) {
-        // Pop back to login or go to main depending on navigation setup
-        Navigator.pop(context);
+        Navigator.pushReplacementNamed(context, '/home');
       }
     }
   }

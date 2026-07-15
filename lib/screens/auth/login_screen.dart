@@ -44,6 +44,8 @@ class _LoginScreenState extends State<LoginScreen> {
 
       if (authProvider.errorMessage != null && mounted) {
         Helpers.showErrorSnackbar(context, authProvider.errorMessage!);
+      } else if (mounted) {
+        Navigator.pushReplacementNamed(context, '/home');
       }
     }
   }
@@ -54,6 +56,8 @@ class _LoginScreenState extends State<LoginScreen> {
     
     if (authProvider.errorMessage != null && mounted) {
       Helpers.showErrorSnackbar(context, authProvider.errorMessage!);
+    } else if (mounted) {
+      Navigator.pushReplacementNamed(context, '/home');
     }
   }
 
