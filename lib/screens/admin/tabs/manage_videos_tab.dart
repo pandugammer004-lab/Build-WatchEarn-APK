@@ -41,18 +41,32 @@ class _ManageVideosTabState extends State<ManageVideosTab> {
               onPressed: () async {
                 if (titleCtrl.text.isEmpty || urlCtrl.text.isEmpty) return;
                 
+                // Assuming url is a youtube link, we extract the id
+                String yId = urlCtrl.text;
+                if (yId.contains('v=')) {
+                  yId = yId.split('v=')[1].split('&')[0];
+                } else if (yId.contains('youtu.be/')) {
+                  yId = yId.split('youtu.be/')[1].split('?')[0];
+                }
+                
                 final newVideo = VideoModel(
                   id: FirebaseFirestore.instance.collection('videos').doc().id,
+                  youtubeId: yId,
                   title: titleCtrl.text,
-                  url: urlCtrl.text,
-                  thumbnail: thumbCtrl.text.isEmpty ? 'https://via.placeholder.com/400x200' : thumbCtrl.text,
+                  description: 'No description',
                   categoryId: 'all',
-                  durationSeconds: 60,
+                  categoryName: 'All',
+                  categoryIcon: '🎬',
+                  duration: 60,
                   views: 0,
-                  rewardCoins: 10,
-                  isActive: true,
-                  isTrending: false,
+                  likes: 0,
                   publishedAt: DateTime.now(),
+                  isTrending: false,
+                  isFeatured: false,
+                  isVipOnly: false,
+                  isActive: true,
+                  order: 0,
+                  tags: [],
                 );
                 
                 await FirebaseFirestore.instance.collection('videos').doc(newVideo.id).set(newVideo.toFirestore());
@@ -84,7 +98,7 @@ class _ManageVideosTabState extends State<ManageVideosTab> {
           if (videoProvider.isLoading) {
             return const Center(child: CircularProgressIndicator());
           }
-          final videos = videoProvider.videos;
+          final videos = videoProvider.allVideos;
           if (videos.isEmpty) {
             return const Center(child: Text('No videos found. Add one!', style: TextStyle(color: Colors.white)));
           }
@@ -97,11 +111,11 @@ class _ManageVideosTabState extends State<ManageVideosTab> {
                 color: AppColors.cardColor,
                 margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
                 child: ListTile(
-                  leading: Image.network(video.thumbnail, width: 80, height: 60, fit: BoxFit.cover,
+                  leading: Image.network(video.thumbnailMQ, width: 80, height: 60, fit: BoxFit.cover,
                     errorBuilder: (context, error, stackTrace) => const Icon(Icons.video_library, color: Colors.white),
                   ),
                   title: Text(video.title, style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold), maxLines: 1, overflow: TextOverflow.ellipsis),
-                  subtitle: Text('${video.views} views • ${video.rewardCoins} coins', style: const TextStyle(color: Colors.white54, fontSize: 12)),
+                  subtitle: Text('${video.views} views • ${video.formattedDuration}', style: const TextStyle(color: Colors.white54, fontSize: 12)),
                   trailing: IconButton(
                     icon: const Icon(Icons.delete, color: Colors.redAccent),
                     onPressed: () async {
