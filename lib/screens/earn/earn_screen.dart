@@ -40,7 +40,7 @@ class EarnScreen extends StatelessWidget {
             _buildSubtitle(),
             const SizedBox(height: 24),
             
-            _buildDailyBonus(),
+            _buildDailyBonus(context),
             const SizedBox(height: 24),
             
             _buildStreakCalendar(),
@@ -89,7 +89,7 @@ class EarnScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildDailyBonus() {
+  Widget _buildDailyBonus(BuildContext context) {
     return Container(
       padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
