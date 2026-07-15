@@ -8,6 +8,7 @@ import '../../core/utils/helpers.dart';
 import '../../data/providers/user_provider.dart';
 import '../../data/providers/video_provider.dart';
 import '../../data/providers/coin_provider.dart';
+import '../../data/models/video_model.dart';
 import '../player/video_player_screen.dart';
 
 class HomeScreen extends StatefulWidget {
