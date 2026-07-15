@@ -54,6 +54,9 @@ class AuthService {
         email: email,
         password: password,
       );
+      if (userCredential.user != null) {
+        await _checkAndCreateUserDocument(userCredential.user);
+      }
       return userCredential;
     } catch (e) {
       throw Exception(_handleAuthError(e.toString()));

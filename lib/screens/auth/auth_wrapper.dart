@@ -14,6 +14,7 @@ class AuthWrapper extends StatefulWidget {
 
 class _AuthWrapperState extends State<AuthWrapper> {
   bool _isInit = false;
+  bool _loadAttempted = false;
 
   @override
   void didChangeDependencies() {
@@ -29,9 +30,14 @@ class _AuthWrapperState extends State<AuthWrapper> {
     final userProvider = Provider.of<UserProvider>(context, listen: false);
 
     if (authProvider.isLoggedIn) {
-      if (userProvider.user == null && !userProvider.isLoading) {
+      if (userProvider.user == null && !userProvider.isLoading && !_loadAttempted) {
+        _loadAttempted = true;
         userProvider.loadUser(authProvider.firebaseUser!.uid).then((_) {
-          userProvider.loadNotifications();
+          if (userProvider.user == null) {
+            authProvider.signOut();
+          } else {
+            userProvider.loadNotifications();
+          }
         });
       }
     }
@@ -42,8 +48,12 @@ class _AuthWrapperState extends State<AuthWrapper> {
     final authProvider = Provider.of<AuthProvider>(context);
     final userProvider = Provider.of<UserProvider>(context);
 
+    if (!authProvider.isLoggedIn) {
+      _loadAttempted = false;
+    }
+
     // Also check on build in case auth state changes later
-    if (authProvider.isLoggedIn && userProvider.user == null && !userProvider.isLoading) {
+    if (authProvider.isLoggedIn && userProvider.user == null && !userProvider.isLoading && !_loadAttempted) {
        Future.microtask(() => _checkUser());
     }
 
