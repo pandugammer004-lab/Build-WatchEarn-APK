@@ -282,8 +282,13 @@ class _SignupScreenState extends State<SignupScreen> {
                           SocialAuthButton(
                             type: SocialAuthType.google,
                             isLoading: authProvider.isLoading,
-                            onPressed: () {
-                              authProvider.signInWithGoogle();
+                            onPressed: () async {
+                              await authProvider.signInWithGoogle();
+                              if (authProvider.errorMessage != null && mounted) {
+                                Helpers.showErrorSnackbar(context, authProvider.errorMessage!);
+                              } else if (mounted) {
+                                Navigator.pushReplacementNamed(context, '/home');
+                              }
                             },
                           ),
                         ],
