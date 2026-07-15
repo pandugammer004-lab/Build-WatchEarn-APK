@@ -36,6 +36,7 @@ dependencies:
   
   # YouTube
   youtube_player_flutter: ^8.1.2
+  http: ^1.1.0
   
   # Ads - Re-enabled
   google_mobile_ads: ^5.1.0

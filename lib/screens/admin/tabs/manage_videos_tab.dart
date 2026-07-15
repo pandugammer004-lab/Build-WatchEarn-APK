@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:http/http.dart' as http;
 import '../../../core/constants/app_colors.dart';
 import '../../../data/models/video_model.dart';
 import '../../../data/providers/video_provider.dart';
@@ -15,72 +16,9 @@ class ManageVideosTab extends StatefulWidget {
 
 class _ManageVideosTabState extends State<ManageVideosTab> {
   void _showAddVideoDialog() {
-    final titleCtrl = TextEditingController();
-    final urlCtrl = TextEditingController();
-    final thumbCtrl = TextEditingController();
-    
     showDialog(
       context: context,
-      builder: (context) {
-        return AlertDialog(
-          backgroundColor: AppColors.cardColor,
-          title: Text('Add New Video', style: GoogleFonts.poppins(color: Colors.white)),
-          content: SingleChildScrollView(
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                TextField(controller: titleCtrl, style: const TextStyle(color: Colors.white), decoration: const InputDecoration(labelText: 'Title', labelStyle: TextStyle(color: Colors.white54))),
-                TextField(controller: urlCtrl, style: const TextStyle(color: Colors.white), decoration: const InputDecoration(labelText: 'Video URL (e.g. YouTube)', labelStyle: TextStyle(color: Colors.white54))),
-                TextField(controller: thumbCtrl, style: const TextStyle(color: Colors.white), decoration: const InputDecoration(labelText: 'Thumbnail URL', labelStyle: TextStyle(color: Colors.white54))),
-              ],
-            ),
-          ),
-          actions: [
-            TextButton(onPressed: () => Navigator.pop(context), child: const Text('Cancel', style: TextStyle(color: Colors.white54))),
-            ElevatedButton(
-              onPressed: () async {
-                if (titleCtrl.text.isEmpty || urlCtrl.text.isEmpty) return;
-                
-                // Assuming url is a youtube link, we extract the id
-                String yId = urlCtrl.text;
-                if (yId.contains('v=')) {
-                  yId = yId.split('v=')[1].split('&')[0];
-                } else if (yId.contains('youtu.be/')) {
-                  yId = yId.split('youtu.be/')[1].split('?')[0];
-                }
-                
-                final newVideo = VideoModel(
-                  id: FirebaseFirestore.instance.collection('videos').doc().id,
-                  youtubeId: yId,
-                  title: titleCtrl.text,
-                  description: 'No description',
-                  categoryId: 'all',
-                  categoryName: 'All',
-                  categoryIcon: '🎬',
-                  duration: 60,
-                  views: 0,
-                  likes: 0,
-                  publishedAt: DateTime.now(),
-                  isTrending: false,
-                  isFeatured: false,
-                  isVipOnly: false,
-                  isActive: true,
-                  order: 0,
-                  tags: [],
-                );
-                
-                await FirebaseFirestore.instance.collection('videos').doc(newVideo.id).set(newVideo.toFirestore());
-                
-                if (context.mounted) {
-                  Navigator.pop(context);
-                  Provider.of<VideoProvider>(context, listen: false).loadVideos();
-                }
-              },
-              child: const Text('Add'),
-            ),
-          ],
-        );
-      },
+      builder: (context) => const AddVideoDialog(),
     );
   }
 
@@ -129,6 +67,122 @@ class _ManageVideosTabState extends State<ManageVideosTab> {
           );
         },
       ),
+    );
+  }
+}
+
+class AddVideoDialog extends StatefulWidget {
+  const AddVideoDialog({Key? key}) : super(key: key);
+
+  @override
+  State<AddVideoDialog> createState() => _AddVideoDialogState();
+}
+
+class _AddVideoDialogState extends State<AddVideoDialog> {
+  final titleCtrl = TextEditingController();
+  final urlCtrl = TextEditingController();
+  final thumbCtrl = TextEditingController();
+  bool isFetching = false;
+
+  void _fetchYoutubeDetails() async {
+    final url = urlCtrl.text.trim();
+    if (url.isEmpty || (!url.contains('youtube.com') && !url.contains('youtu.be'))) return;
+
+    setState(() { isFetching = true; });
+
+    try {
+      final response = await http.get(Uri.parse('https://www.youtube.com/oembed?url=$url&format=json'));
+      if (response.statusCode == 200) {
+        final titleMatch = RegExp(r'"title"\s*:\s*"([^"]+)"').firstMatch(response.body);
+        final thumbMatch = RegExp(r'"thumbnail_url"\s*:\s*"([^"]+)"').firstMatch(response.body);
+        
+        if (titleMatch != null && titleCtrl.text.isEmpty) {
+          titleCtrl.text = titleMatch.group(1) ?? '';
+        }
+        if (thumbMatch != null && thumbCtrl.text.isEmpty) {
+          thumbCtrl.text = (thumbMatch.group(1) ?? '').replaceAll('\\/', '/');
+        }
+      }
+    } catch (e) {
+      debugPrint('Error fetching youtube details: $e');
+    } finally {
+      setState(() { isFetching = false; });
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return AlertDialog(
+      backgroundColor: AppColors.cardColor,
+      title: Text('Add New Video', style: GoogleFonts.poppins(color: Colors.white)),
+      content: SingleChildScrollView(
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Row(
+              children: [
+                Expanded(
+                  child: TextField(
+                    controller: urlCtrl, 
+                    style: const TextStyle(color: Colors.white), 
+                    decoration: const InputDecoration(labelText: 'Video URL', labelStyle: TextStyle(color: Colors.white54))
+                  ),
+                ),
+                IconButton(
+                  icon: isFetching ? const SizedBox(width: 20, height: 20, child: CircularProgressIndicator(strokeWidth: 2)) : const Icon(Icons.search, color: Colors.amber),
+                  onPressed: isFetching ? null : _fetchYoutubeDetails,
+                  tooltip: 'Fetch Title & Thumbnail',
+                ),
+              ],
+            ),
+            TextField(controller: titleCtrl, style: const TextStyle(color: Colors.white), decoration: const InputDecoration(labelText: 'Title', labelStyle: TextStyle(color: Colors.white54))),
+            TextField(controller: thumbCtrl, style: const TextStyle(color: Colors.white), decoration: const InputDecoration(labelText: 'Thumbnail URL', labelStyle: TextStyle(color: Colors.white54))),
+          ],
+        ),
+      ),
+      actions: [
+        TextButton(onPressed: () => Navigator.pop(context), child: const Text('Cancel', style: TextStyle(color: Colors.white54))),
+        ElevatedButton(
+          onPressed: () async {
+            if (titleCtrl.text.isEmpty || urlCtrl.text.isEmpty) return;
+            
+            String yId = urlCtrl.text;
+            if (yId.contains('v=')) {
+              yId = yId.split('v=')[1].split('&')[0];
+            } else if (yId.contains('youtu.be/')) {
+              yId = yId.split('youtu.be/')[1].split('?')[0];
+            }
+            
+            final newVideo = VideoModel(
+              id: FirebaseFirestore.instance.collection('videos').doc().id,
+              youtubeId: yId,
+              title: titleCtrl.text,
+              description: 'No description',
+              categoryId: 'all',
+              categoryName: 'All',
+              categoryIcon: '🎬',
+              duration: 60,
+              views: 0,
+              likes: 0,
+              publishedAt: DateTime.now(),
+              isTrending: false,
+              isFeatured: false,
+              isVipOnly: false,
+              isActive: true,
+              order: 0,
+              tags: [],
+            );
+            
+            await FirebaseFirestore.instance.collection('videos').doc(newVideo.id).set(newVideo.toFirestore());
+            
+            if (context.mounted) {
+              Navigator.pop(context);
+              Provider.of<VideoProvider>(context, listen: false).loadVideos();
+            }
+          },
+          child: const Text('Add'),
+        ),
+      ],
     );
   }
 }
