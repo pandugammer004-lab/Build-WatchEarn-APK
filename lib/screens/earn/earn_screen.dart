@@ -56,7 +56,7 @@ class EarnScreen extends StatelessWidget {
             _buildQuickEarnOptions(),
             const SizedBox(height: 24),
             
-            _buildVipPromo(),
+            _buildVipPromo(context),
             const SizedBox(height: 24),
             
             const BannerAdWidget(),
@@ -278,7 +278,7 @@ class EarnScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildVipPromo() {
+  Widget _buildVipPromo(BuildContext context) {
     return Container(
       padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
