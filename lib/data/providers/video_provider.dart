@@ -142,4 +142,9 @@ class VideoProvider extends ChangeNotifier {
     _currentVideo = video;
     notifyListeners();
   }
+
+  List<VideoModel> getUnwatchedVideos(List<VideoModel> source, dynamic user) {
+    if (user == null) return source;
+    return source.where((v) => !user.watchedVideoIds.contains(v.id)).toList();
+  }
 }

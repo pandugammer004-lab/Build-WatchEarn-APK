@@ -363,9 +363,10 @@ class _HomeScreenState extends State<HomeScreen> {
   Widget _buildFeaturedVideo() {
     return Consumer2<VideoProvider, UserProvider>(
       builder: (context, provider, userProvider, _) {
-        if (provider.featuredVideos.isEmpty) return const SizedBox.shrink();
+        final unwatchedFeatured = provider.getUnwatchedVideos(provider.featuredVideos, userProvider.user);
+        if (unwatchedFeatured.isEmpty) return const SizedBox.shrink();
         
-        final video = provider.featuredVideos.first;
+        final video = unwatchedFeatured.first;
         return Padding(
           padding: const EdgeInsets.symmetric(horizontal: 16.0),
           child: VideoCard(
@@ -384,7 +385,8 @@ class _HomeScreenState extends State<HomeScreen> {
   Widget _buildTrendingNow() {
     return Consumer2<VideoProvider, UserProvider>(
       builder: (context, provider, userProvider, _) {
-        if (provider.trendingVideos.isEmpty) return const SizedBox.shrink();
+        final unwatchedTrending = provider.getUnwatchedVideos(provider.trendingVideos, userProvider.user);
+        if (unwatchedTrending.isEmpty) return const SizedBox.shrink();
         
         return Column(
           children: [
@@ -407,14 +409,14 @@ class _HomeScreenState extends State<HomeScreen> {
               child: ListView.builder(
                 scrollDirection: Axis.horizontal,
                 padding: const EdgeInsets.only(left: 16),
-                itemCount: provider.trendingVideos.length,
+                itemCount: unwatchedTrending.length,
                 itemBuilder: (context, index) {
                   return VideoCard(
-                    video: provider.trendingVideos[index],
+                    video: unwatchedTrending[index],
                     type: VideoCardType.vertical,
                     isVipUnlocked: userProvider.user?.isVip ?? false,
                     onTap: () {
-                      Navigator.push(context, MaterialPageRoute(builder: (_) => VideoPlayerScreen(video: provider.trendingVideos[index])));
+                      Navigator.push(context, MaterialPageRoute(builder: (_) => VideoPlayerScreen(video: unwatchedTrending[index])));
                     },
                   );
                 },
@@ -429,7 +431,8 @@ class _HomeScreenState extends State<HomeScreen> {
   Widget _buildForYou() {
     return Consumer2<VideoProvider, UserProvider>(
       builder: (context, provider, userProvider, _) {
-        if (provider.filteredVideos.isEmpty) return const SizedBox.shrink();
+        final unwatchedFiltered = provider.getUnwatchedVideos(provider.filteredVideos, userProvider.user);
+        if (unwatchedFiltered.isEmpty) return const SizedBox.shrink();
         
         return Column(
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -452,14 +455,14 @@ class _HomeScreenState extends State<HomeScreen> {
                 mainAxisSpacing: 16,
                 childAspectRatio: 0.85,
               ),
-              itemCount: provider.filteredVideos.length > 4 ? 4 : provider.filteredVideos.length,
+              itemCount: unwatchedFiltered.length > 4 ? 4 : unwatchedFiltered.length,
               itemBuilder: (context, index) {
                 return VideoCard(
-                  video: provider.filteredVideos[index],
+                  video: unwatchedFiltered[index],
                   type: VideoCardType.grid,
                   isVipUnlocked: userProvider.user?.isVip ?? false,
                   onTap: () {
-                    Navigator.push(context, MaterialPageRoute(builder: (_) => VideoPlayerScreen(video: provider.filteredVideos[index])));
+                    Navigator.push(context, MaterialPageRoute(builder: (_) => VideoPlayerScreen(video: unwatchedFiltered[index])));
                   },
                 );
               },
@@ -525,9 +528,10 @@ class _HomeScreenState extends State<HomeScreen> {
   Widget _buildMostPopular() {
     return Consumer2<VideoProvider, UserProvider>(
       builder: (context, provider, userProvider, _) {
-        if (provider.allVideos.isEmpty) return const SizedBox.shrink();
+        final unwatchedAll = provider.getUnwatchedVideos(provider.allVideos, userProvider.user);
+        if (unwatchedAll.isEmpty) return const SizedBox.shrink();
         
-        final popular = List.from(provider.allVideos)..sort((a, b) => b.views.compareTo(a.views));
+        final popular = List.from(unwatchedAll)..sort((a, b) => (b as VideoModel).views.compareTo((a as VideoModel).views));
         
         return Column(
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -565,9 +569,10 @@ class _HomeScreenState extends State<HomeScreen> {
   Widget _buildRecentlyAdded() {
     return Consumer2<VideoProvider, UserProvider>(
       builder: (context, provider, userProvider, _) {
-        if (provider.allVideos.isEmpty) return const SizedBox.shrink();
+        final unwatchedAll = provider.getUnwatchedVideos(provider.allVideos, userProvider.user);
+        if (unwatchedAll.isEmpty) return const SizedBox.shrink();
         
-        final recent = List.from(provider.allVideos)..sort((a, b) => b.publishedAt.compareTo(a.publishedAt));
+        final recent = List.from(unwatchedAll)..sort((a, b) => (b as VideoModel).publishedAt.compareTo((a as VideoModel).publishedAt));
         
         return Column(
           crossAxisAlignment: CrossAxisAlignment.start,

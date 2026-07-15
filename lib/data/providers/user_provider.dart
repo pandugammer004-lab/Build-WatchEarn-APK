@@ -198,6 +198,21 @@ class UserProvider extends ChangeNotifier {
     }
   }
 
+  Future<void> subscribeToChannel(String channelId) async {
+    if (_user == null) return;
+    try {
+      List<String> subscribed = List.from(_user!.subscribedChannels);
+      if (!subscribed.contains(channelId)) {
+        subscribed.add(channelId);
+        _user = _user!.copyWith(subscribedChannels: subscribed);
+        notifyListeners();
+        await _firestoreService.updateUser(_user!.uid, {'subscribedChannels': subscribed});
+      }
+    } catch (e) {
+      debugPrint("Error subscribing to channel: $e");
+    }
+  }
+
   Future<void> updateDailyStats(String type) async {
     if (_user == null) return;
     try {

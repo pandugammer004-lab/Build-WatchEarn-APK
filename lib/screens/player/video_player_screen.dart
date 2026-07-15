@@ -12,6 +12,7 @@ import '../../data/providers/coin_provider.dart';
 import '../../data/providers/ad_provider.dart';
 import '../../core/utils/helpers.dart';
 import 'dart:async';
+import 'package:url_launcher/url_launcher.dart';
 
 class VideoPlayerScreen extends StatefulWidget {
   final VideoModel video;
@@ -71,21 +72,38 @@ class _VideoPlayerScreenState extends State<VideoPlayerScreen> {
     _watchTimer?.cancel();
   }
 
+  bool _needsToSubscribe = false;
+
   void _checkEarningMilestones() async {
     if (_hasEarnedCoins) return;
+    
+    final userProvider = Provider.of<UserProvider>(context, listen: false);
+    final user = userProvider.user;
+    if (user == null) return;
 
-    final double progress = _secondsWatched / widget.video.duration;
+    final double progress = widget.video.duration > 0 ? _secondsWatched / widget.video.duration : 1.0;
 
-    if (progress >= 0.3 && _showHalfwayToast) {
+    if (_secondsWatched == 60 && _showHalfwayToast) {
       _showHalfwayToast = false;
       Helpers.showSuccessSnackbar(context, "Keep watching to earn coins! 🪙");
     }
 
-    // Earn at 80% or at least 30 seconds
-    if (progress >= 0.8 && _secondsWatched >= 30) {
-      _hasEarnedCoins = true;
-      _stopTimer();
-      _awardCoins();
+    // Earn at 180 seconds or 80% if duration is less than 180
+    bool timeReached = _secondsWatched >= 180 || (widget.video.duration < 180 && progress >= 0.8 && _secondsWatched >= 30);
+
+    if (timeReached) {
+      if (user.subscribedChannels.contains(widget.video.id)) {
+        _hasEarnedCoins = true;
+        _stopTimer();
+        _awardCoins();
+      } else {
+        if (!_needsToSubscribe) {
+          setState(() {
+            _needsToSubscribe = true;
+          });
+          Helpers.showSuccessSnackbar(context, "Subscribe to claim your coins!");
+        }
+      }
     }
   }
 
@@ -228,6 +246,58 @@ class _VideoPlayerScreenState extends State<VideoPlayerScreen> {
                 style: const TextStyle(color: Colors.white54, fontSize: 12),
               ),
             ],
+          ),
+          const SizedBox(height: 16),
+          Consumer<UserProvider>(
+            builder: (context, userProvider, _) {
+              final isSubscribed = userProvider.user?.subscribedChannels.contains(widget.video.id) ?? false;
+              return Row(
+                children: [
+                  Expanded(
+                    child: ElevatedButton(
+                      onPressed: isSubscribed ? null : () async {
+                        if (userProvider.user != null) {
+                          // Redirect to YouTube
+                          final url = Uri.parse('https://www.youtube.com/watch?v=${widget.video.youtubeId}');
+                          try {
+                            // ignore: avoid_dynamic_calls
+                            await launchUrl(url, mode: LaunchMode.externalApplication);
+                          } catch (e) {
+                            debugPrint("Could not launch $url: $e");
+                          }
+
+                          await userProvider.subscribeToChannel(widget.video.id);
+                          if (mounted) {
+                            Helpers.showSuccessSnackbar(context, "Subscribed successfully!");
+                            // If timer was reached and we were waiting for subscription
+                            if (_needsToSubscribe) {
+                              setState(() {
+                                _needsToSubscribe = false;
+                              });
+                              _checkEarningMilestones();
+                            }
+                          }
+                        }
+                      },
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: isSubscribed ? Colors.grey.withOpacity(0.3) : (_needsToSubscribe ? Colors.redAccent : AppColors.primary),
+                        foregroundColor: Colors.white,
+                        padding: const EdgeInsets.symmetric(vertical: 12),
+                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(24)),
+                        elevation: _needsToSubscribe ? 8 : 0,
+                      ),
+                      child: Text(
+                        isSubscribed ? 'Subscribed ✓' : 'Subscribe to Earn Coins',
+                        style: GoogleFonts.poppins(
+                          fontWeight: FontWeight.bold,
+                          fontSize: 14,
+                        ),
+                      ),
+                    ),
+                  ),
+                ],
+              );
+            },
           ),
         ],
       ),

@@ -39,6 +39,7 @@ class UserModel {
   final int dailyEarned;
   final DateTime? lastDailyBonusClaim;
   final bool isBlocked;
+  final List<String> subscribedChannels;
 
   UserModel({
     required this.uid,
@@ -78,6 +79,7 @@ class UserModel {
     this.dailyEarned = 0,
     this.lastDailyBonusClaim,
     this.isBlocked = false,
+    this.subscribedChannels = const [],
   });
 
   bool get isVip => vipPlan != 'free' && (vipExpiry == null || vipExpiry!.isAfter(DateTime.now()));
@@ -164,6 +166,7 @@ class UserModel {
       dailyEarned: data['dailyEarned'] ?? 0,
       lastDailyBonusClaim: data['lastDailyBonusClaim'] != null ? (data['lastDailyBonusClaim'] as Timestamp).toDate() : null,
       isBlocked: data['isBlocked'] ?? false,
+      subscribedChannels: List<String>.from(data['subscribedChannels'] ?? []),
     );
   }
 
@@ -205,6 +208,7 @@ class UserModel {
       'dailyEarned': dailyEarned,
       'lastDailyBonusClaim': lastDailyBonusClaim != null ? Timestamp.fromDate(lastDailyBonusClaim!) : null,
       'isBlocked': isBlocked,
+      'subscribedChannels': subscribedChannels,
     };
   }
 
@@ -241,6 +245,7 @@ class UserModel {
     int? dailyEarned,
     DateTime? lastDailyBonusClaim,
     bool? isBlocked,
+    List<String>? subscribedChannels,
   }) {
     return UserModel(
       uid: uid,
@@ -280,6 +285,7 @@ class UserModel {
       dailyEarned: dailyEarned ?? this.dailyEarned,
       lastDailyBonusClaim: lastDailyBonusClaim ?? this.lastDailyBonusClaim,
       isBlocked: isBlocked ?? this.isBlocked,
+      subscribedChannels: subscribedChannels ?? this.subscribedChannels,
     );
   }
 }

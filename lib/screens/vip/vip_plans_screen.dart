@@ -1,10 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
+import 'package:qr_flutter/qr_flutter.dart';
+import 'package:clipboard/clipboard.dart';
 import '../../core/constants/app_colors.dart';
 import '../../data/providers/vip_provider.dart';
 import '../../data/providers/user_provider.dart';
 import '../../core/utils/helpers.dart';
+import '../../data/models/user_model.dart';
 
 class VipPlansScreen extends StatefulWidget {
   const VipPlansScreen({Key? key}) : super(key: key);
@@ -359,9 +362,14 @@ class _VipPlansScreenState extends State<VipPlansScreen> {
     );
   }
 
-  void _showPaymentDialog(BuildContext context, UserModel user, Map<String, dynamic> plan, VipProvider vipProvider) {
-    final trxCtrl = TextEditingController();
-    String selectedMethod = 'EasyPaisa';
+  void _showPaymentDialog(BuildContext context, Map<String, dynamic> plan) {
+    final nameController = TextEditingController();
+    final trIdController = TextEditingController();
+    final phoneController = TextEditingController();
+    final vipProvider = Provider.of<VipProvider>(context, listen: false);
+    
+    // Hardcoded TRC20 Crypto Address provided by user
+    final String cryptoAddress = 'TXFVm81MyfzS4M1gYmMedGBzdzQ26f6bub';
     
     showDialog(
       context: context,
@@ -370,22 +378,48 @@ class _VipPlansScreenState extends State<VipPlansScreen> {
           builder: (context, setDialogState) {
             return AlertDialog(
               backgroundColor: AppColors.cardColor,
-              title: Text('Complete Payment', style: GoogleFonts.poppins(color: Colors.white)),
+              title: Text('Crypto Payment', style: GoogleFonts.poppins(color: Colors.white)),
               content: SingleChildScrollView(
                 child: Column(
                   mainAxisSize: MainAxisSize.min,
-                  crossAxisAlignment: CrossAxisAlignment.start,
+                  crossAxisAlignment: CrossAxisAlignment.center,
                   children: [
-                    Text('Send ${plan['price']} to:', style: const TextStyle(color: Colors.white70)),
-                    const SizedBox(height: 8),
+                    Text('Send ${plan['price']} via Crypto', style: const TextStyle(color: Colors.white70)),
+                    const SizedBox(height: 16),
+                    Container(
+                      padding: const EdgeInsets.all(8),
+                      decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(12)),
+                      child: QrImageView(
+                        data: cryptoAddress,
+                        version: QrVersions.auto,
+                        size: 150.0,
+                        backgroundColor: Colors.white,
+                      ),
+                    ),
+                    const SizedBox(height: 16),
                     Container(
                       padding: const EdgeInsets.all(12),
                       decoration: BoxDecoration(color: Colors.black26, borderRadius: BorderRadius.circular(8)),
-                      child: const Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
+                      child: Row(
                         children: [
-                          Text('Title: Admin Name', style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
-                          Text('Account: 0300-0000000', style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
+                          Expanded(
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                const Text('Network: TRC20', style: TextStyle(color: Colors.orangeAccent, fontWeight: FontWeight.bold)),
+                                const SizedBox(height: 4),
+                                Text('Address: $cryptoAddress', style: const TextStyle(color: Colors.white, fontSize: 12)),
+                              ],
+                            ),
+                          ),
+                          IconButton(
+                            icon: const Icon(Icons.copy, color: Colors.amber),
+                            onPressed: () {
+                              FlutterClipboard.copy(cryptoAddress).then((value) {
+                                if (context.mounted) Helpers.showSuccessSnackbar(context, 'Address Copied!');
+                              });
+                            },
+                          ),
                         ],
                       ),
                     ),
@@ -395,7 +429,7 @@ class _VipPlansScreenState extends State<VipPlansScreen> {
                       dropdownColor: AppColors.cardColor,
                       style: const TextStyle(color: Colors.white),
                       decoration: const InputDecoration(labelText: 'Payment Method', labelStyle: TextStyle(color: Colors.white54)),
-                      items: ['EasyPaisa', 'JazzCash', 'SadaPay', 'NayaPay'].map((e) => DropdownMenuItem(value: e, child: Text(e))).toList(),
+                      items: ['USDT (TRC20)', 'BTC', 'ETH'].map((e) => DropdownMenuItem(value: e, child: Text(e))).toList(),
                       onChanged: (val) => setDialogState(() => selectedMethod = val!),
                     ),
                     const SizedBox(height: 12),
@@ -403,9 +437,9 @@ class _VipPlansScreenState extends State<VipPlansScreen> {
                       controller: trxCtrl,
                       style: const TextStyle(color: Colors.white),
                       decoration: const InputDecoration(
-                        labelText: 'Transaction ID (TrxID)',
+                        labelText: 'Transaction Hash / TxID',
                         labelStyle: TextStyle(color: Colors.white54),
-                        hintText: 'Enter TrxID from SMS',
+                        hintText: 'Enter TxID from Binance/TrustWallet',
                         hintStyle: TextStyle(color: Colors.white30),
                       ),
                     ),
@@ -417,7 +451,7 @@ class _VipPlansScreenState extends State<VipPlansScreen> {
                 ElevatedButton(
                   onPressed: () async {
                     if (trxCtrl.text.isEmpty) return;
-                    Navigator.pop(context); // Close dialog
+                    Navigator.pop(context); 
                     
                     final success = await vipProvider.purchasePlan(user, plan['id'], trxCtrl.text, selectedMethod);
                     if (success && mounted) {
