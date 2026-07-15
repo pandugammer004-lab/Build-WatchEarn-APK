@@ -24,6 +24,7 @@ import '../screens/settings/settings_screen.dart';
 import '../screens/notifications/notifications_screen.dart';
 import '../screens/help/help_screen.dart';
 import '../screens/legal/legal_screen.dart';
+import '../screens/auth/auth_wrapper.dart';
 
 class SatisfyMeApp extends StatelessWidget {
   const SatisfyMeApp({Key? key}) : super(key: key);
@@ -40,7 +41,8 @@ class SatisfyMeApp extends StatelessWidget {
         '/onboarding': (context) => const OnboardingScreen(),
         '/login': (context) => const LoginScreen(),
         '/signup': (context) => const SignupScreen(),
-        '/home': (context) => const MainNavigation(),
+        '/home': (context) => const AuthWrapper(),
+        '/main': (context) => const MainNavigation(),
         '/earn': (context) => const EarnScreen(),
         '/spin': (context) => const SpinWheelScreen(),
         '/scratch': (context) => const ScratchCardScreen(),

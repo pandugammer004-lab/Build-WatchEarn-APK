@@ -53,6 +53,13 @@ class UserProvider extends ChangeNotifier {
       final newCoins = _user!.coins + amount;
       final newTotalEarned = amount > 0 ? _user!.totalEarned + amount : _user!.totalEarned;
       
+      // Optimistic update
+      _user = _user!.copyWith(
+        coins: newCoins,
+        totalEarned: newTotalEarned,
+      );
+      notifyListeners();
+      
       await _firestoreService.updateUser(_user!.uid, {
         'coins': newCoins,
         'totalEarned': newTotalEarned,

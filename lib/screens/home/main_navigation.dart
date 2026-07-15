@@ -33,13 +33,7 @@ class _MainNavigationState extends State<MainNavigation> {
   @override
   void initState() {
     super.initState();
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      final userProvider = Provider.of<UserProvider>(context, listen: false);
-      if (userProvider.user != null) {
-        userProvider.loadUser(userProvider.user!.uid);
-        userProvider.loadNotifications();
-      }
-    });
+    // User is loaded by AuthWrapper before MainNavigation is displayed
   }
 
   void _onTabTapped(int index) {
