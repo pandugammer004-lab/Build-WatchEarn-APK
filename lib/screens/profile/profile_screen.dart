@@ -13,6 +13,7 @@ import '../help/help_screen.dart';
 import '../legal/legal_screen.dart';
 import 'package:share_plus/share_plus.dart' as import_share;
 import '../../data/providers/auth_provider.dart';
+import '../../core/constants/app_config.dart';
 
 class ProfileScreen extends StatelessWidget {
   const ProfileScreen({Key? key}) : super(key: key);
@@ -40,7 +41,7 @@ class ProfileScreen extends StatelessWidget {
                       const SizedBox(height: 24),
                       _buildQuickActions(context, user?.isVip ?? false, user?.coins ?? 0, user?.totalReferrals ?? 0),
                       const SizedBox(height: 24),
-                      _buildAccountSection(context),
+                      _buildAccountSection(context, user),
                       const SizedBox(height: 24),
                       _buildDangerZone(),
                       const SizedBox(height: 40),
@@ -310,11 +311,17 @@ class ProfileScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildAccountSection(BuildContext context) {
+  Widget _buildAccountSection(BuildContext context, dynamic user) {
+    final bool isAdmin = user != null && AppConfig.adminEmails.contains(user.email);
+    
     return Container(
       decoration: BoxDecoration(color: AppColors.cardColor, borderRadius: BorderRadius.circular(16)),
       child: Column(
         children: [
+          if (isAdmin) ...[
+            _buildAccountListTile(context, Icons.admin_panel_settings, 'Admin Dashboard', Colors.redAccent, () => Navigator.pushNamed(context, '/admin')),
+            _buildDivider(),
+          ],
           _buildAccountListTile(context, Icons.edit, 'Edit Profile', Colors.white, () => Navigator.push(context, MaterialPageRoute(builder: (_) => const EditProfileScreen()))),
           _buildDivider(),
           _buildAccountListTile(context, Icons.notifications, 'Notifications', Colors.white, () => Navigator.push(context, MaterialPageRoute(builder: (_) => const NotificationsScreen()))),

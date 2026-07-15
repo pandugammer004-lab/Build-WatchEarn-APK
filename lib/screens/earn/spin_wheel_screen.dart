@@ -230,13 +230,11 @@ class _SpinWheelScreenState extends State<SpinWheelScreen> {
                         return Padding(
                           padding: const EdgeInsets.symmetric(horizontal: 32.0),
                           child: ElevatedButton.icon(
-                            onPressed: _isSpinning ? null : () {
-                              adProvider.showRewardedAd(
-                                context,
-                                onReward: () {
-                                  _spin(context, true, false);
-                                },
-                              );
+                            onPressed: _isSpinning ? null : () async {
+                              final reward = await adProvider.showRewardedAd();
+                              if (reward > 0) {
+                                _spin(context, true, false);
+                              }
                             },
                             icon: const Icon(Icons.ondemand_video, color: Colors.white),
                             label: const Text('Watch Ad for Free Spin', style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),

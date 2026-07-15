@@ -25,6 +25,7 @@ import '../screens/notifications/notifications_screen.dart';
 import '../screens/help/help_screen.dart';
 import '../screens/legal/legal_screen.dart';
 import '../screens/auth/auth_wrapper.dart';
+import '../screens/admin/admin_dashboard.dart';
 
 class SatisfyMeApp extends StatelessWidget {
   const SatisfyMeApp({Key? key}) : super(key: key);
@@ -60,6 +61,7 @@ class SatisfyMeApp extends StatelessWidget {
         '/notifications': (context) => const NotificationsScreen(),
         '/help': (context) => const HelpScreen(),
         '/legal': (context) => const LegalScreen(title: 'Terms of Service', url: 'https://watchearn.app/terms'),
+        '/admin': (context) => const AdminDashboardScreen(),
       },
     );
   }
