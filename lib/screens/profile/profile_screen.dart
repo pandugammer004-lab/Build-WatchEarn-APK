@@ -12,6 +12,7 @@ import '../notifications/notifications_screen.dart';
 import '../help/help_screen.dart';
 import '../legal/legal_screen.dart';
 import 'package:share_plus/share_plus.dart' as import_share;
+import '../../data/providers/auth_provider.dart';
 
 class ProfileScreen extends StatelessWidget {
   const ProfileScreen({Key? key}) : super(key: key);
@@ -35,7 +36,7 @@ class ProfileScreen extends StatelessWidget {
                       const SizedBox(height: 24),
                       _buildEarningsSummary(),
                       const SizedBox(height: 24),
-                      _buildRecentBadges(),
+                      _buildRecentBadges(context),
                       const SizedBox(height: 24),
                       _buildQuickActions(context, user?.isVip ?? false, user?.coins ?? 0, user?.totalReferrals ?? 0),
                       const SizedBox(height: 24),
@@ -231,7 +232,7 @@ class ProfileScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildRecentBadges() {
+  Widget _buildRecentBadges(BuildContext context) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
