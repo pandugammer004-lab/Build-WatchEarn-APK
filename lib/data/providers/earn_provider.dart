@@ -17,9 +17,20 @@ class EarnProvider extends ChangeNotifier {
   ];
   List<DailyGoalModel> get dailyGoals => _dailyGoals;
 
-  int getSpinWheelPrize() {
+  int getSpinWheelPrize(bool isPremium) {
     final double r = _random.nextDouble();
-    // [0.25, 0.45, 0.63, 0.78, 0.88, 0.95, 0.99, 1.00]
+    
+    if (isPremium) {
+      // Much better chances for Premium Spins
+      if (r < 0.10) return 25;
+      if (r < 0.30) return 50;
+      if (r < 0.60) return 100;
+      if (r < 0.80) return 200;
+      if (r < 0.95) return 500;
+      return 1000;
+    }
+    
+    // Standard Spin chances
     if (r < 0.25) return 5;
     if (r < 0.45) return 10;
     if (r < 0.63) return 25;

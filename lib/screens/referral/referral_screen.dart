@@ -3,6 +3,7 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
 import 'package:flutter/services.dart';
 import 'package:qr_flutter/qr_flutter.dart';
+import 'package:share_plus/share_plus.dart';
 import '../../core/constants/app_colors.dart';
 import '../../core/utils/helpers.dart';
 import '../../data/providers/user_provider.dart';
@@ -30,11 +31,11 @@ class ReferralScreen extends StatelessWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                _buildHeader(),
+                _buildHeader(user?.totalReferrals ?? 0),
                 const SizedBox(height: 24),
                 _buildReferralCodeCard(context, refCode, link),
                 const SizedBox(height: 24),
-                _buildShareButtons(),
+                _buildShareButtons(link),
                 const SizedBox(height: 24),
                 _buildHowItWorks(),
                 const SizedBox(height: 24),
@@ -54,7 +55,8 @@ class ReferralScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildHeader() {
+  Widget _buildHeader(int totalReferrals) {
+    final int earnedCoins = totalReferrals * 500;
     return Container(
       width: double.infinity,
       padding: const EdgeInsets.all(20),
@@ -66,7 +68,7 @@ class ReferralScreen extends StatelessWidget {
         children: [
           const Text('Earn lifetime 10% commission!', style: TextStyle(color: Colors.white, fontSize: 16, fontWeight: FontWeight.bold)),
           const SizedBox(height: 8),
-          const Text('Total Earned: 5,200 🪙', style: TextStyle(color: Colors.amber, fontSize: 24, fontWeight: FontWeight.bold)),
+          Text('Total Earned: ${Helpers.formatCoins(earnedCoins)} 🪙', style: const TextStyle(color: Colors.amber, fontSize: 24, fontWeight: FontWeight.bold)),
         ],
       ),
     );
@@ -177,7 +179,7 @@ class ReferralScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildShareButtons() {
+  Widget _buildShareButtons(String link) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -191,32 +193,37 @@ class ReferralScreen extends StatelessWidget {
           crossAxisSpacing: 12,
           childAspectRatio: 1.2,
           children: [
-            _buildShareBtn(Icons.chat, 'WhatsApp', Colors.green),
-            _buildShareBtn(Icons.camera_alt, 'Instagram', Colors.purple),
-            _buildShareBtn(Icons.facebook, 'Facebook', Colors.blue),
-            _buildShareBtn(Icons.alternate_email, 'X (Twitter)', Colors.black87),
-            _buildShareBtn(Icons.message, 'SMS', Colors.greenAccent.shade700),
-            _buildShareBtn(Icons.share, 'More...', Colors.grey),
+            _buildShareBtn(Icons.chat, 'WhatsApp', Colors.green, link),
+            _buildShareBtn(Icons.camera_alt, 'Instagram', Colors.purple, link),
+            _buildShareBtn(Icons.facebook, 'Facebook', Colors.blue, link),
+            _buildShareBtn(Icons.alternate_email, 'X (Twitter)', Colors.black87, link),
+            _buildShareBtn(Icons.message, 'SMS', Colors.greenAccent.shade700, link),
+            _buildShareBtn(Icons.share, 'More...', Colors.grey, link),
           ],
         ),
       ],
     );
   }
 
-  Widget _buildShareBtn(IconData icon, String label, Color color) {
-    return Container(
-      decoration: BoxDecoration(
-        color: AppColors.cardColor,
-        borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: Colors.white12),
-      ),
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          Icon(icon, color: color, size: 28),
-          const SizedBox(height: 8),
-          Text(label, style: const TextStyle(color: Colors.white70, fontSize: 10), textAlign: TextAlign.center),
-        ],
+  Widget _buildShareBtn(IconData icon, String label, Color color, String link) {
+    return GestureDetector(
+      onTap: () {
+        Share.share('Hey! Join me on WatchEarn and get 500 free coins. Use my link: $link');
+      },
+      child: Container(
+        decoration: BoxDecoration(
+          color: AppColors.cardColor,
+          borderRadius: BorderRadius.circular(12),
+          border: Border.all(color: Colors.white12),
+        ),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Icon(icon, color: color, size: 28),
+            const SizedBox(height: 8),
+            Text(label, style: const TextStyle(color: Colors.white70, fontSize: 10), textAlign: TextAlign.center),
+          ],
+        ),
       ),
     );
   }
@@ -264,6 +271,8 @@ class ReferralScreen extends StatelessWidget {
   }
 
   Widget _buildReferralStats(int count) {
+    final int earnedCoins = count * 500;
+    final String cashValue = '\$${(earnedCoins / 10000).toStringAsFixed(2)}'; // Assuming 10k coins = $1
     return GridView.count(
       crossAxisCount: 2,
       shrinkWrap: true,
@@ -273,9 +282,9 @@ class ReferralScreen extends StatelessWidget {
       childAspectRatio: 2.0,
       children: [
         _buildStatCard('👥', 'Total Referrals', '$count'),
-        _buildStatCard('✅', 'Active Referrals', '$count'), // Demo
-        _buildStatCard('🪙', 'Coins Earned', '5,200'), // Demo
-        _buildStatCard('💰', 'Cash Value', '\$0.52'), // Demo
+        _buildStatCard('✅', 'Active Referrals', '$count'),
+        _buildStatCard('🪙', 'Coins Earned', Helpers.formatCoins(earnedCoins)),
+        _buildStatCard('💰', 'Cash Value', cashValue),
       ],
     );
   }

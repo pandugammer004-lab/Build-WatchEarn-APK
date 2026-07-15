@@ -81,10 +81,14 @@ class _LoginScreenState extends State<LoginScreen> {
                       delay: const Duration(milliseconds: 100),
                       child: Column(
                         children: [
-                          const Icon(
-                            Icons.play_circle_fill_rounded,
-                            size: 64,
-                            color: AppColors.primary,
+                          ClipRRect(
+                            borderRadius: BorderRadius.circular(16),
+                            child: Image.asset(
+                              'assets/logo.jpg',
+                              height: 80,
+                              width: 80,
+                              fit: BoxFit.cover,
+                            ),
                           ),
                           const SizedBox(height: 16),
                           Text(

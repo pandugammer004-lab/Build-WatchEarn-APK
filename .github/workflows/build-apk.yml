@@ -108,8 +108,20 @@ jobs:
               
               with open(app_gradle, 'w') as f: f.write(c)
 
+          # 4. AndroidManifest.xml for AdMob APPLICATION_ID
+          manifest = 'android/app/src/main/AndroidManifest.xml'
+          if os.path.exists(manifest):
+              with open(manifest, 'r') as f: c = f.read()
+              ad_tag = '<meta-data android:name="com.google.android.gms.ads.APPLICATION_ID" android:value="ca-app-pub-3940256099942544~3347511713"/>'
+              if 'com.google.android.gms.ads.APPLICATION_ID' not in c:
+                  c = c.replace('<application', f'<application\n        {ad_tag}')
+                  with open(manifest, 'w') as f: f.write(c)
+
       - name: Get Dependencies
         run: flutter pub get
+
+      - name: Generate Launcher Icons
+        run: flutter pub run flutter_launcher_icons
 
       - name: Build APK
         run: flutter build apk --release

@@ -70,7 +70,7 @@ class EarnScreen extends StatelessWidget {
   Widget _buildSubtitle() {
     return Consumer<UserProvider>(
       builder: (context, userProvider, _) {
-        final earnedToday = userProvider.user?.dailyVideosWatched ?? 0 * 10;
+        final earnedToday = userProvider.user?.dailyEarned ?? 0;
         return Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
@@ -117,18 +117,24 @@ class EarnScreen extends StatelessWidget {
               ],
             ),
           ),
-          ElevatedButton(
-            onPressed: () {},
-            style: ElevatedButton.styleFrom(
-              backgroundColor: Colors.white,
-              foregroundColor: AppColors.primary,
+            ElevatedButton(
+              onPressed: () {
+                final userProvider = Provider.of<UserProvider>(context, listen: false);
+                userProvider.claimDailyBonus();
+                ScaffoldMessenger.of(context).showSnackBar(
+                  const SnackBar(content: Text('Daily Bonus Claimed! +100 Coins')),
+                );
+              },
+              style: ElevatedButton.styleFrom(
+                backgroundColor: Colors.white,
+                foregroundColor: AppColors.primary,
+              ),
+              child: const Text('Claim'),
             ),
-            child: const Text('Claim'),
-          ),
-        ],
-      ),
-    );
-  }
+          ],
+        ),
+      );
+    }
 
   Widget _buildStreakCalendar() {
     return Container(
@@ -292,10 +298,15 @@ class EarnScreen extends StatelessWidget {
               ],
             ),
           ),
-          Container(
-            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-            decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(20)),
-            child: const Text('Upgrade', style: TextStyle(color: Colors.orange, fontWeight: FontWeight.bold)),
+          GestureDetector(
+            onTap: () {
+              Navigator.pushNamed(context, '/vip');
+            },
+            child: Container(
+              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+              decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(20)),
+              child: const Text('Upgrade', style: TextStyle(color: Colors.orange, fontWeight: FontWeight.bold)),
+            ),
           ),
         ],
       ),

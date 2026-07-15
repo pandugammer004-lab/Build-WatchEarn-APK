@@ -85,9 +85,11 @@ class _CoinEarnedAnimationState extends State<CoinEarnedAnimation> {
               colors: const [Colors.amber, Colors.orange, AppColors.primary, Colors.white],
             ),
           ),
-          Center(
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
+          Padding(
+            padding: const EdgeInsets.only(bottom: 150.0), // Moved up to avoid overlapping with wheel/cards
+            child: Center(
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 ZoomIn(
                   duration: const Duration(milliseconds: 500),
@@ -139,6 +141,7 @@ class _CoinEarnedAnimationState extends State<CoinEarnedAnimation> {
                 ),
               ],
             ),
+          ),
           ),
         ],
       ),

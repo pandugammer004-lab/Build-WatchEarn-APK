@@ -37,8 +37,8 @@ dependencies:
   # YouTube
   youtube_player_flutter: ^8.1.2
   
-  # Ads - disabled (requires AndroidManifest APPLICATION_ID setup)
-  # google_mobile_ads: ^5.1.0
+  # Ads - Re-enabled
+  google_mobile_ads: ^5.1.0
   
   # State Management
   provider: ^6.1.1
@@ -68,6 +68,13 @@ dev_dependencies:
   flutter_test:
     sdk: flutter
   flutter_lints: ^2.0.0
+  flutter_launcher_icons: ^0.13.1
+
+flutter_launcher_icons:
+  android: "launcher_icon"
+  ios: true
+  image_path: "assets/logo.jpg"
+  min_sdk_Android: 21
 
 flutter:
   uses-material-design: true

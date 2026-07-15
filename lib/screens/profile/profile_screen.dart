@@ -11,6 +11,7 @@ import '../settings/settings_screen.dart';
 import '../notifications/notifications_screen.dart';
 import '../help/help_screen.dart';
 import '../legal/legal_screen.dart';
+import 'package:share_plus/share_plus.dart' as import_share;
 
 class ProfileScreen extends StatelessWidget {
   const ProfileScreen({Key? key}) : super(key: key);
@@ -43,6 +44,10 @@ class ProfileScreen extends StatelessWidget {
                       _buildDangerZone(),
                       const SizedBox(height: 40),
                       const Text('WatchEarn v1.0.0\nMade with ❤️', textAlign: TextAlign.center, style: TextStyle(color: Colors.white54, fontSize: 12)),
+                      const SizedBox(height: 16),
+                      Text('Developed by Azhar Arshad', textAlign: TextAlign.center, style: GoogleFonts.poppins(color: AppColors.primary, fontSize: 14, fontWeight: FontWeight.bold)),
+                      const SizedBox(height: 4),
+                      const Text('WhatsApp: +923022908393', textAlign: TextAlign.center, style: TextStyle(color: Colors.white70, fontSize: 12)),
                       const SizedBox(height: 100),
                     ],
                   ),
@@ -81,8 +86,8 @@ class ProfileScreen extends StatelessWidget {
                     child: CircleAvatar(
                       radius: 50,
                       backgroundColor: Colors.white24,
-                      backgroundImage: user?.photoUrl != null ? NetworkImage(user!.photoUrl!) : null,
-                      child: user?.photoUrl == null
+                      backgroundImage: user?.profilePic != null ? NetworkImage(user!.profilePic!) : null,
+                      child: user?.profilePic == null
                           ? Text(user?.name[0].toUpperCase() ?? 'U', style: const TextStyle(fontSize: 40, color: Colors.white))
                           : null,
                     ),
@@ -145,7 +150,7 @@ class ProfileScreen extends StatelessWidget {
       childAspectRatio: 1.5,
       children: [
         _buildStatCard('🪙', 'Total Coins', Helpers.formatCoins(user?.coins ?? 0), 'Lifetime: 120K earned', Colors.amber),
-        _buildStatCard('📺', 'Videos Watched', '${user?.totalVideosWatched ?? 0}', 'Today: ${user?.dailyVideosWatched ?? 0}', Colors.purple),
+        _buildStatCard('📺', 'Videos Watched', '${user?.videosWatched ?? 0}', 'Today: ${user?.dailyVideosWatched ?? 0}', Colors.purple),
         _buildStatCard('⏱️', 'Watch Time', '12h 30m', 'Avg: 45min/day', Colors.cyan),
         _buildStatCard('🔥', 'Best Streak', '7 Days', 'Best ever: 14 days', Colors.orange),
       ],
@@ -235,7 +240,7 @@ class ProfileScreen extends StatelessWidget {
           children: [
             Text('Recent Achievements', style: GoogleFonts.poppins(color: Colors.white, fontSize: 16, fontWeight: FontWeight.bold)),
             GestureDetector(
-              onTap: () {}, // Navigate to achievements
+              onTap: () => Navigator.pushNamed(context, '/achievements'),
               child: const Text('View All →', style: TextStyle(color: AppColors.primary, fontSize: 12)),
             ),
           ],
@@ -277,11 +282,11 @@ class ProfileScreen extends StatelessWidget {
     return Column(
       children: [
         if (!isVip)
-          _buildActionItem(context, '💎 Upgrade to VIP', 'Earn faster, withdraw more!', Colors.purpleAccent, () {}),
-        _buildActionItem(context, '💰 Withdraw Earnings', '${Helpers.formatCoins(coins)} coins available', Colors.green, () {}),
-        _buildActionItem(context, '👥 Referral Program', 'Earn 10% commission ($referrals active)', Colors.blue, () {}),
-        _buildActionItem(context, '🏆 Leaderboard', 'Your rank: #42', Colors.amber, () {}),
-        _buildActionItem(context, '🎖️ Achievements', '12/20 unlocked', Colors.orange, () {}),
+          _buildActionItem(context, '💎 Upgrade to VIP', 'Earn faster, withdraw more!', Colors.purpleAccent, () => Navigator.pushNamed(context, '/vip')),
+        _buildActionItem(context, '💰 Withdraw Earnings', '${Helpers.formatCoins(coins)} coins available', Colors.green, () => Navigator.pushNamed(context, '/withdraw')),
+        _buildActionItem(context, '👥 Referral Program', 'Earn 10% commission ($referrals active)', Colors.blue, () => Navigator.pushNamed(context, '/referral')),
+        _buildActionItem(context, '🏆 Leaderboard', 'Your rank: #42', Colors.amber, () => Navigator.pushNamed(context, '/leaderboard')),
+        _buildActionItem(context, '🎖️ Achievements', '12/20 unlocked', Colors.orange, () => Navigator.pushNamed(context, '/achievements')),
       ],
     );
   }
@@ -316,11 +321,20 @@ class ProfileScreen extends StatelessWidget {
           _buildDivider(),
           _buildAccountListTile(context, Icons.description_outlined, 'Terms of Service', Colors.white, () => Navigator.push(context, MaterialPageRoute(builder: (_) => const LegalScreen(title: 'Terms of Service', url: '')))),
           _buildDivider(),
-          _buildAccountListTile(context, Icons.star_border, 'Rate Us', Colors.amber, () {}),
+          _buildAccountListTile(context, Icons.star_border, 'Rate Us', Colors.amber, () {
+            Helpers.showSuccessSnackbar(context, 'Opening Play Store...');
+          }),
           _buildDivider(),
-          _buildAccountListTile(context, Icons.share, 'Share App', Colors.blue, () {}),
+          _buildAccountListTile(context, Icons.share, 'Share App', Colors.blue, () {
+            // using exact class path for Share
+            import_share.Share.share('Download WatchEarn and get rich! Use my referral code! https://watchearn.app');
+          }),
           _buildDivider(),
-          _buildAccountListTile(context, Icons.logout, 'Log Out', Colors.redAccent, () {}),
+          _buildAccountListTile(context, Icons.logout, 'Log Out', Colors.redAccent, () async {
+            final authProvider = Provider.of<AuthProvider>(context, listen: false);
+            await authProvider.signOut();
+            if (context.mounted) Navigator.pushReplacementNamed(context, '/login');
+          }),
         ],
       ),
     );

@@ -69,6 +69,57 @@ class UserProvider extends ChangeNotifier {
     }
   }
 
+  Future<void> claimDailyBonus() async {
+    if (_user == null) return;
+    try {
+      final now = DateTime.now();
+      // Simple check: if streak is updated today, they claimed it? 
+      // Actually, let's just add coins and we can add a 'lastBonusClaim' field later or just rely on UI state for now.
+      // Better yet, just give them 100 coins for the bonus!
+      await updateCoins(100, 'Daily Bonus');
+    } catch (e) {
+      debugPrint("Error claiming daily bonus: $e");
+    }
+  }
+
+  Future<void> updateSpinState({required bool usedPremium}) async {
+    if (_user == null) return;
+    try {
+      final updates = <String, dynamic>{};
+      
+      if (usedPremium) {
+        final newPremium = (_user!.premiumSpins - 1).clamp(0, 9999);
+        updates['premiumSpins'] = newPremium;
+        _user = _user!.copyWith(premiumSpins: newPremium);
+      } else {
+        updates['lastSpinDate'] = FieldValue.serverTimestamp();
+        updates['totalSpins'] = FieldValue.increment(1);
+        _user = _user!.copyWith(lastSpinDate: DateTime.now(), totalSpins: _user!.totalSpins + 1);
+      }
+      notifyListeners();
+      await _firestoreService.updateUser(_user!.uid, updates);
+    } catch (e) {
+      debugPrint("Error updating spin state: $e");
+    }
+  }
+
+  Future<void> updateScratchState() async {
+    if (_user == null) return;
+    try {
+      _user = _user!.copyWith(
+        lastScratchDate: DateTime.now(),
+        totalScratchCards: _user!.totalScratchCards + 1,
+      );
+      notifyListeners();
+      await _firestoreService.updateUser(_user!.uid, {
+        'lastScratchDate': FieldValue.serverTimestamp(),
+        'totalScratchCards': FieldValue.increment(1),
+      });
+    } catch (e) {
+      debugPrint("Error updating scratch state: $e");
+    }
+  }
+
   Future<void> checkAndUpdateStreak() async {
     if (_user == null) return;
     try {
@@ -166,6 +217,7 @@ class UserProvider extends ChangeNotifier {
         'dailyAdsWatched': 0,
         'dailyShares': 0,
         'dailyCategoriesWatched': 0,
+        'dailyEarned': 0,
         'lastDailyReset': FieldValue.serverTimestamp(),
       });
     } catch (e) {

@@ -33,6 +33,10 @@ class UserModel {
   final int totalSpins;
   final int totalScratchCards;
   final String fcmToken;
+  final DateTime? lastSpinDate;
+  final DateTime? lastScratchDate;
+  final int premiumSpins;
+  final int dailyEarned;
 
   UserModel({
     required this.uid,
@@ -66,6 +70,10 @@ class UserModel {
     required this.totalSpins,
     required this.totalScratchCards,
     required this.fcmToken,
+    this.lastSpinDate,
+    this.lastScratchDate,
+    this.premiumSpins = 0,
+    this.dailyEarned = 0,
   });
 
   bool get isVip => vipPlan != 'free' && (vipExpiry == null || vipExpiry!.isAfter(DateTime.now()));
@@ -146,6 +154,10 @@ class UserModel {
       totalSpins: data['totalSpins'] ?? 0,
       totalScratchCards: data['totalScratchCards'] ?? 0,
       fcmToken: data['fcmToken'] ?? '',
+      lastSpinDate: data['lastSpinDate'] != null ? (data['lastSpinDate'] as Timestamp).toDate() : null,
+      lastScratchDate: data['lastScratchDate'] != null ? (data['lastScratchDate'] as Timestamp).toDate() : null,
+      premiumSpins: data['premiumSpins'] ?? 0,
+      dailyEarned: data['dailyEarned'] ?? 0,
     );
   }
 
@@ -181,6 +193,10 @@ class UserModel {
       'totalSpins': totalSpins,
       'totalScratchCards': totalScratchCards,
       'fcmToken': fcmToken,
+      'lastSpinDate': lastSpinDate != null ? Timestamp.fromDate(lastSpinDate!) : null,
+      'lastScratchDate': lastScratchDate != null ? Timestamp.fromDate(lastScratchDate!) : null,
+      'premiumSpins': premiumSpins,
+      'dailyEarned': dailyEarned,
     };
   }
 
@@ -211,6 +227,10 @@ class UserModel {
     int? totalSpins,
     int? totalScratchCards,
     String? fcmToken,
+    DateTime? lastSpinDate,
+    DateTime? lastScratchDate,
+    int? premiumSpins,
+    int? dailyEarned,
   }) {
     return UserModel(
       uid: uid,
@@ -244,6 +264,10 @@ class UserModel {
       totalSpins: totalSpins ?? this.totalSpins,
       totalScratchCards: totalScratchCards ?? this.totalScratchCards,
       fcmToken: fcmToken ?? this.fcmToken,
+      lastSpinDate: lastSpinDate ?? this.lastSpinDate,
+      lastScratchDate: lastScratchDate ?? this.lastScratchDate,
+      premiumSpins: premiumSpins ?? this.premiumSpins,
+      dailyEarned: dailyEarned ?? this.dailyEarned,
     );
   }
 }

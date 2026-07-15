@@ -19,8 +19,22 @@ class SpinWheelScreen extends StatefulWidget {
 class _SpinWheelScreenState extends State<SpinWheelScreen> {
   StreamController<int> selected = StreamController<int>();
   bool _isSpinning = false;
-  int _spinsAvailable = 1; // Default 1 free spin per session
   int _currentPrize = 0;
+  bool _usedPremiumSpin = false;
+  Timer? _countdownTimer;
+  String _timeRemaining = '';
+  
+  @override
+  void initState() {
+    super.initState();
+    _startTimer();
+  }
+  
+  void _startTimer() {
+    _countdownTimer = Timer.periodic(const Duration(seconds: 1), (timer) {
+      if (mounted) setState(() {});
+    });
+  }
   
   final List<int> _prizes = [5, 10, 25, 50, 100, 200, 500, 1000];
   final List<Color> _colors = [
@@ -37,14 +51,16 @@ class _SpinWheelScreenState extends State<SpinWheelScreen> {
   @override
   void dispose() {
     selected.close();
+    _countdownTimer?.cancel();
     super.dispose();
   }
 
-  void _spin(BuildContext context) {
+  void _spin(BuildContext context, bool hasFreeSpin, bool hasPremium) {
     if (_isSpinning) return;
-    if (_spinsAvailable <= 0) {
+    
+    if (!hasFreeSpin && !hasPremium) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('No spins available! Watch an ad to get more.')),
+        const SnackBar(content: Text('No spins available! Wait for timer or invite friends.')),
       );
       return;
     }
@@ -53,10 +69,10 @@ class _SpinWheelScreenState extends State<SpinWheelScreen> {
     
     setState(() {
       _isSpinning = true;
-      _spinsAvailable -= 1;
+      _usedPremiumSpin = hasPremium;
     });
 
-    _currentPrize = earnProvider.getSpinWheelPrize();
+    _currentPrize = earnProvider.getSpinWheelPrize(_usedPremiumSpin);
     final index = earnProvider.getSpinIndexForPrize(_currentPrize);
     
     selected.add(index);
@@ -75,11 +91,12 @@ class _SpinWheelScreenState extends State<SpinWheelScreen> {
     // Award Prize
     if (userProvider.user != null) {
       await earnProvider.logSpin(userProvider.user!, _currentPrize);
-      await userProvider.updateCoins(_currentPrize, 'Lucky Spin');
+      await userProvider.updateCoins(_currentPrize, _usedPremiumSpin ? 'Premium Spin' : 'Daily Free Spin');
+      await userProvider.updateSpinState(usedPremium: _usedPremiumSpin);
     }
     
     if (mounted) {
-      CoinEarnedAnimation.show(context, coins: _currentPrize, source: 'Lucky Spin');
+      CoinEarnedAnimation.show(context, coins: _currentPrize, source: _usedPremiumSpin ? 'Premium Spin' : 'Lucky Spin');
     }
   }
 
@@ -107,120 +124,114 @@ class _SpinWheelScreenState extends State<SpinWheelScreen> {
             ),
           ),
           const SizedBox(height: 8),
-          Container(
-            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-            decoration: BoxDecoration(
-              color: Colors.white10,
-              borderRadius: BorderRadius.circular(20),
-            ),
-            child: Text(
-              '$_spinsAvailable Free Spin${_spinsAvailable == 1 ? '' : 's'} Available',
-              style: const TextStyle(color: Colors.amber, fontWeight: FontWeight.bold),
-            ),
-          ),
-          const SizedBox(height: 40),
-          Expanded(
-            child: Stack(
-              alignment: Alignment.center,
-              children: [
-                // Neon glow effect behind wheel
-                Container(
-                  width: 300,
-                  height: 300,
-                  decoration: BoxDecoration(
-                    shape: BoxShape.circle,
-                    boxShadow: [
-                      BoxShadow(
-                        color: Colors.amber.withOpacity(0.3),
-                        blurRadius: 50,
-                        spreadRadius: 20,
-                      ),
-                    ],
-                  ),
-                ),
-                Padding(
-                  padding: const EdgeInsets.all(20.0),
-                  child: FortuneWheel(
-                    selected: selected.stream,
-                    animateFirst: false,
-                    onAnimationEnd: _onAnimationEnd,
-                    physics: CircularPanPhysics(
-                      duration: const Duration(seconds: 1),
-                      curve: Curves.decelerate,
+          Consumer<UserProvider>(
+            builder: (context, userProvider, _) {
+              final user = userProvider.user;
+              final lastSpin = user?.lastSpinDate;
+              bool hasFreeSpin = false;
+              if (lastSpin == null) {
+                hasFreeSpin = true;
+              } else {
+                final diff = DateTime.now().difference(lastSpin);
+                if (diff.inHours >= 24) hasFreeSpin = true;
+                else {
+                  final remaining = const Duration(hours: 24) - diff;
+                  final h = remaining.inHours.toString().padLeft(2, '0');
+                  final m = (remaining.inMinutes % 60).toString().padLeft(2, '0');
+                  final s = (remaining.inSeconds % 60).toString().padLeft(2, '0');
+                  _timeRemaining = '$h:$m:$s';
+                }
+              }
+              final int premiumSpins = user?.premiumSpins ?? 0;
+              final bool hasPremium = premiumSpins > 0;
+              
+              return Column(
+                children: [
+                  if (hasPremium)
+                    Container(
+                      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                      decoration: BoxDecoration(color: Colors.purple.withOpacity(0.2), borderRadius: BorderRadius.circular(20), border: Border.all(color: Colors.purple)),
+                      child: Text('✨ $premiumSpins Premium Spins Available ✨', style: const TextStyle(color: Colors.purpleAccent, fontWeight: FontWeight.bold)),
+                    )
+                  else if (hasFreeSpin)
+                    Container(
+                      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                      decoration: BoxDecoration(color: Colors.white10, borderRadius: BorderRadius.circular(20)),
+                      child: const Text('1 Daily Free Spin Available', style: TextStyle(color: Colors.amber, fontWeight: FontWeight.bold)),
+                    )
+                  else
+                    Container(
+                      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                      decoration: BoxDecoration(color: Colors.red.withOpacity(0.1), borderRadius: BorderRadius.circular(20)),
+                      child: Text('Next Free Spin in: $_timeRemaining', style: const TextStyle(color: Colors.redAccent, fontWeight: FontWeight.bold)),
                     ),
-                    items: [
-                      for (int i = 0; i < _prizes.length; i++)
-                        FortuneItem(
-                          child: Text(
-                            '${_prizes[i]} 🪙',
-                            style: GoogleFonts.poppins(
-                              color: Colors.white,
-                              fontWeight: FontWeight.bold,
-                              fontSize: 18,
-                            ),
-                          ),
-                          style: FortuneItemStyle(
-                            color: _colors[i],
-                            borderColor: Colors.amber,
-                            borderWidth: 2,
+                  
+                  const SizedBox(height: 40),
+                  SizedBox(
+                    height: 340,
+                    child: Stack(
+                      alignment: Alignment.center,
+                      children: [
+                        Container(
+                          width: 300,
+                          height: 300,
+                          decoration: BoxDecoration(
+                            shape: BoxShape.circle,
+                            boxShadow: [BoxShadow(color: Colors.amber.withOpacity(0.3), blurRadius: 50, spreadRadius: 20)],
                           ),
                         ),
-                    ],
+                        Padding(
+                          padding: const EdgeInsets.all(20.0),
+                          child: FortuneWheel(
+                            selected: selected.stream,
+                            animateFirst: false,
+                            onAnimationEnd: _onAnimationEnd,
+                            physics: CircularPanPhysics(duration: const Duration(seconds: 1), curve: Curves.decelerate),
+                            items: [
+                              for (int i = 0; i < _prizes.length; i++)
+                                FortuneItem(
+                                  child: Text('${_prizes[i]} 🪙', style: GoogleFonts.poppins(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 18)),
+                                  style: FortuneItemStyle(color: _colors[i], borderColor: Colors.amber, borderWidth: 2),
+                                ),
+                            ],
+                          ),
+                        ),
+                        Container(
+                          width: 60, height: 60,
+                          decoration: BoxDecoration(color: AppColors.background, shape: BoxShape.circle, border: Border.all(color: Colors.amber, width: 4)),
+                          child: const Center(child: Icon(Icons.play_circle_fill, color: Colors.amber, size: 30)),
+                        ),
+                      ],
+                    ),
                   ),
-                ),
-                // Center Hub
-                Container(
-                  width: 60,
-                  height: 60,
-                  decoration: BoxDecoration(
-                    color: AppColors.background,
-                    shape: BoxShape.circle,
-                    border: Border.all(color: Colors.amber, width: 4),
+                  const SizedBox(height: 40),
+                  Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 32.0),
+                    child: ElevatedButton(
+                      onPressed: _isSpinning ? null : () => _spin(context, hasFreeSpin, hasPremium),
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: hasPremium ? Colors.purpleAccent : (hasFreeSpin ? Colors.amber : Colors.grey),
+                        foregroundColor: Colors.black,
+                        minimumSize: const Size(double.infinity, 60),
+                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(30)),
+                        elevation: 10,
+                        shadowColor: (hasPremium ? Colors.purple : Colors.amber).withOpacity(0.5),
+                      ),
+                      child: Text(
+                        _isSpinning ? 'SPINNING...' : (hasPremium ? 'SPIN PREMIUM' : (hasFreeSpin ? 'SPIN NOW' : 'WAIT FOR TIMER')),
+                        style: GoogleFonts.poppins(fontSize: 20, fontWeight: FontWeight.bold),
+                      ),
+                    ),
                   ),
-                  child: const Center(
-                    child: Icon(Icons.play_circle_fill, color: Colors.amber, size: 30),
-                  ),
-                ),
-              ],
-            ),
-          ),
-          const SizedBox(height: 40),
-          Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 32.0),
-            child: ElevatedButton(
-              onPressed: _isSpinning ? null : () => _spin(context),
-              style: ElevatedButton.styleFrom(
-                backgroundColor: _spinsAvailable > 0 ? Colors.amber : Colors.grey,
-                foregroundColor: Colors.black,
-                minimumSize: const Size(double.infinity, 60),
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(30),
-                ),
-                elevation: 10,
-                shadowColor: Colors.amber.withOpacity(0.5),
-              ),
-              child: Text(
-                _isSpinning ? 'SPINNING...' : (_spinsAvailable > 0 ? 'SPIN NOW' : 'OUT OF SPINS'),
-                style: GoogleFonts.poppins(
-                  fontSize: 20,
-                  fontWeight: FontWeight.bold,
-                ),
-              ),
-            ),
+                ],
+              );
+            },
           ),
           const SizedBox(height: 16),
           TextButton(
-            onPressed: () {
-              // Simulating watching an ad for a free spin
-              setState(() {
-                _spinsAvailable += 1;
-              });
-              ScaffoldMessenger.of(context).showSnackBar(
-                const SnackBar(content: Text('You watched an ad! +1 Spin granted.')),
-              );
-            },
+            onPressed: () {},
             child: const Text(
-              'Watch Ad to Spin Extra',
+              'Invite Friends for Premium Spins!',
               style: TextStyle(color: Colors.white70, decoration: TextDecoration.underline),
             ),
           ),
