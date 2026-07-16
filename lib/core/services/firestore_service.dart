@@ -43,23 +43,26 @@ class FirestoreService {
 
   // Videos
   Future<List<VideoModel>> getVideos({String? category, bool? trending, int? limit}) async {
-    Query query = _db.collection('videos').where('isActive', isEqualTo: true);
-    
-    if (category != null && category != 'all') {
-      query = query.where('categoryId', isEqualTo: category);
-    }
-    if (trending == true) {
-      query = query.where('isTrending', isEqualTo: true);
-    }
-    
-    query = query.orderBy('publishedAt', descending: true);
-    
+    Query query = _db.collection('videos').orderBy('publishedAt', descending: true);
+
     if (limit != null) {
       query = query.limit(limit);
     }
 
     final snapshot = await query.get();
-    return snapshot.docs.map((doc) => VideoModel.fromFirestore(doc)).toList();
+    var videos = snapshot.docs.map((doc) => VideoModel.fromFirestore(doc)).toList();
+    
+    // Filter locally to avoid requiring complex composite indexes in Firebase
+    videos = videos.where((v) => v.isActive).toList();
+    
+    if (category != null && category != 'all') {
+      videos = videos.where((v) => v.categoryId == category).toList();
+    }
+    if (trending == true) {
+      videos = videos.where((v) => v.isTrending).toList();
+    }
+    
+    return videos;
   }
 
   Future<void> incrementVideoViews(String videoId) async {

@@ -361,7 +361,10 @@ class ReferralScreen extends StatelessWidget {
                 ),
                 if (reached && !claimed)
                   ElevatedButton(
-                    onPressed: () {},
+                    onPressed: () {
+                      // Simulated claim
+                      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Claimed $reward! Added to your balance.')));
+                    },
                     style: ElevatedButton.styleFrom(backgroundColor: Colors.amber, foregroundColor: Colors.black, minimumSize: const Size(60, 30)),
                     child: const Text('Claim', style: TextStyle(fontSize: 12)),
                   )

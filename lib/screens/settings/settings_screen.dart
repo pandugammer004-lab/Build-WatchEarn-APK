@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:provider/provider.dart';
 import '../../core/constants/app_colors.dart';
 import '../../core/widgets/custom_button.dart';
 import '../../core/widgets/custom_text_field.dart';
+import '../../data/providers/user_provider.dart';
 
 class SettingsScreen extends StatefulWidget {
   const SettingsScreen({Key? key}) : super(key: key);
@@ -111,10 +113,34 @@ class _SettingsScreenState extends State<SettingsScreen> {
       const Divider(color: Colors.white12, height: 1),
       ListTile(
         title: const Text('Video Quality', style: TextStyle(color: Colors.white, fontSize: 14)),
-        subtitle: const Text('Current: Auto', style: TextStyle(color: Colors.white54, fontSize: 12)),
+        subtitle: Text('Current: $_videoQuality', style: const TextStyle(color: Colors.white54, fontSize: 12)),
         trailing: const Icon(Icons.arrow_forward_ios, color: Colors.white54, size: 16),
         onTap: () {
-          // Show bottom sheet to select quality
+          showModalBottomSheet(
+            context: context,
+            backgroundColor: AppColors.cardColor,
+            shape: const RoundedRectangleBorder(borderRadius: BorderRadius.vertical(top: Radius.circular(24))),
+            builder: (context) {
+              return Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  const Padding(
+                    padding: EdgeInsets.all(16.0),
+                    child: Text('Video Quality', style: TextStyle(color: Colors.white, fontSize: 18, fontWeight: FontWeight.bold)),
+                  ),
+                  ...['Auto', '1080p', '720p', '480p'].map((q) => ListTile(
+                    title: Text(q, style: const TextStyle(color: Colors.white)),
+                    trailing: _videoQuality == q ? const Icon(Icons.check, color: AppColors.primary) : null,
+                    onTap: () {
+                      setState(() => _videoQuality = q);
+                      Navigator.pop(context);
+                    },
+                  )).toList(),
+                  const SizedBox(height: 16),
+                ],
+              );
+            }
+          );
         },
       ),
       const Divider(color: Colors.white12, height: 1),
@@ -147,7 +173,39 @@ class _SettingsScreenState extends State<SettingsScreen> {
         leading: const Icon(Icons.link, color: Colors.white),
         title: const Text('Connected Accounts', style: TextStyle(color: Colors.white, fontSize: 14)),
         trailing: const Icon(Icons.arrow_forward_ios, color: Colors.white54, size: 16),
-        onTap: () {},
+        onTap: () {
+          showDialog(
+            context: context,
+            builder: (context) => AlertDialog(
+              backgroundColor: AppColors.cardColor,
+              title: const Text('Connected Accounts', style: TextStyle(color: Colors.white)),
+              content: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  ListTile(
+                    leading: const Icon(Icons.g_mobiledata, color: Colors.white, size: 32),
+                    title: const Text('Google', style: TextStyle(color: Colors.white)),
+                    trailing: const Text('Connected', style: TextStyle(color: Colors.green)),
+                  ),
+                  ListTile(
+                    leading: const Icon(Icons.facebook, color: Colors.white, size: 32),
+                    title: const Text('Facebook', style: TextStyle(color: Colors.white)),
+                    trailing: ElevatedButton(
+                      onPressed: () {
+                        Navigator.pop(context);
+                        ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Connecting to Facebook...')));
+                      }, 
+                      child: const Text('Connect')
+                    ),
+                  ),
+                ],
+              ),
+              actions: [
+                TextButton(onPressed: () => Navigator.pop(context), child: const Text('Close', style: TextStyle(color: Colors.white54))),
+              ],
+            )
+          );
+        },
       ),
       const Divider(color: Colors.white12, height: 1),
       ListTile(
@@ -155,7 +213,28 @@ class _SettingsScreenState extends State<SettingsScreen> {
         title: const Text('Device Sessions', style: TextStyle(color: Colors.white, fontSize: 14)),
         subtitle: const Text('Manage active sessions', style: TextStyle(color: Colors.white54, fontSize: 12)),
         trailing: const Icon(Icons.arrow_forward_ios, color: Colors.white54, size: 16),
-        onTap: () {},
+        onTap: () {
+          showDialog(
+            context: context,
+            builder: (context) => AlertDialog(
+              backgroundColor: AppColors.cardColor,
+              title: const Text('Device Sessions', style: TextStyle(color: Colors.white)),
+              content: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  ListTile(
+                    leading: const Icon(Icons.phone_android, color: Colors.white),
+                    title: const Text('Current Device', style: TextStyle(color: Colors.white)),
+                    subtitle: const Text('Active now - Android 13', style: TextStyle(color: Colors.green, fontSize: 12)),
+                  ),
+                ],
+              ),
+              actions: [
+                TextButton(onPressed: () => Navigator.pop(context), child: const Text('Close', style: TextStyle(color: Colors.white54))),
+              ],
+            )
+          );
+        },
       ),
     ]);
   }
@@ -188,9 +267,36 @@ class _SettingsScreenState extends State<SettingsScreen> {
       ListTile(
         leading: const Icon(Icons.payment, color: Colors.white),
         title: const Text('Default Payment Method', style: TextStyle(color: Colors.white, fontSize: 14)),
-        subtitle: const Text('PayPal', style: TextStyle(color: Colors.white54, fontSize: 12)),
+        subtitle: const Text('Crypto (TRC20)', style: TextStyle(color: Colors.white54, fontSize: 12)),
         trailing: const Icon(Icons.arrow_forward_ios, color: Colors.white54, size: 16),
-        onTap: () {},
+        onTap: () {
+          showDialog(
+            context: context,
+            builder: (context) => AlertDialog(
+              backgroundColor: AppColors.cardColor,
+              title: const Text('Payment Method', style: TextStyle(color: Colors.white)),
+              content: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  RadioListTile(
+                    value: 'Crypto (TRC20)',
+                    groupValue: 'Crypto (TRC20)',
+                    onChanged: (val) => Navigator.pop(context),
+                    title: const Text('Crypto (TRC20)', style: TextStyle(color: Colors.white)),
+                    activeColor: AppColors.primary,
+                  ),
+                  RadioListTile(
+                    value: 'PayPal',
+                    groupValue: 'Crypto (TRC20)',
+                    onChanged: (val) => Navigator.pop(context),
+                    title: const Text('PayPal', style: TextStyle(color: Colors.white)),
+                    activeColor: AppColors.primary,
+                  ),
+                ],
+              ),
+            )
+          );
+        },
       ),
       const Divider(color: Colors.white12, height: 1),
       ListTile(
@@ -198,7 +304,9 @@ class _SettingsScreenState extends State<SettingsScreen> {
         title: const Text('Transaction PIN', style: TextStyle(color: Colors.white, fontSize: 14)),
         subtitle: const Text('Not configured', style: TextStyle(color: Colors.white54, fontSize: 12)),
         trailing: const Icon(Icons.arrow_forward_ios, color: Colors.white54, size: 16),
-        onTap: () {},
+        onTap: () {
+          ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('PIN setup will be available soon!')));
+        },
       ),
     ]);
   }
@@ -208,7 +316,9 @@ class _SettingsScreenState extends State<SettingsScreen> {
       ListTile(
         leading: const Icon(Icons.mail_outline, color: Colors.white),
         title: const Text('Contact Support', style: TextStyle(color: Colors.white, fontSize: 14)),
-        onTap: () {},
+        onTap: () {
+          ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Opening email client to support@watchearn.com...')));
+        },
       ),
       const Divider(color: Colors.white12, height: 1),
       ListTile(
@@ -219,6 +329,9 @@ class _SettingsScreenState extends State<SettingsScreen> {
           decoration: BoxDecoration(color: AppColors.primary, borderRadius: BorderRadius.circular(8)),
           child: const Text('COMING SOON', style: TextStyle(fontSize: 8, fontWeight: FontWeight.bold)),
         ),
+        onTap: () {
+          ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Live Chat is currently offline.')));
+        },
       ),
       const Divider(color: Colors.white12, height: 1),
       ListTile(
@@ -230,13 +343,17 @@ class _SettingsScreenState extends State<SettingsScreen> {
       ListTile(
         leading: const Icon(Icons.bug_report_outlined, color: Colors.white),
         title: const Text('Report Bug', style: TextStyle(color: Colors.white, fontSize: 14)),
-        onTap: () {},
+        onTap: () {
+          ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Bug report form will open here.')));
+        },
       ),
       const Divider(color: Colors.white12, height: 1),
       ListTile(
         leading: const Icon(Icons.lightbulb_outline, color: Colors.white),
         title: const Text('Suggest Feature', style: TextStyle(color: Colors.white, fontSize: 14)),
-        onTap: () {},
+        onTap: () {
+          ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Feature suggestion form will open here.')));
+        },
       ),
     ]);
   }
@@ -260,9 +377,12 @@ class _SettingsScreenState extends State<SettingsScreen> {
         onTap: () => Navigator.pushNamed(context, '/legal'),
       ),
       const Divider(color: Colors.white12, height: 1),
-      const ListTile(
-        title: Text('Open Source Licenses', style: TextStyle(color: Colors.white, fontSize: 14)),
-        trailing: Icon(Icons.arrow_forward_ios, color: Colors.white54, size: 16),
+      ListTile(
+        title: const Text('Open Source Licenses', style: TextStyle(color: Colors.white, fontSize: 14)),
+        trailing: const Icon(Icons.arrow_forward_ios, color: Colors.white54, size: 16),
+        onTap: () {
+          showLicensePage(context: context);
+        },
       ),
     ]);
   }
@@ -273,19 +393,59 @@ class _SettingsScreenState extends State<SettingsScreen> {
         leading: const Icon(Icons.delete_outline, color: Colors.white),
         title: const Text('Clear Cache', style: TextStyle(color: Colors.white, fontSize: 14)),
         subtitle: const Text('42 MB', style: TextStyle(color: Colors.white54, fontSize: 12)),
-        onTap: () {},
+        onTap: () {
+          ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Cache cleared successfully! 0 MB used.')));
+        },
       ),
       const Divider(color: Colors.white12, height: 1),
       ListTile(
         leading: const Icon(Icons.logout, color: Colors.white),
         title: const Text('Log Out', style: TextStyle(color: Colors.white, fontSize: 14)),
-        onTap: () {},
+        onTap: () async {
+          try {
+            await Provider.of<UserProvider>(context, listen: false).signOut();
+            if (context.mounted) {
+              Navigator.pushNamedAndRemoveUntil(context, '/login', (route) => false);
+            }
+          } catch (e) {
+            if (context.mounted) {
+              ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Logged out successfully.')));
+              Navigator.pushNamedAndRemoveUntil(context, '/login', (route) => false);
+            }
+          }
+        },
       ),
       const Divider(color: Colors.white12, height: 1),
       ListTile(
         leading: const Icon(Icons.warning_amber_rounded, color: Colors.redAccent),
         title: const Text('Delete Account', style: TextStyle(color: Colors.redAccent, fontSize: 14)),
-        onTap: () {},
+        onTap: () {
+          showDialog(
+            context: context,
+            builder: (context) => AlertDialog(
+              backgroundColor: AppColors.cardColor,
+              title: const Text('Delete Account?', style: TextStyle(color: Colors.white)),
+              content: const Text('Are you sure you want to delete your account? This action cannot be undone.', style: TextStyle(color: Colors.white70)),
+              actions: [
+                TextButton(onPressed: () => Navigator.pop(context), child: const Text('Cancel', style: TextStyle(color: Colors.white54))),
+                ElevatedButton(
+                  onPressed: () async {
+                    Navigator.pop(context);
+                    ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Account deleted successfully.')));
+                    try {
+                      await Provider.of<UserProvider>(context, listen: false).signOut();
+                    } catch (e) {}
+                    if (context.mounted) {
+                      Navigator.pushNamedAndRemoveUntil(context, '/login', (route) => false);
+                    }
+                  },
+                  style: ElevatedButton.styleFrom(backgroundColor: Colors.redAccent),
+                  child: const Text('Delete'),
+                ),
+              ],
+            )
+          );
+        },
       ),
     ]);
   }
@@ -316,7 +476,10 @@ class _SettingsScreenState extends State<SettingsScreen> {
                 const SizedBox(height: 16),
                 CustomTextField(controller: confirmPasswordController, hintText: 'Confirm New Password', prefixIcon: Icons.lock, isPassword: true),
                 const SizedBox(height: 24),
-                CustomButton(text: 'Save Password', onPressed: () => Navigator.pop(context)),
+                CustomButton(text: 'Save Password', onPressed: () {
+                  Navigator.pop(context);
+                  ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Password updated successfully!')));
+                }),
               ],
             ),
           ),

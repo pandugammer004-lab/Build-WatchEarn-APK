@@ -9,6 +9,7 @@ import '../../data/providers/user_provider.dart';
 import '../../data/providers/video_provider.dart';
 import '../../data/providers/coin_provider.dart';
 import '../../data/models/video_model.dart';
+import '../../data/providers/ad_provider.dart';
 import '../player/video_player_screen.dart';
 
 class HomeScreen extends StatefulWidget {
@@ -51,7 +52,17 @@ class _HomeScreenState extends State<HomeScreen> {
               _buildGreetingHeader(),
               _buildDailyBonusBanner(),
               _buildStatsRow(),
-              const SizedBox(height: 24),
+              const SizedBox(height: 16),
+              Consumer<AdProvider>(
+                builder: (context, adProvider, _) {
+                  return Container(
+                    alignment: Alignment.center,
+                    width: double.infinity,
+                    child: adProvider.buildBannerAdWidget(),
+                  );
+                },
+              ),
+              const SizedBox(height: 16),
               _buildCategories(),
               const SizedBox(height: 24),
               _buildFeaturedVideo(),

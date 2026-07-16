@@ -83,6 +83,7 @@ class _AddVideoDialogState extends State<AddVideoDialog> {
   final urlCtrl = TextEditingController();
   final thumbCtrl = TextEditingController();
   bool isFetching = false;
+  String? _selectedCategoryId;
 
   void _fetchYoutubeDetails() async {
     final url = urlCtrl.text.trim();
@@ -137,6 +138,32 @@ class _AddVideoDialogState extends State<AddVideoDialog> {
             ),
             TextField(controller: titleCtrl, style: const TextStyle(color: Colors.white), decoration: const InputDecoration(labelText: 'Title', labelStyle: TextStyle(color: Colors.white54))),
             TextField(controller: thumbCtrl, style: const TextStyle(color: Colors.white), decoration: const InputDecoration(labelText: 'Thumbnail URL', labelStyle: TextStyle(color: Colors.white54))),
+            const SizedBox(height: 16),
+            Consumer<VideoProvider>(
+              builder: (context, videoProvider, _) {
+                final categories = videoProvider.categories.where((c) => c.id != 'all').toList();
+                if (categories.isEmpty) return const SizedBox.shrink();
+                
+                return DropdownButtonFormField<String>(
+                  value: _selectedCategoryId,
+                  dropdownColor: AppColors.cardColor,
+                  style: const TextStyle(color: Colors.white),
+                  decoration: const InputDecoration(
+                    labelText: 'Category',
+                    labelStyle: TextStyle(color: Colors.white54),
+                  ),
+                  items: categories.map((c) => DropdownMenuItem(
+                    value: c.id,
+                    child: Text('${c.icon} ${c.name}'),
+                  )).toList(),
+                  onChanged: (val) {
+                    setState(() {
+                      _selectedCategoryId = val;
+                    });
+                  },
+                );
+              }
+            ),
           ],
         ),
       ),
@@ -163,15 +190,26 @@ class _AddVideoDialogState extends State<AddVideoDialog> {
             }
             
             try {
+              final videoProvider = Provider.of<VideoProvider>(context, listen: false);
+              String catId = _selectedCategoryId ?? 'all';
+              String catName = 'All';
+              String catIcon = '🎬';
+              
+              if (catId != 'all') {
+                final cat = videoProvider.categories.firstWhere((c) => c.id == catId, orElse: () => videoProvider.categories.first);
+                catName = cat.name;
+                catIcon = cat.icon;
+              }
+              
               final docRef = FirebaseFirestore.instance.collection('videos').doc();
               final newVideo = VideoModel(
                 id: docRef.id,
                 youtubeId: yId,
                 title: titleCtrl.text.trim(),
                 description: 'No description',
-                categoryId: 'all',
-                categoryName: 'All',
-                categoryIcon: '🎬',
+                categoryId: catId,
+                categoryName: catName,
+                categoryIcon: catIcon,
                 duration: 60, // Default 60s, will be updated if needed
                 views: 0,
                 likes: 0,

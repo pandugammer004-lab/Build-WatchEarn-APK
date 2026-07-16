@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:google_fonts/google_fonts.dart';
 import '../../../core/constants/app_colors.dart';
+import '../../../data/models/category_model.dart';
 
 class ManageCategoriesTab extends StatelessWidget {
   const ManageCategoriesTab({Key? key}) : super(key: key);
@@ -53,10 +54,26 @@ class ManageCategoriesTab extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: AppColors.background,
-      floatingActionButton: FloatingActionButton(
-        onPressed: () => _showAddCategoryDialog(context),
-        backgroundColor: AppColors.primary,
-        child: const Icon(Icons.add, color: Colors.white),
+      floatingActionButton: Column(
+        mainAxisAlignment: MainAxisAlignment.end,
+        children: [
+          FloatingActionButton.extended(
+            onPressed: () async {
+              for (var cat in CategoryModel.defaultCategories) {
+                await FirebaseFirestore.instance.collection('categories').doc(cat.id).set(cat.toFirestore());
+              }
+            },
+            backgroundColor: Colors.amber,
+            icon: const Icon(Icons.download, color: Colors.black),
+            label: const Text('Load 10 Defaults', style: TextStyle(color: Colors.black)),
+          ),
+          const SizedBox(height: 16),
+          FloatingActionButton(
+            onPressed: () => _showAddCategoryDialog(context),
+            backgroundColor: AppColors.primary,
+            child: const Icon(Icons.add, color: Colors.white),
+          ),
+        ],
       ),
       body: StreamBuilder<QuerySnapshot>(
         stream: FirebaseFirestore.instance.collection('categories').snapshots(),

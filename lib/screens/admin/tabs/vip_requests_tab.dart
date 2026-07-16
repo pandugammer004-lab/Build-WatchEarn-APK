@@ -31,16 +31,20 @@ class VipRequestsTab extends StatelessWidget {
     return Scaffold(
       backgroundColor: AppColors.background,
       body: StreamBuilder<QuerySnapshot>(
-        stream: FirebaseFirestore.instance.collection('vip_requests').where('status', isEqualTo: 'pending').orderBy('createdAt', descending: true).snapshots(),
+        stream: FirebaseFirestore.instance.collection('vip_requests').orderBy('createdAt', descending: true).snapshots(),
         builder: (context, snapshot) {
           if (snapshot.connectionState == ConnectionState.waiting) {
             return const Center(child: CircularProgressIndicator());
           }
           if (snapshot.hasError) {
-            return const Center(child: Text('Error loading requests', style: TextStyle(color: Colors.white)));
+            return Center(child: Text('Error loading requests: ${snapshot.error}', style: const TextStyle(color: Colors.white)));
           }
           
-          final docs = snapshot.data?.docs ?? [];
+          var docs = snapshot.data?.docs ?? [];
+          docs = docs.where((doc) {
+            final data = doc.data() as Map<String, dynamic>;
+            return data['status'] == 'pending';
+          }).toList();
           if (docs.isEmpty) {
             return const Center(child: Text('No pending VIP requests.', style: TextStyle(color: Colors.white)));
           }
