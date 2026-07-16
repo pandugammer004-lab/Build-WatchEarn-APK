@@ -38,13 +38,13 @@ class _VideoPlayerScreenState extends State<VideoPlayerScreen> {
 
   void _initPlayer() {
     _controller = YoutubePlayerController(
+      initialVideoId: widget.video.youtubeId,
       params: const YoutubePlayerParams(
         showControls: true,
         showFullscreenButton: true,
         userAgent: 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
       ),
     );
-    _controller.loadVideoById(videoId: widget.video.youtubeId);
     
     _controller.listen((event) {
       if (mounted) {
@@ -152,7 +152,7 @@ class _VideoPlayerScreenState extends State<VideoPlayerScreen> {
         child: Column(
           children: [
             // Video Player Area
-            YoutubePlayer(
+            YoutubePlayerIFrame(
               controller: _controller,
               aspectRatio: 16 / 9,
             ),
