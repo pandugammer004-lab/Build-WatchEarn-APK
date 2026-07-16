@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:youtube_player_flutter/youtube_player_flutter.dart';
+import 'package:pod_player/pod_player.dart';
 import 'package:provider/provider.dart';
 import '../../core/constants/app_colors.dart';
 import '../../core/widgets/video_card.dart';
@@ -24,8 +24,7 @@ class VideoPlayerScreen extends StatefulWidget {
 }
 
 class _VideoPlayerScreenState extends State<VideoPlayerScreen> {
-  late YoutubePlayerController _controller;
-  bool _isPlayerReady = false;
+  late final PodPlayerController _controller;
   bool _hasEarnedCoins = false;
   bool _showHalfwayToast = true;
   Timer? _watchTimer;
@@ -38,19 +37,20 @@ class _VideoPlayerScreenState extends State<VideoPlayerScreen> {
   }
 
   void _initPlayer() {
-    _controller = YoutubePlayerController(
-      initialVideoId: widget.video.youtubeId,
-      flags: const YoutubePlayerFlags(
+    _controller = PodPlayerController(
+      playVideoFrom: PlayVideoFrom.youtube('https://youtu.be/${widget.video.youtubeId}'),
+      podPlayerConfig: const PodPlayerConfig(
         autoPlay: true,
-        mute: false,
-        enableCaption: false,
+        isLooping: false,
       ),
-    )..addListener(_listener);
+    )..initialise();
+    
+    _controller.addListener(_listener);
   }
 
   void _listener() {
-    if (_isPlayerReady && mounted && !_controller.value.isFullScreen) {
-      if (_controller.value.isPlaying) {
+    if (_controller.isInitialised && mounted && !_controller.isFullScreen) {
+      if (_controller.isVideoPlaying) {
         if (_watchTimer == null || !_watchTimer!.isActive) {
           _startTimer();
         }
@@ -153,53 +153,25 @@ class _VideoPlayerScreenState extends State<VideoPlayerScreen> {
         child: Column(
           children: [
             // Video Player Area
-            YoutubePlayerBuilder(
-              player: YoutubePlayer(
-                controller: _controller,
-                showVideoProgressIndicator: true,
-                progressIndicatorColor: AppColors.primary,
-                progressColors: const ProgressBarColors(
-                  playedColor: AppColors.primary,
-                  handleColor: Colors.white,
-                ),
-                onReady: () {
-                  _isPlayerReady = true;
-                },
-                topActions: [
-                  const SizedBox(width: 8.0),
-                  Expanded(
-                    child: Text(
-                      _controller.metadata.title,
-                      style: const TextStyle(
-                        color: Colors.white,
-                        fontSize: 18.0,
-                      ),
-                      overflow: TextOverflow.ellipsis,
-                      maxLines: 1,
-                    ),
-                  ),
-                ],
+            PodVideoPlayer(
+              controller: _controller,
+              podProgressBarConfig: const PodProgressBarConfig(
+                playingBarColor: AppColors.primary,
+                circleHandlerColor: Colors.white,
               ),
-              builder: (context, player) {
-                return Column(
+            ),
+            Expanded(
+              child: SingleChildScrollView(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    player,
-                    Expanded(
-                      child: SingleChildScrollView(
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            _buildVideoInfo(),
-                            _buildActionButtons(),
-                            _buildDailyProgress(),
-                            _buildRelatedVideos(),
-                          ],
-                        ),
-                      ),
-                    ),
+                    _buildVideoInfo(),
+                    _buildActionButtons(),
+                    _buildDailyProgress(),
+                    _buildRelatedVideos(),
                   ],
-                );
-              },
+                ),
+              ),
             ),
           ],
         ),
