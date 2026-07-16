@@ -5,6 +5,7 @@ import '../../core/constants/app_colors.dart';
 import '../../core/widgets/custom_button.dart';
 import '../../core/widgets/custom_text_field.dart';
 import '../../data/providers/user_provider.dart';
+import '../../data/providers/auth_provider.dart';
 
 class SettingsScreen extends StatefulWidget {
   const SettingsScreen({Key? key}) : super(key: key);
@@ -403,7 +404,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
         title: const Text('Log Out', style: TextStyle(color: Colors.white, fontSize: 14)),
         onTap: () async {
           try {
-            await Provider.of<UserProvider>(context, listen: false).signOut();
+            await Provider.of<AuthProvider>(context, listen: false).signOut();
             if (context.mounted) {
               Navigator.pushNamedAndRemoveUntil(context, '/login', (route) => false);
             }
@@ -433,7 +434,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                     Navigator.pop(context);
                     ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Account deleted successfully.')));
                     try {
-                      await Provider.of<UserProvider>(context, listen: false).signOut();
+                      await Provider.of<AuthProvider>(context, listen: false).signOut();
                     } catch (e) {}
                     if (context.mounted) {
                       Navigator.pushNamedAndRemoveUntil(context, '/login', (route) => false);

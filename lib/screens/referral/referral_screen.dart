@@ -318,16 +318,16 @@ class ReferralScreen extends StatelessWidget {
       children: [
         Text('Milestone Rewards', style: GoogleFonts.poppins(color: Colors.white, fontSize: 18, fontWeight: FontWeight.bold)),
         const SizedBox(height: 12),
-        _buildMilestone(5, '5,000 coins', count >= 5, true),
-        _buildMilestone(10, '15,000 coins + Bronze', count >= 10, false),
-        _buildMilestone(25, '50,000 coins + Silver', count >= 25, false),
-        _buildMilestone(50, '150,000 coins + Gold', count >= 50, false),
-        _buildMilestone(100, '500,000 coins + VIP', count >= 100, false),
+        _buildMilestone(context, 5, '5,000 coins', count >= 5, true),
+        _buildMilestone(context, 10, '15,000 coins + Bronze', count >= 10, false),
+        _buildMilestone(context, 25, '50,000 coins + Silver', count >= 25, false),
+        _buildMilestone(context, 50, '150,000 coins + Gold', count >= 50, false),
+        _buildMilestone(context, 100, '500,000 coins + VIP', count >= 100, false),
       ],
     );
   }
 
-  Widget _buildMilestone(int target, String reward, bool reached, bool claimed) {
+  Widget _buildMilestone(BuildContext context, int target, String reward, bool reached, bool claimed) {
     return Row(
       children: [
         Column(
