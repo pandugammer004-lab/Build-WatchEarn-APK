@@ -41,7 +41,7 @@ class ReferralScreen extends StatelessWidget {
                 const SizedBox(height: 24),
                 _buildReferralStats(user?.totalReferrals ?? 0),
                 const SizedBox(height: 24),
-                _buildMilestoneRewards(user?.totalReferrals ?? 0),
+                _buildMilestoneRewards(context, user?.totalReferrals ?? 0),
                 const SizedBox(height: 24),
                 _buildMyReferralsList(),
                 const SizedBox(height: 24),
@@ -311,7 +311,7 @@ class ReferralScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildMilestoneRewards(int count) {
+  Widget _buildMilestoneRewards(BuildContext context, int count) {
     // Demo milestones
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
