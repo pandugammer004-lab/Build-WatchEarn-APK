@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:pod_player/pod_player.dart';
+import 'package:youtube_player_iframe/youtube_player_iframe.dart';
 import 'package:provider/provider.dart';
 import '../../core/constants/app_colors.dart';
 import '../../core/widgets/video_card.dart';
@@ -24,7 +24,7 @@ class VideoPlayerScreen extends StatefulWidget {
 }
 
 class _VideoPlayerScreenState extends State<VideoPlayerScreen> {
-  late final PodPlayerController _controller;
+  late final YoutubePlayerController _controller;
   bool _hasEarnedCoins = false;
   bool _showHalfwayToast = true;
   Timer? _watchTimer;
@@ -37,27 +37,26 @@ class _VideoPlayerScreenState extends State<VideoPlayerScreen> {
   }
 
   void _initPlayer() {
-    _controller = PodPlayerController(
-      playVideoFrom: PlayVideoFrom.youtube('https://youtu.be/${widget.video.youtubeId}'),
-      podPlayerConfig: const PodPlayerConfig(
-        autoPlay: true,
-        isLooping: false,
+    _controller = YoutubePlayerController(
+      params: const YoutubePlayerParams(
+        showControls: true,
+        showFullscreenButton: true,
+        userAgent: 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
       ),
-    )..initialise();
+    );
+    _controller.loadVideoById(videoId: widget.video.youtubeId);
     
-    _controller.addListener(_listener);
-  }
-
-  void _listener() {
-    if (_controller.isInitialised && mounted && !_controller.isFullScreen) {
-      if (_controller.isVideoPlaying) {
-        if (_watchTimer == null || !_watchTimer!.isActive) {
-          _startTimer();
+    _controller.listen((event) {
+      if (mounted) {
+        if (event.playerState == PlayerState.playing) {
+          if (_watchTimer == null || !_watchTimer!.isActive) {
+            _startTimer();
+          }
+        } else {
+          _stopTimer();
         }
-      } else {
-        _stopTimer();
       }
-    }
+    });
   }
 
   void _startTimer() {
@@ -141,7 +140,7 @@ class _VideoPlayerScreenState extends State<VideoPlayerScreen> {
   @override
   void dispose() {
     _stopTimer();
-    _controller.dispose();
+    _controller.close();
     super.dispose();
   }
 
@@ -153,12 +152,9 @@ class _VideoPlayerScreenState extends State<VideoPlayerScreen> {
         child: Column(
           children: [
             // Video Player Area
-            PodVideoPlayer(
+            YoutubePlayer(
               controller: _controller,
-              podProgressBarConfig: const PodProgressBarConfig(
-                playingBarColor: AppColors.primary,
-                circleHandlerColor: Colors.white,
-              ),
+              aspectRatio: 16 / 9,
             ),
             Expanded(
               child: SingleChildScrollView(
