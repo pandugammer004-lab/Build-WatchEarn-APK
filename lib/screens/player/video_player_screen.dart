@@ -133,6 +133,12 @@ class _VideoPlayerScreenState extends State<VideoPlayerScreen> {
   }
 
   @override
+  void deactivate() {
+    _controller.pause();
+    super.deactivate();
+  }
+
+  @override
   void dispose() {
     _stopTimer();
     _controller.dispose();
@@ -332,6 +338,20 @@ class _VideoPlayerScreenState extends State<VideoPlayerScreen> {
                 label: 'Share',
                 onTap: () {
                   Helpers.shareText('Watch this awesome video on WatchEarn! https://watchearn.app/v/${widget.video.id}');
+                },
+              ),
+              _buildActionButton(
+                icon: Icons.open_in_new,
+                label: 'YouTube',
+                color: Colors.redAccent,
+                onTap: () async {
+                  final url = Uri.parse('https://www.youtube.com/watch?v=${widget.video.youtubeId}');
+                  try {
+                    // ignore: avoid_dynamic_calls
+                    await launchUrl(url, mode: LaunchMode.externalApplication);
+                  } catch (e) {
+                    debugPrint("Could not launch $url: $e");
+                  }
                 },
               ),
               _buildWatchAdButton(),

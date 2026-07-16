@@ -82,6 +82,7 @@ class _AddVideoDialogState extends State<AddVideoDialog> {
   final titleCtrl = TextEditingController();
   final urlCtrl = TextEditingController();
   final thumbCtrl = TextEditingController();
+  final durationCtrl = TextEditingController(text: '10');
   bool isFetching = false;
   String? _selectedCategoryId;
 
@@ -138,6 +139,7 @@ class _AddVideoDialogState extends State<AddVideoDialog> {
             ),
             TextField(controller: titleCtrl, style: const TextStyle(color: Colors.white), decoration: const InputDecoration(labelText: 'Title', labelStyle: TextStyle(color: Colors.white54))),
             TextField(controller: thumbCtrl, style: const TextStyle(color: Colors.white), decoration: const InputDecoration(labelText: 'Thumbnail URL', labelStyle: TextStyle(color: Colors.white54))),
+            TextField(controller: durationCtrl, keyboardType: TextInputType.number, style: const TextStyle(color: Colors.white), decoration: const InputDecoration(labelText: 'Duration (Minutes)', hintText: 'e.g. 10', hintStyle: TextStyle(color: Colors.white30), labelStyle: TextStyle(color: Colors.white54))),
             const SizedBox(height: 16),
             Consumer<VideoProvider>(
               builder: (context, videoProvider, _) {
@@ -201,6 +203,7 @@ class _AddVideoDialogState extends State<AddVideoDialog> {
                 catIcon = cat.icon;
               }
               
+              final int durationMinutes = int.tryParse(durationCtrl.text.trim()) ?? 10;
               final docRef = FirebaseFirestore.instance.collection('videos').doc();
               final newVideo = VideoModel(
                 id: docRef.id,
@@ -210,7 +213,7 @@ class _AddVideoDialogState extends State<AddVideoDialog> {
                 categoryId: catId,
                 categoryName: catName,
                 categoryIcon: catIcon,
-                duration: 60, // Default 60s, will be updated if needed
+                duration: durationMinutes * 60, // Convert minutes to seconds
                 views: 0,
                 likes: 0,
                 publishedAt: DateTime.now(),
