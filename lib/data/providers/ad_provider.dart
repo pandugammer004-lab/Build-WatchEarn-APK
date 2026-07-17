@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:google_mobile_ads/google_mobile_ads.dart';
 import '../../core/services/ad_service.dart';
@@ -104,30 +105,36 @@ class AdProvider extends ChangeNotifier {
   }
 
   Future<int> showRewardedAd() async {
+    if (!_isRewardedLoaded || _rewardedAd == null) return 0;
+
+    final completer = Completer<int>();
     int rewardAmount = 0;
-    if (_isRewardedLoaded && _rewardedAd != null) {
-      _rewardedAd!.fullScreenContentCallback = FullScreenContentCallback(
-        onAdDismissedFullScreenContent: (ad) {
-          ad.dispose();
-          _isRewardedLoaded = false;
-          loadRewardedAd(); // Load next ad
-        },
-        onAdFailedToShowFullScreenContent: (ad, err) {
-          ad.dispose();
-          _isRewardedLoaded = false;
-          loadRewardedAd();
-        },
-      );
-      await _rewardedAd!.show(
-        onUserEarnedReward: (AdWithoutView ad, RewardItem reward) {
-          rewardAmount = reward.amount.toInt();
-          // Use AppConfig.coinsPerAd if reward config is zero or default 1
-          if (rewardAmount <= 1) rewardAmount = AppConfig.coinsPerAd;
-        },
-      );
-      _rewardedAd = null;
-    }
-    return rewardAmount;
+
+    _rewardedAd!.fullScreenContentCallback = FullScreenContentCallback(
+      onAdDismissedFullScreenContent: (ad) {
+        ad.dispose();
+        _isRewardedLoaded = false;
+        loadRewardedAd(); // Load next ad
+        if (!completer.isCompleted) completer.complete(rewardAmount);
+      },
+      onAdFailedToShowFullScreenContent: (ad, err) {
+        ad.dispose();
+        _isRewardedLoaded = false;
+        loadRewardedAd();
+        if (!completer.isCompleted) completer.complete(0);
+      },
+    );
+
+    await _rewardedAd!.show(
+      onUserEarnedReward: (AdWithoutView ad, RewardItem reward) {
+        rewardAmount = reward.amount.toInt();
+        // Use AppConfig.coinsPerAd if reward config is zero or default 1
+        if (rewardAmount <= 1) rewardAmount = AppConfig.coinsPerAd;
+      },
+    );
+    _rewardedAd = null;
+    
+    return completer.future;
   }
 
   void disposeBannerAd() {

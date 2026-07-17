@@ -14,7 +14,7 @@ class StreakCalendar extends StatelessWidget {
     required this.claimedToday,
   }) : super(key: key);
 
-  final List<int> _rewards = const [25, 35, 50, 65, 80, 100, 200];
+  final List<int> _rewards = const [50, 100, 150, 200, 250, 300, 1000];
   final List<String> _days = const ['Day 1', 'Day 2', 'Day 3', 'Day 4', 'Day 5', 'Day 6', 'Day 7'];
 
   @override

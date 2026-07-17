@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:provider/provider.dart';
 import '../../core/constants/app_colors.dart';
+import '../../core/services/firestore_service.dart';
+import '../../data/providers/user_provider.dart';
 
 class LeaderboardScreen extends StatefulWidget {
   const LeaderboardScreen({Key? key}) : super(key: key);
@@ -12,15 +15,7 @@ class LeaderboardScreen extends StatefulWidget {
 class _LeaderboardScreenState extends State<LeaderboardScreen> with SingleTickerProviderStateMixin {
   late TabController _tabController;
 
-  final List<Map<String, dynamic>> _topUsers = [
-    {'name': 'AlexKing', 'coins': 84500, 'rank': 1, 'isVip': true},
-    {'name': 'SarahM', 'coins': 62300, 'rank': 2, 'isVip': true},
-    {'name': 'ProGamer', 'coins': 55100, 'rank': 3, 'isVip': false},
-    {'name': 'JaneDoe', 'coins': 42000, 'rank': 4, 'isVip': false},
-    {'name': 'Mike99', 'coins': 38500, 'rank': 5, 'isVip': true},
-    {'name': 'CoolCat', 'coins': 35000, 'rank': 6, 'isVip': false},
-    {'name': 'SuperWatch', 'coins': 31200, 'rank': 7, 'isVip': false},
-  ];
+  late TabController _tabController;
 
   @override
   void initState() {
@@ -73,46 +68,77 @@ class _LeaderboardScreenState extends State<LeaderboardScreen> with SingleTicker
               children: [
                 const Icon(Icons.timer, color: Colors.amber, size: 16),
                 const SizedBox(width: 8),
-                Text('Resets in: 2d 14h 32m', style: GoogleFonts.poppins(color: Colors.amber, fontWeight: FontWeight.bold)),
+                Text('Real-time Leaderboard', style: GoogleFonts.poppins(color: Colors.amber, fontWeight: FontWeight.bold)),
               ],
             ),
           ),
         Expanded(
-          child: SingleChildScrollView(
-            child: Column(
-              children: [
-                const SizedBox(height: 20),
-                if (isWeekly) const Text('Weekly Prize Pool: 500,000 🪙', style: TextStyle(color: Colors.white, fontSize: 16, fontWeight: FontWeight.bold)),
-                const SizedBox(height: 30),
-                _buildPodium(),
-                const SizedBox(height: 30),
-                _buildMyRankCard(),
-                const SizedBox(height: 20),
-                _buildRankingsList(),
-                const SizedBox(height: 40),
-                if (isWeekly) _buildPrizesTable(),
-                const SizedBox(height: 40),
-              ],
-            ),
+          child: FutureBuilder<List<dynamic>>(
+            future: _fetchLeaderboard(isWeekly),
+            builder: (context, snapshot) {
+              if (snapshot.connectionState == ConnectionState.waiting) {
+                return const Center(child: CircularProgressIndicator(color: AppColors.primary));
+              }
+              if (snapshot.hasError || !snapshot.hasData || snapshot.data!.isEmpty) {
+                return const Center(child: Text('No ranking data available yet.', style: TextStyle(color: Colors.white70)));
+              }
+              
+              final topUsers = snapshot.data as List<dynamic>;
+              
+              return SingleChildScrollView(
+                child: Column(
+                  children: [
+                    const SizedBox(height: 20),
+                    if (isWeekly) const Text('Weekly Prize Pool: 500,000 🪙', style: TextStyle(color: Colors.white, fontSize: 16, fontWeight: FontWeight.bold)),
+                    const SizedBox(height: 30),
+                    _buildPodium(topUsers),
+                    const SizedBox(height: 30),
+                    _buildMyRankCard(topUsers),
+                    const SizedBox(height: 20),
+                    _buildRankingsList(topUsers),
+                    const SizedBox(height: 40),
+                    if (isWeekly) _buildPrizesTable(),
+                    const SizedBox(height: 40),
+                  ],
+                ),
+              );
+            },
           ),
         ),
       ],
     );
   }
 
-  Widget _buildPodium() {
+  Future<List<dynamic>> _fetchLeaderboard(bool isWeekly) async {
+    // We will use FirestoreService inside this method
+    // I need to import it at the top.
+    final firestoreService = FirestoreService();
+    final leaderboard = await firestoreService.getLeaderboard(weekly: isWeekly);
+    // Convert to map format expected by UI or refactor UI to use LeaderboardModel directly
+    return leaderboard.map((model) => {
+      'name': model.name,
+      'coins': isWeekly ? model.weeklyCoins : model.totalCoins,
+      'rank': model.rank,
+      'isVip': model.vipPlan != 'free',
+      'userId': model.userId,
+    }).toList();
+  }
+
+  Widget _buildPodium(List<dynamic> topUsers) {
+    if (topUsers.isEmpty) return const SizedBox.shrink();
+    
     return Row(
       mainAxisAlignment: MainAxisAlignment.center,
       crossAxisAlignment: CrossAxisAlignment.end,
       children: [
-        _buildPodiumSpot(_topUsers[1], 2, 120, const Color(0xFFC0C0C0)), // Silver
-        _buildPodiumSpot(_topUsers[0], 1, 160, const Color(0xFFFFD700)), // Gold
-        _buildPodiumSpot(_topUsers[2], 3, 100, const Color(0xFFCD7F32)), // Bronze
+        if (topUsers.length > 1) _buildPodiumSpot(topUsers[1], 2, 120, const Color(0xFFC0C0C0)), // Silver
+        if (topUsers.isNotEmpty) _buildPodiumSpot(topUsers[0], 1, 160, const Color(0xFFFFD700)), // Gold
+        if (topUsers.length > 2) _buildPodiumSpot(topUsers[2], 3, 100, const Color(0xFFCD7F32)), // Bronze
       ],
     );
   }
 
-  Widget _buildPodiumSpot(Map<String, dynamic> user, int rank, double height, Color color) {
+  Widget _buildPodiumSpot(dynamic user, int rank, double height, Color color) {
     return Column(
       mainAxisAlignment: MainAxisAlignment.end,
       children: [
@@ -144,59 +170,72 @@ class _LeaderboardScreenState extends State<LeaderboardScreen> with SingleTicker
     );
   }
 
-  Widget _buildMyRankCard() {
-    return Container(
-      margin: const EdgeInsets.symmetric(horizontal: 16),
-      padding: const EdgeInsets.all(16),
-      decoration: BoxDecoration(
-        gradient: AppColors.primaryGradient,
-        borderRadius: BorderRadius.circular(16),
-        boxShadow: [BoxShadow(color: AppColors.primary.withOpacity(0.3), blurRadius: 10)],
-      ),
-      child: Row(
-        children: [
-          Container(
-            width: 40,
-            height: 40,
-            decoration: const BoxDecoration(color: Colors.white24, shape: BoxShape.circle),
-            child: const Center(child: Text('#42', style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold))),
+  Widget _buildMyRankCard(List<dynamic> topUsers) {
+    return Consumer<UserProvider>(
+      builder: (context, userProvider, _) {
+        final currentUser = userProvider.user;
+        if (currentUser == null) return const SizedBox.shrink();
+        
+        int myRank = -1;
+        for (var i = 0; i < topUsers.length; i++) {
+          if (topUsers[i]['userId'] == currentUser.uid) {
+            myRank = topUsers[i]['rank'];
+            break;
+          }
+        }
+        
+        String rankText = myRank != -1 ? '#$myRank' : 'Unranked';
+
+        return Container(
+          margin: const EdgeInsets.symmetric(horizontal: 16),
+          padding: const EdgeInsets.all(16),
+          decoration: BoxDecoration(
+            gradient: AppColors.primaryGradient,
+            borderRadius: BorderRadius.circular(16),
+            boxShadow: [BoxShadow(color: AppColors.primary.withOpacity(0.3), blurRadius: 10)],
           ),
-          const SizedBox(width: 16),
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                const Text('You', style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 16)),
-                const SizedBox(height: 4),
-                const Text('Need 2,400 more coins to reach #41', style: TextStyle(color: Colors.white70, fontSize: 12)),
-                const SizedBox(height: 8),
-                ClipRRect(
-                  borderRadius: BorderRadius.circular(4),
-                  child: const LinearProgressIndicator(value: 0.7, backgroundColor: Colors.white24, valueColor: AlwaysStoppedAnimation<Color>(Colors.white)),
+          child: Row(
+            children: [
+              Container(
+                width: 40,
+                height: 40,
+                decoration: const BoxDecoration(color: Colors.white24, shape: BoxShape.circle),
+                child: Center(child: Text(rankText, style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold))),
+              ),
+              const SizedBox(width: 16),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    const Text('You', style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 16)),
+                    const SizedBox(height: 4),
+                    Text(myRank != -1 ? 'Keep earning to rank up!' : 'Earn coins to get on the board!', style: const TextStyle(color: Colors.white70, fontSize: 12)),
+                  ],
                 ),
-              ],
-            ),
+              ),
+              const SizedBox(width: 16),
+              Text('${currentUser.coins} 🪙', style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
+            ],
           ),
-          const SizedBox(width: 16),
-          const Text('12,400 🪙', style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
-        ],
-      ),
+        );
+      },
     );
   }
 
-  Widget _buildRankingsList() {
+  Widget _buildRankingsList(List<dynamic> topUsers) {
+    if (topUsers.length <= 3) return const SizedBox.shrink();
     return ListView.builder(
       shrinkWrap: true,
       physics: const NeverScrollableScrollPhysics(),
-      itemCount: _topUsers.length - 3,
+      itemCount: topUsers.length - 3,
       itemBuilder: (context, index) {
-        final user = _topUsers[index + 3];
+        final user = topUsers[index + 3];
         return _buildRankingRow(user);
       },
     );
   }
 
-  Widget _buildRankingRow(Map<String, dynamic> user) {
+  Widget _buildRankingRow(dynamic user) {
     Color bgColor = Colors.transparent;
     if (user['rank'] <= 10) bgColor = AppColors.primary.withOpacity(0.1);
 

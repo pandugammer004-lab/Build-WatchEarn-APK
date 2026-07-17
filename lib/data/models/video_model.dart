@@ -18,6 +18,7 @@ class VideoModel {
   final bool isActive;
   final int order;
   final List<String> tags;
+  final String? customThumbnail;
 
   VideoModel({
     required this.id,
@@ -37,11 +38,14 @@ class VideoModel {
     required this.isActive,
     required this.order,
     required this.tags,
+    this.customThumbnail,
   });
 
-  String get thumbnailHQ => 'https://img.youtube.com/vi/$youtubeId/maxresdefault.jpg';
-  String get thumbnailMQ => 'https://img.youtube.com/vi/$youtubeId/hqdefault.jpg';
-  String get thumbnailSQ => 'https://img.youtube.com/vi/$youtubeId/mqdefault.jpg';
+  String get thumbnailHQ => customThumbnail != null && customThumbnail!.isNotEmpty ? customThumbnail! : 'https://img.youtube.com/vi/$youtubeId/maxresdefault.jpg';
+  String get thumbnailMQ => customThumbnail != null && customThumbnail!.isNotEmpty ? customThumbnail! : 'https://img.youtube.com/vi/$youtubeId/hqdefault.jpg';
+  String get thumbnailSQ => customThumbnail != null && customThumbnail!.isNotEmpty ? customThumbnail! : 'https://img.youtube.com/vi/$youtubeId/mqdefault.jpg';
+  
+  bool get isDirectLink => youtubeId.startsWith('http://') || youtubeId.startsWith('https://');
   
   String get formattedDuration {
     int minutes = duration ~/ 60;
@@ -91,6 +95,7 @@ class VideoModel {
       isActive: data['isActive'] ?? true,
       order: data['order'] ?? 0,
       tags: List<String>.from(data['tags'] ?? []),
+      customThumbnail: data['customThumbnail'],
     );
   }
 
@@ -112,6 +117,7 @@ class VideoModel {
       'isActive': isActive,
       'order': order,
       'tags': tags,
+      'customThumbnail': customThumbnail,
     };
   }
 }

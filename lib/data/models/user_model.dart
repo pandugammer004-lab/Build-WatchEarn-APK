@@ -14,6 +14,7 @@ class UserModel {
   final String referralCode;
   final String referredBy;
   final int totalReferrals;
+  final int referralEarnings;
   final int streak;
   final DateTime lastLogin;
   final int videosWatched;
@@ -38,6 +39,7 @@ class UserModel {
   final DateTime? lastMysteryBoxDate;
   final int premiumSpins;
   final int dailyEarned;
+  final List<String> claimedGoals;
   final DateTime? lastDailyBonusClaim;
   final bool isBlocked;
   final List<String> subscribedChannels;
@@ -55,6 +57,7 @@ class UserModel {
     required this.referralCode,
     required this.referredBy,
     required this.totalReferrals,
+    this.referralEarnings = 0,
     required this.streak,
     required this.lastLogin,
     required this.videosWatched,
@@ -79,6 +82,7 @@ class UserModel {
     this.lastMysteryBoxDate,
     this.premiumSpins = 0,
     this.dailyEarned = 0,
+    this.claimedGoals = const [],
     this.lastDailyBonusClaim,
     this.isBlocked = false,
     this.subscribedChannels = const [],
@@ -143,6 +147,7 @@ class UserModel {
       referralCode: data['referralCode'] ?? '',
       referredBy: data['referredBy'] ?? '',
       totalReferrals: data['totalReferrals'] ?? 0,
+      referralEarnings: data['referralEarnings'] ?? 0,
       streak: data['streak'] ?? 0,
       lastLogin: (data['lastLogin'] as Timestamp?)?.toDate() ?? DateTime.now(),
       videosWatched: data['videosWatched'] ?? 0,
@@ -167,6 +172,7 @@ class UserModel {
       lastMysteryBoxDate: data['lastMysteryBoxDate'] != null ? (data['lastMysteryBoxDate'] as Timestamp).toDate() : null,
       premiumSpins: data['premiumSpins'] ?? 0,
       dailyEarned: data['dailyEarned'] ?? 0,
+      claimedGoals: List<String>.from(data['claimedGoals'] ?? []),
       lastDailyBonusClaim: data['lastDailyBonusClaim'] != null ? (data['lastDailyBonusClaim'] as Timestamp).toDate() : null,
       isBlocked: data['isBlocked'] ?? false,
       subscribedChannels: List<String>.from(data['subscribedChannels'] ?? []),
@@ -186,6 +192,7 @@ class UserModel {
       'referralCode': referralCode,
       'referredBy': referredBy,
       'totalReferrals': totalReferrals,
+      'referralEarnings': referralEarnings,
       'streak': streak,
       'lastLogin': Timestamp.fromDate(lastLogin),
       'videosWatched': videosWatched,
@@ -210,6 +217,7 @@ class UserModel {
       'lastMysteryBoxDate': lastMysteryBoxDate != null ? Timestamp.fromDate(lastMysteryBoxDate!) : null,
       'premiumSpins': premiumSpins,
       'dailyEarned': dailyEarned,
+      'claimedGoals': claimedGoals,
       'lastDailyBonusClaim': lastDailyBonusClaim != null ? Timestamp.fromDate(lastDailyBonusClaim!) : null,
       'isBlocked': isBlocked,
       'subscribedChannels': subscribedChannels,
@@ -225,6 +233,7 @@ class UserModel {
     String? vipPlan,
     DateTime? vipExpiry,
     int? totalReferrals,
+    int? referralEarnings,
     int? streak,
     DateTime? lastLogin,
     int? videosWatched,
@@ -248,6 +257,7 @@ class UserModel {
     DateTime? lastMysteryBoxDate,
     int? premiumSpins,
     int? dailyEarned,
+    List<String>? claimedGoals,
     DateTime? lastDailyBonusClaim,
     bool? isBlocked,
     List<String>? subscribedChannels,
@@ -265,6 +275,7 @@ class UserModel {
       referralCode: referralCode,
       referredBy: referredBy,
       totalReferrals: totalReferrals ?? this.totalReferrals,
+      referralEarnings: referralEarnings ?? this.referralEarnings,
       streak: streak ?? this.streak,
       lastLogin: lastLogin ?? this.lastLogin,
       videosWatched: videosWatched ?? this.videosWatched,
@@ -289,6 +300,7 @@ class UserModel {
       lastMysteryBoxDate: lastMysteryBoxDate ?? this.lastMysteryBoxDate,
       premiumSpins: premiumSpins ?? this.premiumSpins,
       dailyEarned: dailyEarned ?? this.dailyEarned,
+      claimedGoals: claimedGoals ?? this.claimedGoals,
       lastDailyBonusClaim: lastDailyBonusClaim ?? this.lastDailyBonusClaim,
       isBlocked: isBlocked ?? this.isBlocked,
       subscribedChannels: subscribedChannels ?? this.subscribedChannels,

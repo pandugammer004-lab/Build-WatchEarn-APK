@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:youtube_player_iframe/youtube_player_iframe.dart';
+import 'package:video_player/video_player.dart';
+import 'package:chewie/chewie.dart';
 import 'package:provider/provider.dart';
 import '../../core/constants/app_colors.dart';
 import '../../core/widgets/video_card.dart';
@@ -24,7 +26,9 @@ class VideoPlayerScreen extends StatefulWidget {
 }
 
 class _VideoPlayerScreenState extends State<VideoPlayerScreen> {
-  late final YoutubePlayerController _controller;
+  YoutubePlayerController? _youtubeController;
+  VideoPlayerController? _videoPlayerController;
+  ChewieController? _chewieController;
   bool _hasEarnedCoins = false;
   bool _showHalfwayToast = true;
   Timer? _watchTimer;
@@ -37,25 +41,49 @@ class _VideoPlayerScreenState extends State<VideoPlayerScreen> {
   }
 
   void _initPlayer() {
-    _controller = YoutubePlayerController(
-      initialVideoId: widget.video.youtubeId,
-      params: const YoutubePlayerParams(
-        showControls: true,
-        showFullscreenButton: true,
-      ),
-    );
-    
-    _controller.listen((event) {
-      if (mounted) {
-        if (event.playerState == PlayerState.playing) {
-          if (_watchTimer == null || !_watchTimer!.isActive) {
-            _startTimer();
+    if (widget.video.isDirectLink) {
+      _videoPlayerController = VideoPlayerController.networkUrl(Uri.parse(widget.video.youtubeId));
+      _videoPlayerController!.initialize().then((_) {
+        _chewieController = ChewieController(
+          videoPlayerController: _videoPlayerController!,
+          aspectRatio: 16 / 9,
+          autoPlay: true,
+          looping: false,
+        );
+        _videoPlayerController!.addListener(() {
+          if (mounted) {
+            if (_videoPlayerController!.value.isPlaying) {
+              if (_watchTimer == null || !_watchTimer!.isActive) {
+                _startTimer();
+              }
+            } else {
+              _stopTimer();
+            }
           }
-        } else {
-          _stopTimer();
+        });
+        setState(() {});
+      });
+    } else {
+      _youtubeController = YoutubePlayerController(
+        initialVideoId: widget.video.youtubeId,
+        params: const YoutubePlayerParams(
+          showControls: true,
+          showFullscreenButton: true,
+        ),
+      );
+      
+      _youtubeController!.listen((event) {
+        if (mounted) {
+          if (event.playerState == PlayerState.playing) {
+            if (_watchTimer == null || !_watchTimer!.isActive) {
+              _startTimer();
+            }
+          } else {
+            _stopTimer();
+          }
         }
-      }
-    });
+      });
+    }
   }
 
   void _startTimer() {
@@ -133,7 +161,9 @@ class _VideoPlayerScreenState extends State<VideoPlayerScreen> {
   @override
   void dispose() {
     _stopTimer();
-    _controller.close();
+    _youtubeController?.close();
+    _videoPlayerController?.dispose();
+    _chewieController?.dispose();
     super.dispose();
   }
 
@@ -142,7 +172,8 @@ class _VideoPlayerScreenState extends State<VideoPlayerScreen> {
     return PopScope(
       canPop: true,
       onPopInvoked: (didPop) {
-        _controller.pauseVideo();
+        _youtubeController?.pauseVideo();
+        _videoPlayerController?.pause();
       },
       child: Scaffold(
         backgroundColor: AppColors.background,
@@ -150,10 +181,18 @@ class _VideoPlayerScreenState extends State<VideoPlayerScreen> {
         child: Column(
           children: [
             // Video Player Area
-            YoutubePlayerIFrame(
-              controller: _controller,
-              aspectRatio: 16 / 9,
-            ),
+            if (widget.video.isDirectLink)
+              AspectRatio(
+                aspectRatio: 16 / 9,
+                child: _chewieController != null && _chewieController!.videoPlayerController.value.isInitialized
+                    ? Chewie(controller: _chewieController!)
+                    : const Center(child: CircularProgressIndicator()),
+              )
+            else
+              YoutubePlayerIFrame(
+                controller: _youtubeController!,
+                aspectRatio: 16 / 9,
+              ),
             Expanded(
               child: SingleChildScrollView(
                 child: Column(

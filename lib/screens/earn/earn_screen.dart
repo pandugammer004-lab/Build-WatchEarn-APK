@@ -5,6 +5,9 @@ import '../../core/constants/app_colors.dart';
 import '../../core/widgets/streak_calendar.dart';
 import '../../core/widgets/banner_ad_widget.dart';
 import '../../data/providers/user_provider.dart';
+import '../../data/providers/ad_provider.dart';
+import '../../data/providers/coin_provider.dart';
+import '../../core/widgets/coin_earned_animation.dart';
 
 import 'spin_wheel_screen.dart';
 import 'scratch_card_screen.dart';
@@ -130,10 +133,10 @@ class EarnScreen extends StatelessWidget {
           ),
           ElevatedButton(
             onPressed: hasClaimed ? null : () async {
-              await userProvider.claimDailyBonus();
-              if (context.mounted) {
+              int amount = await userProvider.claimDailyBonus();
+              if (context.mounted && amount > 0) {
                 ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(content: Text('Daily Bonus Claimed! +100 Coins')),
+                  SnackBar(content: Text('Daily Bonus Claimed! +$amount Coins')),
                 );
               }
             },
@@ -288,7 +291,26 @@ class EarnScreen extends StatelessWidget {
       ),
       child: Column(
         children: [
-          _buildListTile(Icons.ondemand_video, 'Watch Rewarded Ad', '+15 Coins per ad', 'Watch', Colors.blue, () {}),
+          Consumer2<AdProvider, UserProvider>(
+            builder: (context, adProvider, userProvider, _) {
+              return _buildListTile(Icons.ondemand_video, 'Watch Rewarded Ad', '+15 Coins per ad', adProvider.isRewardedLoaded ? 'Watch' : 'Loading...', Colors.blue, () async {
+                if (!adProvider.isRewardedLoaded) {
+                  ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Ad is not ready yet, please wait.')));
+                  return;
+                }
+                final reward = await adProvider.showRewardedAd();
+                if (reward > 0 && context.mounted && userProvider.user != null) {
+                  final coinProvider = Provider.of<CoinProvider>(context, listen: false);
+                  final earned = await coinProvider.earnFromAd(userProvider.user!);
+                  await userProvider.updateCoins(earned, 'Ad Watched');
+                  await userProvider.updateDailyStats('ad');
+                  if (context.mounted) {
+                    CoinEarnedAnimation.show(context, coins: earned, source: 'Ad Watched');
+                  }
+                }
+              });
+            },
+          ),
           const Divider(color: Colors.white10, height: 1),
           _buildListTile(Icons.share, 'Share App', '+50 Coins (3x daily)', '1/3', Colors.green, () {}),
           const Divider(color: Colors.white10, height: 1),

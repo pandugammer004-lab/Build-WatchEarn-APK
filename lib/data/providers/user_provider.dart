@@ -29,8 +29,12 @@ class UserProvider extends ChangeNotifier {
     try {
       _setLoading(true);
       _user = await _firestoreService.getUser(uid);
-      if (_user != null && _user!.needsDailyReset) {
-        await checkAndResetDaily();
+      if (_user != null) {
+        await checkAndUpdateStreak();
+        if (_user!.needsDailyReset) {
+          await checkAndResetDaily();
+        }
+        await loadTransactions();
       }
     } catch (e) {
       debugPrint("Error loading user: $e");
@@ -48,35 +52,57 @@ class UserProvider extends ChangeNotifier {
   }
 
   Future<void> updateCoins(int amount, String source) async {
-    if (_user == null) return;
+    if (_user == null || amount == 0) return;
     try {
       final newCoins = _user!.coins + amount;
       final newTotalEarned = amount > 0 ? _user!.totalEarned + amount : _user!.totalEarned;
+      final newDailyEarned = amount > 0 ? _user!.dailyEarned + amount : _user!.dailyEarned;
       
       // Optimistic update
       _user = _user!.copyWith(
         coins: newCoins,
         totalEarned: newTotalEarned,
+        dailyEarned: newDailyEarned,
       );
       notifyListeners();
       
       await _firestoreService.updateUser(_user!.uid, {
         'coins': newCoins,
         'totalEarned': newTotalEarned,
+        'dailyEarned': newDailyEarned,
       });
+
+      // Add transaction record
+      final tx = TransactionModel(
+        id: 'tx_${DateTime.now().millisecondsSinceEpoch}',
+        userId: _user!.uid,
+        type: amount > 0 ? 'earning' : 'withdrawal',
+        source: source.toLowerCase(),
+        coins: amount,
+        amount: 0.0,
+        status: 'completed',
+        paymentMethod: '',
+        paymentEmail: '',
+        description: source,
+        timestamp: DateTime.now(),
+      );
+      await _firestoreService.addTransaction(tx);
+      _transactions.insert(0, tx);
+      notifyListeners();
+      
     } catch (e) {
       debugPrint("Error updating coins: $e");
     }
   }
 
-  Future<void> claimDailyBonus() async {
-    if (_user == null) return;
+  Future<int> claimDailyBonus() async {
+    if (_user == null) return 0;
     try {
       final now = DateTime.now();
       if (_user!.lastDailyBonusClaim != null) {
         final last = _user!.lastDailyBonusClaim!;
         if (last.year == now.year && last.month == now.month && last.day == now.day) {
-          return; // Already claimed today
+          return 0; // Already claimed today
         }
       }
       
@@ -84,9 +110,14 @@ class UserProvider extends ChangeNotifier {
       await _firestoreService.updateUser(_user!.uid, {
         'lastDailyBonusClaim': FieldValue.serverTimestamp(),
       });
-      await updateCoins(100, 'Daily Bonus');
+      
+      final streakCount = _user!.streak.clamp(1, 7);
+      final amount = streakCount == 7 ? 1000 : 50 * streakCount;
+      await updateCoins(amount, 'Daily Bonus');
+      return amount;
     } catch (e) {
       debugPrint("Error claiming daily bonus: $e");
+      return 0;
     }
   }
 
@@ -108,6 +139,22 @@ class UserProvider extends ChangeNotifier {
       await _firestoreService.updateUser(_user!.uid, updates);
     } catch (e) {
       debugPrint("Error updating spin state: $e");
+    }
+  }
+
+  Future<void> claimGoal(String goalId, int reward) async {
+    if (_user == null || _user!.claimedGoals.contains(goalId)) return;
+    try {
+      final newClaimed = List<String>.from(_user!.claimedGoals)..add(goalId);
+      _user = _user!.copyWith(claimedGoals: newClaimed);
+      notifyListeners();
+      
+      await _firestoreService.updateUser(_user!.uid, {
+        'claimedGoals': newClaimed,
+      });
+      await updateCoins(reward, 'goal');
+    } catch (e) {
+      debugPrint("Error claiming goal: $e");
     }
   }
 
@@ -153,13 +200,17 @@ class UserProvider extends ChangeNotifier {
           .inDays;
 
       int newStreak = _user!.streak;
+      if (newStreak == 0) newStreak = 1; // Base case for new users
+
       if (difference == 1) {
         newStreak++;
       } else if (difference > 1) {
         newStreak = 1;
       }
 
-      if (difference > 0) {
+      if (difference > 0 || _user!.streak == 0) {
+        _user = _user!.copyWith(streak: newStreak, lastLogin: now);
+        notifyListeners();
         await _firestoreService.updateUser(_user!.uid, {
           'streak': newStreak,
           'lastLogin': FieldValue.serverTimestamp(),
@@ -232,14 +283,35 @@ class UserProvider extends ChangeNotifier {
     if (_user == null) return;
     try {
       String field = '';
-      if (type == 'video') field = 'dailyVideosWatched';
-      if (type == 'ad') field = 'dailyAdsWatched';
-      if (type == 'share') field = 'dailyShares';
-      if (type == 'category') field = 'dailyCategoriesWatched';
+      int newValue = 0;
+      
+      if (type == 'video') {
+        field = 'dailyVideosWatched';
+        newValue = _user!.dailyVideosWatched + 1;
+        _user = _user!.copyWith(dailyVideosWatched: newValue, videosWatched: _user!.videosWatched + 1);
+      }
+      if (type == 'ad') {
+        field = 'dailyAdsWatched';
+        newValue = _user!.dailyAdsWatched + 1;
+        _user = _user!.copyWith(dailyAdsWatched: newValue);
+      }
+      if (type == 'share') {
+        field = 'dailyShares';
+        newValue = _user!.dailyShares + 1;
+        _user = _user!.copyWith(dailyShares: newValue);
+      }
+      if (type == 'category') {
+        field = 'dailyCategoriesWatched';
+        newValue = _user!.dailyCategoriesWatched + 1;
+        _user = _user!.copyWith(dailyCategoriesWatched: newValue);
+      }
+      
+      notifyListeners();
       
       if (field.isNotEmpty) {
         await _firestoreService.updateUser(_user!.uid, {
-          field: FieldValue.increment(1)
+          field: newValue,
+          if (type == 'video') 'videosWatched': _user!.videosWatched,
         });
       }
     } catch (e) {
@@ -250,12 +322,23 @@ class UserProvider extends ChangeNotifier {
   Future<void> checkAndResetDaily() async {
     if (_user == null) return;
     try {
+      _user = _user!.copyWith(
+        dailyVideosWatched: 0,
+        dailyAdsWatched: 0,
+        dailyShares: 0,
+        dailyCategoriesWatched: 0,
+        dailyEarned: 0,
+        claimedGoals: const [],
+        lastDailyReset: DateTime.now(),
+      );
+      notifyListeners();
       await _firestoreService.updateUser(_user!.uid, {
         'dailyVideosWatched': 0,
         'dailyAdsWatched': 0,
         'dailyShares': 0,
         'dailyCategoriesWatched': 0,
         'dailyEarned': 0,
+        'claimedGoals': const [],
         'lastDailyReset': FieldValue.serverTimestamp(),
       });
     } catch (e) {

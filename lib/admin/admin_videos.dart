@@ -191,7 +191,9 @@ class AddVideoDialog extends StatelessWidget {
                   flex: 2,
                   child: Column(
                     children: [
-                      const CustomTextField(hintText: 'YouTube Video ID (e.g. dQw4w9WgXcQ)', prefixIcon: Icons.link),
+                      const CustomTextField(hintText: 'YouTube ID OR Direct MP4 URL', prefixIcon: Icons.link),
+                      const SizedBox(height: 16),
+                      const CustomTextField(hintText: 'Thumbnail URL (Optional for YouTube)', prefixIcon: Icons.image),
                       const SizedBox(height: 16),
                       const CustomTextField(hintText: 'Video Title', prefixIcon: Icons.title),
                       const SizedBox(height: 16),

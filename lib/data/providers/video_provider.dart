@@ -54,9 +54,11 @@ class VideoProvider extends ChangeNotifier {
       if (_categories.isEmpty) {
         _categories = CategoryModel.defaultCategories;
       }
-      notifyListeners();
     } catch (e) {
       debugPrint("Error loading categories: $e");
+      _categories = CategoryModel.defaultCategories;
+    } finally {
+      notifyListeners();
     }
   }
 

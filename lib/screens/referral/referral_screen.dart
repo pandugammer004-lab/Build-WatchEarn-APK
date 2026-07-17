@@ -7,6 +7,7 @@ import 'package:share_plus/share_plus.dart';
 import '../../core/constants/app_colors.dart';
 import '../../core/utils/helpers.dart';
 import '../../data/providers/user_provider.dart';
+import '../../core/services/firestore_service.dart';
 
 class ReferralScreen extends StatelessWidget {
   const ReferralScreen({Key? key}) : super(key: key);
@@ -31,7 +32,7 @@ class ReferralScreen extends StatelessWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                _buildHeader(user?.totalReferrals ?? 0),
+                _buildHeader(user?.referralEarnings ?? 0),
                 const SizedBox(height: 24),
                 _buildReferralCodeCard(context, refCode, link),
                 const SizedBox(height: 24),
@@ -39,11 +40,11 @@ class ReferralScreen extends StatelessWidget {
                 const SizedBox(height: 24),
                 _buildHowItWorks(),
                 const SizedBox(height: 24),
-                _buildReferralStats(user?.totalReferrals ?? 0),
+                _buildReferralStats(user?.totalReferrals ?? 0, user?.referralEarnings ?? 0),
                 const SizedBox(height: 24),
                 _buildMilestoneRewards(context, user?.totalReferrals ?? 0),
                 const SizedBox(height: 24),
-                _buildMyReferralsList(),
+                _buildMyReferralsList(user?.uid ?? ''),
                 const SizedBox(height: 24),
                 _buildCommissionHistory(),
                 const SizedBox(height: 80),
@@ -55,8 +56,7 @@ class ReferralScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildHeader(int totalReferrals) {
-    final int earnedCoins = totalReferrals * 500;
+  Widget _buildHeader(int referralEarnings) {
     return Container(
       width: double.infinity,
       padding: const EdgeInsets.all(20),
@@ -66,9 +66,9 @@ class ReferralScreen extends StatelessWidget {
       ),
       child: Column(
         children: [
-          const Text('Earn lifetime 10% commission!', style: TextStyle(color: Colors.white, fontSize: 16, fontWeight: FontWeight.bold)),
+          const Text('Earn lifetime 15% commission!', style: TextStyle(color: Colors.white, fontSize: 16, fontWeight: FontWeight.bold)),
           const SizedBox(height: 8),
-          Text('Total Earned: ${Helpers.formatCoins(earnedCoins)} 🪙', style: const TextStyle(color: Colors.amber, fontSize: 24, fontWeight: FontWeight.bold)),
+          Text('Total Earned: ${Helpers.formatCoins(referralEarnings)} 🪙', style: const TextStyle(color: Colors.amber, fontSize: 24, fontWeight: FontWeight.bold)),
         ],
       ),
     );
@@ -237,7 +237,7 @@ class ReferralScreen extends StatelessWidget {
         _buildStepCard('1', '📤', 'Share your code', 'Share your unique referral code with friends'),
         _buildStepCard('2', '👤', 'Friend joins', 'Friend downloads app & signs up (+500 coins!)'),
         _buildStepCard('3', '▶️', 'Friend watches', 'Friend watches 10 videos (+200 coins!)'),
-        _buildStepCard('4', '♾️', 'Lifetime commission', 'Earn 10% of all coins your friend earns forever!'),
+        _buildStepCard('4', '♾️', 'Lifetime commission', 'Earn 15% of all coins your friend earns forever!'),
       ],
     );
   }
@@ -270,9 +270,8 @@ class ReferralScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildReferralStats(int count) {
-    final int earnedCoins = count * 500;
-    final String cashValue = '\$${(earnedCoins / 10000).toStringAsFixed(2)}'; // Assuming 10k coins = $1
+  Widget _buildReferralStats(int count, int referralEarnings) {
+    final String cashValue = '\$${(referralEarnings / 10000).toStringAsFixed(2)}'; // Assuming 10k coins = $1
     return GridView.count(
       crossAxisCount: 2,
       shrinkWrap: true,
@@ -283,7 +282,7 @@ class ReferralScreen extends StatelessWidget {
       children: [
         _buildStatCard('👥', 'Total Referrals', '$count'),
         _buildStatCard('✅', 'Active Referrals', '$count'),
-        _buildStatCard('🪙', 'Coins Earned', Helpers.formatCoins(earnedCoins)),
+        _buildStatCard('🪙', 'Coins Earned', Helpers.formatCoins(referralEarnings)),
         _buildStatCard('💰', 'Cash Value', cashValue),
       ],
     );
@@ -378,23 +377,47 @@ class ReferralScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildMyReferralsList() {
+  Widget _buildMyReferralsList(String uid) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text('My Referrals', style: GoogleFonts.poppins(color: Colors.white, fontSize: 18, fontWeight: FontWeight.bold)),
         const SizedBox(height: 12),
-        // Empty state demo
-        Center(
-          child: Column(
-            children: [
-              const Icon(Icons.people, color: Colors.white24, size: 64),
-              const SizedBox(height: 16),
-              const Text('No referrals yet', style: TextStyle(color: Colors.white, fontSize: 16, fontWeight: FontWeight.bold)),
-              const Text('Share your code and start earning!', style: TextStyle(color: Colors.white54)),
-            ],
-          ),
-        ),
+        FutureBuilder<List<dynamic>>(
+          future: FirestoreService().getReferrals(uid),
+          builder: (context, snapshot) {
+            if (snapshot.connectionState == ConnectionState.waiting) {
+              return const Center(child: CircularProgressIndicator());
+            }
+            if (!snapshot.hasData || snapshot.data!.isEmpty) {
+              return Center(
+                child: Column(
+                  children: [
+                    const Icon(Icons.people, color: Colors.white24, size: 64),
+                    const SizedBox(height: 16),
+                    const Text('No referrals yet', style: TextStyle(color: Colors.white, fontSize: 16, fontWeight: FontWeight.bold)),
+                    const Text('Share your code and start earning!', style: TextStyle(color: Colors.white54)),
+                  ],
+                ),
+              );
+            }
+            final referrals = snapshot.data!;
+            return ListView.builder(
+              shrinkWrap: true,
+              physics: const NeverScrollableScrollPhysics(),
+              itemCount: referrals.length,
+              itemBuilder: (context, index) {
+                final ref = referrals[index];
+                return ListTile(
+                  leading: CircleAvatar(backgroundImage: NetworkImage(ref.referredProfilePic.isNotEmpty ? ref.referredProfilePic : 'https://ui-avatars.com/api/?name=${ref.referredName}')),
+                  title: Text(ref.referredName, style: const TextStyle(color: Colors.white)),
+                  subtitle: Text('Earned: ${Helpers.formatCoins(ref.coinsEarned)} 🪙', style: const TextStyle(color: Colors.amber)),
+                  trailing: Text(ref.statusBadge, style: const TextStyle(fontSize: 12)),
+                );
+              },
+            );
+          },
+        )
       ],
     );
   }

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:fl_chart/fl_chart.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
 // Note: In a real app, you would uncomment this
@@ -35,7 +36,7 @@ class ProfileScreen extends StatelessWidget {
                     children: [
                       _buildStatsGrid(user),
                       const SizedBox(height: 24),
-                      _buildEarningsSummary(user),
+                      _buildEarningsSummary(userProvider),
                       const SizedBox(height: 24),
                       _buildRecentBadges(context),
                       const SizedBox(height: 24),
@@ -187,7 +188,34 @@ class ProfileScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildEarningsSummary(dynamic user) {
+  Widget _buildEarningsSummary(UserProvider provider) {
+    final user = provider.user;
+    
+    // Calculate last 7 days earnings for chart
+    final now = DateTime.now();
+    List<FlSpot> spots = [];
+    double maxEarning = 0;
+    
+    for (int i = 6; i >= 0; i--) {
+      final date = now.subtract(Duration(days: i));
+      int dailySum = 0;
+      
+      for (var tx in provider.transactions) {
+        if (tx.isEarning && 
+            tx.timestamp.year == date.year && 
+            tx.timestamp.month == date.month && 
+            tx.timestamp.day == date.day) {
+          dailySum += tx.coins;
+        }
+      }
+      
+      if (dailySum > maxEarning) maxEarning = dailySum.toDouble();
+      spots.add(FlSpot((6 - i).toDouble(), dailySum.toDouble()));
+    }
+    
+    if (maxEarning == 0) maxEarning = 100; // default scale
+    maxEarning = maxEarning * 1.2; // 20% padding top
+
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(color: AppColors.cardColor, borderRadius: BorderRadius.circular(16), border: Border.all(color: Colors.white12)),
@@ -201,17 +229,55 @@ class ProfileScreen extends StatelessWidget {
               Container(
                 padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
                 decoration: BoxDecoration(color: Colors.white10, borderRadius: BorderRadius.circular(12)),
-                child: const Text('Lifetime', style: TextStyle(color: Colors.white, fontSize: 10)),
+                child: const Text('Last 7 Days', style: TextStyle(color: Colors.white, fontSize: 10)),
               ),
             ],
           ),
           const SizedBox(height: 24),
-          // Chart Placeholder
-          Container(
+          SizedBox(
             height: 150,
             width: double.infinity,
-            decoration: BoxDecoration(color: Colors.white.withOpacity(0.05), borderRadius: BorderRadius.circular(8)),
-            child: const Center(child: Text('Add fl_chart package to view graphs', textAlign: TextAlign.center, style: TextStyle(color: Colors.white38))),
+            child: LineChart(
+              LineChartData(
+                gridData: FlGridData(show: false),
+                titlesData: FlTitlesData(
+                  leftTitles: AxisTitles(sideTitles: SideTitles(showTitles: false)),
+                  rightTitles: AxisTitles(sideTitles: SideTitles(showTitles: false)),
+                  topTitles: AxisTitles(sideTitles: SideTitles(showTitles: false)),
+                  bottomTitles: AxisTitles(
+                    sideTitles: SideTitles(
+                      showTitles: true,
+                      reservedSize: 22,
+                      getTitlesWidget: (value, meta) {
+                        final daysAgo = 6 - value.toInt();
+                        if (daysAgo == 0) return const Text('Today', style: TextStyle(color: Colors.white54, fontSize: 10));
+                        if (daysAgo == 6) return const Text('7d ago', style: TextStyle(color: Colors.white54, fontSize: 10));
+                        return const Text('');
+                      },
+                    ),
+                  ),
+                ),
+                borderData: FlBorderData(show: false),
+                minX: 0,
+                maxX: 6,
+                minY: 0,
+                maxY: maxEarning,
+                lineBarsData: [
+                  LineChartBarData(
+                    spots: spots,
+                    isCurved: true,
+                    color: Colors.amber,
+                    barWidth: 3,
+                    isStrokeCapRound: true,
+                    dotData: FlDotData(show: false),
+                    belowBarData: BarAreaData(
+                      show: true,
+                      color: Colors.amber.withOpacity(0.15),
+                    ),
+                  ),
+                ],
+              ),
+            ),
           ),
           const SizedBox(height: 24),
           Row(
@@ -292,8 +358,8 @@ class ProfileScreen extends StatelessWidget {
           _buildActionItem(context, '💎 Upgrade to VIP', 'Earn faster, withdraw more!', Colors.purpleAccent, () => Navigator.pushNamed(context, '/vip')),
         _buildActionItem(context, '💰 Withdraw Earnings', '${Helpers.formatCoins(coins)} coins available', Colors.green, () => Navigator.pushNamed(context, '/withdraw')),
         _buildActionItem(context, '👥 Referral Program', 'Earn 10% commission ($referrals active)', Colors.blue, () => Navigator.pushNamed(context, '/referral')),
-        _buildActionItem(context, '🏆 Leaderboard', 'Your rank: #42', Colors.amber, () => Navigator.pushNamed(context, '/leaderboard')),
-        _buildActionItem(context, '🎖️ Achievements', '12/20 unlocked', Colors.orange, () => Navigator.pushNamed(context, '/achievements')),
+        _buildActionItem(context, '🏆 Leaderboard', 'Check your rank', Colors.amber, () => Navigator.pushNamed(context, '/leaderboard')),
+        _buildActionItem(context, '🎖️ Achievements', 'View unlocked badges', Colors.orange, () => Navigator.pushNamed(context, '/achievements')),
       ],
     );
   }

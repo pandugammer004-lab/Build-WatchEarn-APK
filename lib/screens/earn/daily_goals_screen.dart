@@ -16,11 +16,8 @@ class DailyGoalsScreen extends StatefulWidget {
 }
 
 class _DailyGoalsScreenState extends State<DailyGoalsScreen> {
-  // Demo state for claimed goals
-  final Set<String> _claimedGoals = {};
 
   int _getGoalProgress(String goalId, UserProvider userProvider) {
-    // In reality this would read from user stats
     final user = userProvider.user;
     if (user == null) return 0;
 
@@ -31,7 +28,7 @@ class _DailyGoalsScreenState extends State<DailyGoalsScreen> {
       case 'g4':
         return user.dailyVideosWatched;
       case 'g5':
-        return 2; // Demo ads watched
+        return user.dailyAdsWatched;
       default:
         return 0;
     }
@@ -39,18 +36,16 @@ class _DailyGoalsScreenState extends State<DailyGoalsScreen> {
 
   void _claimGoal(String goalId, int reward) async {
     final userProvider = Provider.of<UserProvider>(context, listen: false);
-    final coinProvider = Provider.of<CoinProvider>(context, listen: false);
+    final user = userProvider.user;
+    if (user == null || user.claimedGoals.contains(goalId)) return;
 
-    setState(() {
-      _claimedGoals.add(goalId);
-    });
-
-    final actualReward = reward * (userProvider.user?.isVip == true ? 3 : 1); // Simple multiplier logic
-
-    await userProvider.updateCoins(actualReward, 'Goal Completed');
+    final actualReward = reward * (user.isVip ? 3 : 1); // Multiplier logic
+    await userProvider.claimGoal(goalId, actualReward);
     
-    // Animation is handled inside DailyGoalCard, but we might want a global one
-    // CoinEarnedAnimation.show(context, coins: actualReward, source: 'Goal');
+    // Show animation
+    if (mounted) {
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Claimed $actualReward coins!'), backgroundColor: Colors.green));
+    }
   }
 
   @override
@@ -74,7 +69,7 @@ class _DailyGoalsScreenState extends State<DailyGoalsScreen> {
           }
 
           final allComplete = completedCount == goals.length;
-          final bonusClaimed = _claimedGoals.contains('bonus');
+          final bonusClaimed = userProvider.user?.claimedGoals.contains('bonus') ?? false;
 
           return SingleChildScrollView(
             padding: const EdgeInsets.all(16.0),
@@ -88,7 +83,7 @@ class _DailyGoalsScreenState extends State<DailyGoalsScreen> {
                   return DailyGoalCard(
                     goal: goal,
                     currentProgress: progress,
-                    isClaimed: _claimedGoals.contains(goal.id),
+                    isClaimed: userProvider.user?.claimedGoals.contains(goal.id) ?? false,
                     onClaim: () => _claimGoal(goal.id, goal.reward),
                   );
                 }).toList(),

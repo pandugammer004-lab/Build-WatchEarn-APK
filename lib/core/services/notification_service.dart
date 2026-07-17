@@ -17,6 +17,9 @@ class NotificationService {
     // Handle background messages (must be a top-level function in main.dart usually)
     // FirebaseMessaging.onBackgroundMessage(_firebaseMessagingBackgroundHandler);
     
+    // Schedule engagement notifications
+    await scheduleEngagementNotification();
+    
     // Handle foreground messages
     FirebaseMessaging.onMessage.listen((RemoteMessage message) {
       showLocalNotification(message);
@@ -85,9 +88,28 @@ class NotificationService {
     }
   }
 
-  Future<void> scheduleDailyReminder() async {
-    // Requires timezone package for correct scheduling
-    // Placeholder for scheduled notification
+  Future<void> scheduleEngagementNotification() async {
+    try {
+      await _localNotifs.periodicallyShow(
+        0,
+        '🎉 Come back and earn!',
+        'New rewards and videos are waiting for you. Watch and earn more coins now.',
+        RepeatInterval.hourly,
+        const NotificationDetails(
+          android: AndroidNotificationDetails(
+            'engagement_channel',
+            'Engagement Notifications',
+            channelDescription: 'Reminders to earn coins',
+            importance: Importance.defaultImportance,
+            priority: Priority.defaultPriority,
+          ),
+          iOS: DarwinNotificationDetails(),
+        ),
+        androidScheduleMode: AndroidScheduleMode.inexactAllowWhileIdle,
+      );
+    } catch (e) {
+      debugPrint("Error scheduling engagement notification: $e");
+    }
   }
 
   void handleNotificationTap(RemoteMessage message) {
