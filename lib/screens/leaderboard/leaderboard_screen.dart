@@ -15,8 +15,6 @@ class LeaderboardScreen extends StatefulWidget {
 class _LeaderboardScreenState extends State<LeaderboardScreen> with SingleTickerProviderStateMixin {
   late TabController _tabController;
 
-  late TabController _tabController;
-
   @override
   void initState() {
     super.initState();
