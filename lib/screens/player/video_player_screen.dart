@@ -131,12 +131,6 @@ class _VideoPlayerScreenState extends State<VideoPlayerScreen> {
   }
 
   @override
-  void deactivate() {
-    _controller.pause();
-    super.deactivate();
-  }
-
-  @override
   void dispose() {
     _stopTimer();
     _controller.close();
@@ -145,9 +139,14 @@ class _VideoPlayerScreenState extends State<VideoPlayerScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: AppColors.background,
-      body: SafeArea(
+    return PopScope(
+      canPop: true,
+      onPopInvoked: (didPop) {
+        _controller.pauseVideo();
+      },
+      child: Scaffold(
+        backgroundColor: AppColors.background,
+        body: SafeArea(
         child: Column(
           children: [
             // Video Player Area
@@ -353,7 +352,7 @@ class _VideoPlayerScreenState extends State<VideoPlayerScreen> {
         
         return InkWell(
           onTap: isAdReady ? () async {
-            _controller.pause();
+            _controller.pauseVideo();
             final reward = await adProvider.showRewardedAd();
             if (reward > 0 && mounted && userProvider.user != null) {
               final coinProvider = Provider.of<CoinProvider>(context, listen: false);

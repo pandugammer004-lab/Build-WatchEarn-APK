@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:provider/provider.dart';
 import '../../core/constants/app_colors.dart';
+import '../../data/models/user_model.dart';
+import '../../data/providers/user_provider.dart';
 
 class AchievementsScreen extends StatefulWidget {
   const AchievementsScreen({Key? key}) : super(key: key);
@@ -13,76 +16,97 @@ class _AchievementsScreenState extends State<AchievementsScreen> {
   String _selectedCategory = 'All';
   final List<String> _categories = ['All', 'Watching', 'Streaks', 'Referrals', 'Special'];
 
-  // Demo badges data
-  final List<Map<String, dynamic>> _badges = [
-    {
-      'id': 'w1', 'category': 'Watching', 'name': 'First View',
-      'desc': 'Watch your first video', 'emoji': '👀', 'reward': 500,
-      'reqDesc': 'Watch 1 video (1/1)', 'isUnlocked': true, 'unlockDate': 'Mar 15'
-    },
-    {
-      'id': 'w2', 'category': 'Watching', 'name': 'Binge Watcher',
-      'desc': 'Watch 50 videos', 'emoji': '🍿', 'reward': 2000,
-      'reqDesc': 'Watch 50 videos (23/50)', 'isUnlocked': false,
-    },
-    {
-      'id': 's1', 'category': 'Streaks', 'name': 'Weekend Warrior',
-      'desc': 'Login both Saturday and Sunday', 'emoji': '⚔️', 'reward': 1000,
-      'reqDesc': 'Login on weekend (2/2)', 'isUnlocked': true, 'unlockDate': 'Mar 17'
-    },
-    {
-      'id': 's2', 'category': 'Streaks', 'name': '7-Day Streak',
-      'desc': 'Login for 7 consecutive days', 'emoji': '🔥', 'reward': 5000,
-      'reqDesc': 'Login 7 days (4/7)', 'isUnlocked': false,
-    },
-    {
-      'id': 'r1', 'category': 'Referrals', 'name': 'First Invite',
-      'desc': 'Successfully refer 1 friend', 'emoji': '🤝', 'reward': 1000,
-      'reqDesc': 'Refer 1 friend (0/1)', 'isUnlocked': false,
-    },
-    {
-      'id': 'sp1', 'category': 'Special', 'name': 'VIP Member',
-      'desc': 'Become a VIP member', 'emoji': '👑', 'reward': 5000,
-      'reqDesc': 'Purchase VIP plan', 'isUnlocked': false,
-    },
-  ];
+  List<Map<String, dynamic>> _getBadges(UserModel? user) {
+    if (user == null) return [];
+    
+    return [
+      {
+        'id': 'w1', 'category': 'Watching', 'name': 'First View',
+        'desc': 'Watch your first video', 'emoji': '👀', 'reward': 500,
+        'reqDesc': 'Watch 1 video (${user.videosWatched.clamp(0, 1)}/1)', 
+        'isUnlocked': user.videosWatched >= 1, 
+        'unlockDate': user.videosWatched >= 1 ? 'Unlocked' : ''
+      },
+      {
+        'id': 'w2', 'category': 'Watching', 'name': 'Binge Watcher',
+        'desc': 'Watch 50 videos', 'emoji': '🍿', 'reward': 2000,
+        'reqDesc': 'Watch 50 videos (${user.videosWatched.clamp(0, 50)}/50)', 
+        'isUnlocked': user.videosWatched >= 50,
+        'unlockDate': user.videosWatched >= 50 ? 'Unlocked' : ''
+      },
+      {
+        'id': 's1', 'category': 'Streaks', 'name': 'Weekend Warrior',
+        'desc': 'Login on a weekend', 'emoji': '⚔️', 'reward': 1000,
+        'reqDesc': 'Login on weekend', 
+        'isUnlocked': user.streak >= 2, // Simple approximation
+        'unlockDate': user.streak >= 2 ? 'Unlocked' : ''
+      },
+      {
+        'id': 's2', 'category': 'Streaks', 'name': '7-Day Streak',
+        'desc': 'Login for 7 consecutive days', 'emoji': '🔥', 'reward': 5000,
+        'reqDesc': 'Login 7 days (${user.streak.clamp(0, 7)}/7)', 
+        'isUnlocked': user.streak >= 7,
+        'unlockDate': user.streak >= 7 ? 'Unlocked' : ''
+      },
+      {
+        'id': 'r1', 'category': 'Referrals', 'name': 'First Invite',
+        'desc': 'Successfully refer 1 friend', 'emoji': '🤝', 'reward': 1000,
+        'reqDesc': 'Refer 1 friend (${user.totalReferrals.clamp(0, 1)}/1)', 
+        'isUnlocked': user.totalReferrals >= 1,
+        'unlockDate': user.totalReferrals >= 1 ? 'Unlocked' : ''
+      },
+      {
+        'id': 'sp1', 'category': 'Special', 'name': 'VIP Member',
+        'desc': 'Become a VIP member', 'emoji': '👑', 'reward': 5000,
+        'reqDesc': 'Purchase VIP plan', 
+        'isUnlocked': user.isVip,
+        'unlockDate': user.isVip ? 'Unlocked' : ''
+      },
+    ];
+  }
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: AppColors.background,
-      appBar: AppBar(
-        backgroundColor: Colors.transparent,
-        elevation: 0,
-        title: Text('🎖️ Achievements', style: GoogleFonts.poppins(fontWeight: FontWeight.bold)),
-      ),
-      body: SingleChildScrollView(
-        padding: const EdgeInsets.all(16),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            _buildHeader(),
-            const SizedBox(height: 24),
-            _buildCategoriesFilter(),
-            const SizedBox(height: 24),
-            _buildRecentUnlocks(),
-            const SizedBox(height: 24),
-            Text('Next to Unlock', style: GoogleFonts.poppins(color: Colors.white, fontSize: 18, fontWeight: FontWeight.bold)),
-            const SizedBox(height: 12),
-            _buildAlmostThere(),
-            const SizedBox(height: 24),
-            Text('All Badges', style: GoogleFonts.poppins(color: Colors.white, fontSize: 18, fontWeight: FontWeight.bold)),
-            const SizedBox(height: 12),
-            _buildBadgesGrid(),
-            const SizedBox(height: 40),
-          ],
-        ),
-      ),
+    return Consumer<UserProvider>(
+      builder: (context, userProvider, _) {
+        final badges = _getBadges(userProvider.user);
+        
+        return Scaffold(
+          backgroundColor: AppColors.background,
+          appBar: AppBar(
+            backgroundColor: Colors.transparent,
+            elevation: 0,
+            title: Text('🎖️ Achievements', style: GoogleFonts.poppins(fontWeight: FontWeight.bold)),
+          ),
+          body: SingleChildScrollView(
+            padding: const EdgeInsets.all(16),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                _buildHeader(badges),
+                const SizedBox(height: 24),
+                _buildCategoriesFilter(),
+                const SizedBox(height: 24),
+                _buildRecentUnlocks(badges),
+                const SizedBox(height: 24),
+                Text('Next to Unlock', style: GoogleFonts.poppins(color: Colors.white, fontSize: 18, fontWeight: FontWeight.bold)),
+                const SizedBox(height: 12),
+                _buildAlmostThere(badges),
+                const SizedBox(height: 24),
+                Text('All Badges', style: GoogleFonts.poppins(color: Colors.white, fontSize: 18, fontWeight: FontWeight.bold)),
+                const SizedBox(height: 12),
+                _buildBadgesGrid(badges),
+                const SizedBox(height: 40),
+              ],
+            ),
+          ),
+        );
+      },
     );
   }
 
-  Widget _buildHeader() {
-    int unlockedCount = _badges.where((b) => b['isUnlocked']).length;
+  Widget _buildHeader(List<Map<String, dynamic>> badges) {
+    int unlockedCount = badges.where((b) => b['isUnlocked']).length;
     
     return Container(
       padding: const EdgeInsets.all(24),
@@ -98,7 +122,7 @@ class _AchievementsScreenState extends State<AchievementsScreen> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text('$unlockedCount/${_badges.length} Unlocked', style: GoogleFonts.poppins(color: Colors.white, fontSize: 20, fontWeight: FontWeight.bold)),
+                Text('$unlockedCount/${badges.length} Unlocked', style: GoogleFonts.poppins(color: Colors.white, fontSize: 20, fontWeight: FontWeight.bold)),
                 const SizedBox(height: 4),
                 const Text('1,500 🪙 from badges', style: TextStyle(color: Colors.amber, fontWeight: FontWeight.bold)),
               ],
@@ -111,14 +135,14 @@ class _AchievementsScreenState extends State<AchievementsScreen> {
                 width: 80,
                 height: 80,
                 child: CircularProgressIndicator(
-                  value: unlockedCount / _badges.length,
+                  value: badges.isEmpty ? 0 : unlockedCount / badges.length,
                   backgroundColor: Colors.white10,
                   valueColor: const AlwaysStoppedAnimation<Color>(AppColors.primary),
                   strokeWidth: 8,
                 ),
               ),
               Text(
-                '${((unlockedCount / _badges.length) * 100).toInt()}%',
+                '${badges.isEmpty ? 0 : ((unlockedCount / badges.length) * 100).toInt()}%',
                 style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 16),
               ),
             ],
@@ -154,8 +178,8 @@ class _AchievementsScreenState extends State<AchievementsScreen> {
     );
   }
 
-  Widget _buildRecentUnlocks() {
-    final recent = _badges.where((b) => b['isUnlocked']).toList();
+  Widget _buildRecentUnlocks(List<Map<String, dynamic>> badges) {
+    final recent = badges.where((b) => b['isUnlocked']).toList();
     if (recent.isEmpty) return const SizedBox.shrink();
 
     return Column(
@@ -204,9 +228,9 @@ class _AchievementsScreenState extends State<AchievementsScreen> {
     );
   }
 
-  Widget _buildAlmostThere() {
+  Widget _buildAlmostThere(List<Map<String, dynamic>> badges) {
     // Demo logic, just show locked badges with progress
-    final almost = _badges.where((b) => !b['isUnlocked']).take(2).toList();
+    final almost = badges.where((b) => !b['isUnlocked']).take(2).toList();
     if (almost.isEmpty) return const SizedBox.shrink();
 
     return Column(
@@ -241,10 +265,10 @@ class _AchievementsScreenState extends State<AchievementsScreen> {
     );
   }
 
-  Widget _buildBadgesGrid() {
+  Widget _buildBadgesGrid(List<Map<String, dynamic>> badges) {
     final filteredBadges = _selectedCategory == 'All' 
-        ? _badges 
-        : _badges.where((b) => b['category'] == _selectedCategory).toList();
+        ? badges 
+        : badges.where((b) => b['category'] == _selectedCategory).toList();
 
     return GridView.builder(
       shrinkWrap: true,
