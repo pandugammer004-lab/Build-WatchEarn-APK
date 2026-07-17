@@ -36,8 +36,8 @@ dependencies:
   
   # YouTube and Video
   youtube_player_iframe: ^2.3.0
-  video_player: ^2.8.6
-  chewie: ^1.8.1
+  video_player: ^2.8.0
+  chewie: ^1.7.5
   http: ^1.1.0
   
   # Ads - Re-enabled
