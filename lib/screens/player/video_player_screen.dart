@@ -172,7 +172,7 @@ class _VideoPlayerScreenState extends State<VideoPlayerScreen> {
     return PopScope(
       canPop: true,
       onPopInvoked: (didPop) {
-        _youtubeController?.pauseVideo();
+        _youtubeController?.pause();
         _videoPlayerController?.pause();
       },
       child: Scaffold(
@@ -391,7 +391,8 @@ class _VideoPlayerScreenState extends State<VideoPlayerScreen> {
         
         return InkWell(
           onTap: isAdReady ? () async {
-            _controller.pauseVideo();
+            _youtubeController?.pause(); 
+            _videoPlayerController?.pause();
             final reward = await adProvider.showRewardedAd();
             if (reward > 0 && mounted && userProvider.user != null) {
               final coinProvider = Provider.of<CoinProvider>(context, listen: false);
