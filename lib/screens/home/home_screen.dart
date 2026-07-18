@@ -398,7 +398,7 @@ class _HomeScreenState extends State<HomeScreen> {
   Widget _buildFeaturedVideo() {
     return Consumer2<VideoProvider, UserProvider>(
       builder: (context, provider, userProvider, _) {
-        final mixedShorts = provider.getMixedUnwatchedShorts(userProvider.user?.watchedVideoIds ?? []);
+        final mixedShorts = provider.getMixedUnwatchedShorts(userProvider.user?.watchedVideoIds ?? <String>[]);
         if (mixedShorts.isEmpty) return const SizedBox.shrink();
         
         final video = mixedShorts.first;

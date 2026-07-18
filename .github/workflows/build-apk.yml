@@ -123,6 +123,9 @@ jobs:
       - name: Generate Launcher Icons
         run: flutter pub run flutter_launcher_icons
 
+      - name: Analyze Dart Code
+        run: flutter analyze || true
+
       - name: Build APK
         run: flutter build apk --release
 
