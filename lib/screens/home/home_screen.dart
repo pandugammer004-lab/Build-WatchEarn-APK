@@ -12,7 +12,6 @@ import '../../data/providers/video_provider.dart';
 import '../../data/providers/coin_provider.dart';
 import '../../data/models/video_model.dart';
 import '../../data/providers/ad_provider.dart';
-import '../player/video_player_screen.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({Key? key}) : super(key: key);
