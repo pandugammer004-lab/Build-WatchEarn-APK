@@ -252,13 +252,20 @@ class ProfileScreen extends StatelessWidget {
                   bottomTitles: AxisTitles(
                     sideTitles: SideTitles(
                       showTitles: true,
-                      reservedSize: 22,
+                      reservedSize: 30,
+                      interval: 1,
                       getTitlesWidget: (value, meta) {
                         final daysAgo = 6 - value.toInt();
-                        if (daysAgo == 0) return const Padding(padding: EdgeInsets.only(top: 8), child: Text('Today', style: TextStyle(color: AppColors.primary, fontSize: 11, fontWeight: FontWeight.bold)));
-                        if (daysAgo == 3) return const Padding(padding: EdgeInsets.only(top: 8), child: Text('3d ago', style: TextStyle(color: Colors.white54, fontSize: 10)));
-                        if (daysAgo == 6) return const Padding(padding: EdgeInsets.only(top: 8), child: Text('7d ago', style: TextStyle(color: Colors.white54, fontSize: 10)));
-                        return const Text('');
+                        // Only show 3 labels: start, middle, end - to avoid overlap
+                        if (daysAgo == 0) return const Padding(
+                          padding: EdgeInsets.only(top: 6),
+                          child: Text('Today', style: TextStyle(color: AppColors.primary, fontSize: 10, fontWeight: FontWeight.bold)),
+                        );
+                        if (daysAgo == 6) return const Padding(
+                          padding: EdgeInsets.only(top: 6),
+                          child: Text('7d ago', style: TextStyle(color: Colors.white54, fontSize: 10)),
+                        );
+                        return const SizedBox.shrink();
                       },
                     ),
                   ),

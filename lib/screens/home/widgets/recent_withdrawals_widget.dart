@@ -28,8 +28,24 @@ class _RecentWithdrawalsWidgetState extends State<RecentWithdrawalsWidget> {
   }
 
   Future<void> _fetchAndMergeData() async {
+    // Step 1: Show demo data immediately so the spinner doesn't hang
+    final demoData = DemoDataService.getDemoWithdrawals(50);
+    _allWithdrawals = demoData;
+    for (int i = 0; i < 3 && i < _allWithdrawals.length; i++) {
+      _displayList.add(_allWithdrawals[i]);
+    }
+    if (mounted) {
+      setState(() {
+        _isInitialized = true;
+        _currentIndex = 3;
+      });
+      _rotationTimer = Timer.periodic(const Duration(seconds: 15), (timer) {
+        _rotateWithdrawals();
+      });
+    }
+
+    // Step 2: Try to fetch real withdrawals in background and merge
     try {
-      // 1. Fetch real withdrawals
       final snapshot = await FirebaseFirestore.instance
           .collection('withdrawals')
           .where('status', isEqualTo: 'approved')
@@ -37,59 +53,40 @@ class _RecentWithdrawalsWidgetState extends State<RecentWithdrawalsWidget> {
           .limit(10)
           .get();
 
-      List<Map<String, dynamic>> mergedList = [];
-
-      for (var doc in snapshot.docs) {
-        final data = doc.data();
-        final amount = data['amount'] ?? 0.0;
-        final email = data['paymentEmail'] ?? 'User';
-        final maskedName = email.contains('@') 
-            ? '${email.split('@')[0].substring(0, 3)}***' 
-            : 'User***';
-            
-        mergedList.add({
-          'id': doc.id,
-          'name': maskedName,
-          'countryFlag': '🌎',
-          'countryName': 'Global',
-          'amount': amount.toInt(),
-          'method': data['method'] ?? 'Wallet',
-          'methodIcon': 'assets/images/usdt.png', // Fallback
-          'methodColor': 0xFF26A17B,
-          'time': 'Just now',
-          'timestamp': (data['timestamp'] as Timestamp?)?.toDate() ?? DateTime.now(),
-        });
-      }
-
-      // 2. Add demo withdrawals if we don't have enough real ones
-      if (mergedList.length < 50) {
-        final demoData = DemoDataService.getDemoWithdrawals(50 - mergedList.length);
-        mergedList.addAll(demoData);
-      }
-
-      // Sort combined
-      mergedList.sort((a, b) => (b['timestamp'] as DateTime).compareTo(a['timestamp'] as DateTime));
-      
-      _allWithdrawals = mergedList;
-      
-      // Initialize with first 3 items
-      for (int i = 0; i < 3 && i < _allWithdrawals.length; i++) {
-        _displayList.add(_allWithdrawals[i]);
-      }
-      
-      if (mounted) {
-        setState(() {
-          _isInitialized = true;
-          _currentIndex = 3;
-        });
-        
-        // Start rotation timer (rotate every 15 seconds)
-        _rotationTimer = Timer.periodic(const Duration(seconds: 15), (timer) {
-          _rotateWithdrawals();
-        });
+      if (snapshot.docs.isNotEmpty) {
+        List<Map<String, dynamic>> realList = [];
+        for (var doc in snapshot.docs) {
+          final data = doc.data();
+          final amount = data['amount'] ?? 0.0;
+          final email = data['paymentEmail'] ?? 'User';
+          final maskedName = email.contains('@') 
+              ? '${email.split('@')[0].substring(0, 3)}***' 
+              : 'User***';
+          realList.add({
+            'id': doc.id,
+            'name': maskedName,
+            'countryFlag': '🌎',
+            'countryName': 'Global',
+            'amount': amount.toInt(),
+            'method': data['method'] ?? 'Wallet',
+            'methodIcon': 'assets/images/usdt.png',
+            'methodColor': 0xFF26A17B,
+            'time': 'Just now',
+            'timestamp': (data['timestamp'] as Timestamp?)?.toDate() ?? DateTime.now(),
+          });
+        }
+        // Merge real + demo
+        final merged = [...realList, ...demoData];
+        merged.sort((a, b) => (b['timestamp'] as DateTime).compareTo(a['timestamp'] as DateTime));
+        if (mounted) {
+          setState(() {
+            _allWithdrawals = merged;
+          });
+        }
       }
     } catch (e) {
-      debugPrint('Error fetching withdrawals: $e');
+      // silently ignore - demo data is already showing
+      debugPrint('Withdrawals fetch error (using demo data): $e');
     }
   }
 

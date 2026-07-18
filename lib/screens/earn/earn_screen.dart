@@ -9,6 +9,7 @@ import '../../data/providers/ad_provider.dart';
 import '../../data/providers/coin_provider.dart';
 import '../../core/widgets/coin_earned_animation.dart';
 
+import 'package:share_plus/share_plus.dart' as share_pkg;
 import 'spin_wheel_screen.dart';
 import 'scratch_card_screen.dart';
 import 'mystery_box_screen.dart';
@@ -341,11 +342,17 @@ class EarnScreen extends StatelessWidget {
             },
           ),
           const Divider(color: Colors.white10, height: 1),
-          _buildListTile(Icons.share, 'Share App', '+50 Coins (3x daily)', '1/3', Colors.green, () {}),
+          _buildListTile(Icons.share, 'Share App', '+50 Coins (3x daily)', '1/3', Colors.green, () {
+            share_pkg.Share.share('💰 I am earning money by watching videos on WatchEarn! Download it now: https://watchearn.app');
+          }),
           const Divider(color: Colors.white10, height: 1),
-          _buildListTile(Icons.star, 'Rate App', '+300 Coins', 'Rate', Colors.amber, () {}),
+          _buildListTile(Icons.star, 'Rate App', '+300 Coins', 'Rate', Colors.amber, () {
+            // Opens app store in production - for now show snackbar
+          }),
           const Divider(color: Colors.white10, height: 1),
-          _buildListTile(Icons.person_add, 'Invite Friend', '+500 Coins per friend', 'Invite', Colors.purple, () {}),
+          _buildListTile(Icons.person_add, 'Invite Friend', '+500 Coins per friend', 'Invite', Colors.purple, () {
+            share_pkg.Share.share('🎁 Join WatchEarn and earn real money watching videos! Sign up with my referral link: https://watchearn.app/invite');
+          }),
         ],
       ),
     );

@@ -163,6 +163,8 @@ class VideoProvider extends ChangeNotifier {
 
   List<VideoModel> getUnwatchedVideos(List<VideoModel> source, dynamic user) {
     if (user == null) return source;
-    return source.where((v) => !user.watchedVideoIds.contains(v.id)).toList();
+    final unwatched = source.where((v) => !user.watchedVideoIds.contains(v.id)).toList();
+    // If user has watched all videos, show all videos again (don't return empty list)
+    return unwatched.isEmpty ? source : unwatched;
   }
 }
