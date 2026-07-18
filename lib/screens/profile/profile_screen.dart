@@ -216,6 +216,7 @@ class ProfileScreen extends StatelessWidget {
     if (maxEarning == 0) maxEarning = 100; // default scale
     maxEarning = maxEarning * 1.2; // 20% padding top
 
+    return Container(
       padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
         color: AppColors.cardColor, 
