@@ -90,7 +90,7 @@ class VideoModel {
       isTrending: data['isTrending'] ?? false,
       isFeatured: data['isFeatured'] ?? false,
       isVipOnly: data['isVipOnly'] ?? false,
-      isActive: data['isActive'] ?? true,
+      isActive: data['isActive'] != false, // Show video unless explicitly set to false
       order: data['order'] ?? 0,
       tags: List<String>.from(data['tags'] ?? []),
       thumbnailUrl: data['thumbnailUrl'] ?? data['customThumbnail'],

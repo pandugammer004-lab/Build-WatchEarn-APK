@@ -43,26 +43,35 @@ class FirestoreService {
 
   // Videos
   Future<List<VideoModel>> getVideos({String? category, bool? trending, int? limit}) async {
-    Query query = _db.collection('videos').orderBy('publishedAt', descending: true);
+    try {
+      // Use simple query without orderBy to avoid index issues
+      Query query = _db.collection('videos');
 
-    if (limit != null) {
-      query = query.limit(limit);
-    }
+      if (limit != null) {
+        query = query.limit(limit);
+      }
 
-    final snapshot = await query.get();
-    var videos = snapshot.docs.map((doc) => VideoModel.fromFirestore(doc)).toList();
-    
-    // Filter locally to avoid requiring complex composite indexes in Firebase
-    videos = videos.where((v) => v.isActive).toList();
-    
-    if (category != null && category != 'all') {
-      videos = videos.where((v) => v.categoryId == category).toList();
+      final snapshot = await query.get();
+      var videos = snapshot.docs.map((doc) => VideoModel.fromFirestore(doc)).toList();
+      
+      // Filter locally - only show active videos
+      videos = videos.where((v) => v.isActive).toList();
+      
+      // Sort locally by publishedAt descending
+      videos.sort((a, b) => b.publishedAt.compareTo(a.publishedAt));
+      
+      if (category != null && category != 'all') {
+        videos = videos.where((v) => v.categoryId == category).toList();
+      }
+      if (trending == true) {
+        videos = videos.where((v) => v.isTrending).toList();
+      }
+      
+      return videos;
+    } catch (e) {
+      debugPrint('Error fetching videos: $e');
+      return [];
     }
-    if (trending == true) {
-      videos = videos.where((v) => v.isTrending).toList();
-    }
-    
-    return videos;
   }
 
   Future<void> incrementVideoViews(String videoId) async {

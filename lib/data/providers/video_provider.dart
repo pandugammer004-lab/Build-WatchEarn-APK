@@ -38,12 +38,8 @@ class VideoProvider extends ChangeNotifier {
     try {
       _setLoading(true);
       final rawVideos = await _firestoreService.getVideos();
-      // Enforce the 3 strictly allowed categories
-      _allVideos = rawVideos.where((v) => 
-        v.categoryId == 'cricket' || 
-        v.categoryId == 'football' || 
-        v.categoryId == 'funny'
-      ).toList();
+      // Show all active videos - no category restriction
+      _allVideos = rawVideos;
       _trendingVideos = _allVideos.where((v) => v.isTrending).toList();
       _featuredVideos = _allVideos.where((v) => v.isFeatured).toList();
       _filteredVideos = _allVideos;
