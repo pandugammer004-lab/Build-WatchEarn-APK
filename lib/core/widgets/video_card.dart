@@ -21,9 +21,9 @@ class VideoCard extends StatelessWidget {
     this.isVipUnlocked = false,
   }) : super(key: key);
 
-  String get _thumbnailUrl => video.thumbnailSQ;
-  String get _hqThumbnailUrl => video.thumbnailMQ;
-  String get _maxresThumbnailUrl => video.thumbnailHQ;
+  String get _thumbnailUrl => video.thumbnail;
+  String get _hqThumbnailUrl => video.thumbnail;
+  String get _maxresThumbnailUrl => video.thumbnail;
 
   @override
   Widget build(BuildContext context) {
