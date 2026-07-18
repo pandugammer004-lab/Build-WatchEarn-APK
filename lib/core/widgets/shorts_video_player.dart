@@ -140,7 +140,7 @@ class _ShortsVideoPlayerState extends State<ShortsVideoPlayer> {
         videoProvider.incrementViews(widget.video.id);
 
         if (mounted) {
-          CoinEarnedAnimation.show(context, coins: earnedCoins);
+          CoinEarnedAnimation.show(context, coins: earnedCoins, source: 'Shorts');
         }
       } catch (e) {
         debugPrint('Error granting reward: $e');
