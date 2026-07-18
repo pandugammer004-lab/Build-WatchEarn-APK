@@ -39,6 +39,7 @@ dependencies:
   video_player: ^2.8.0
   chewie: ^1.7.5
   http: ^1.1.0
+  audioplayers: ^5.2.1
   
   # Ads - Re-enabled
   google_mobile_ads: ^5.1.0

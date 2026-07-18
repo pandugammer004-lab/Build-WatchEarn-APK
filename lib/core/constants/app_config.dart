@@ -4,7 +4,7 @@ class AppConfig {
 
   // Coin System
   static const int coinsPerVideo = 10;
-  static const int coinsPerAd = 15;
+  static const int coinsPerAd = 50;
   static const int coinsPerReferral = 500;
   static const int coinsPerReferralWatch = 200;
   static const int coinsPerRateApp = 300;
@@ -12,7 +12,7 @@ class AppConfig {
   static const double coinsPerDollar = 10000.0;
 
   // Streak Rewards (7 days)
-  static const List<int> streakRewards = [25, 35, 50, 65, 80, 100, 200];
+  static const List<int> streakRewards = [140, 140, 140, 140, 140, 150, 150];
 
   // Daily Goals
   static const List<int> videoGoals = [1, 3, 5, 10, 20, 30];

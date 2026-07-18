@@ -3,6 +3,7 @@ import '../../core/constants/app_colors.dart';
 import 'animations/glow_pulse_widget.dart';
 import 'animations/scale_in_widget.dart';
 import 'package:google_fonts/google_fonts.dart';
+import '../../core/constants/app_config.dart';
 
 class StreakCalendar extends StatelessWidget {
   final int currentStreak;
@@ -14,7 +15,7 @@ class StreakCalendar extends StatelessWidget {
     required this.claimedToday,
   }) : super(key: key);
 
-  final List<int> _rewards = const [50, 100, 150, 200, 250, 300, 1000];
+  final List<int> _rewards = AppConfig.streakRewards;
   final List<String> _days = const ['Day 1', 'Day 2', 'Day 3', 'Day 4', 'Day 5', 'Day 6', 'Day 7'];
 
   @override

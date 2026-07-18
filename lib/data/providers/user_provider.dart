@@ -194,30 +194,70 @@ class UserProvider extends ChangeNotifier {
     if (_user == null) return;
     try {
       final now = DateTime.now();
-      final lastLogin = _user!.lastLogin;
-      final difference = DateTime(now.year, now.month, now.day)
-          .difference(DateTime(lastLogin.year, lastLogin.month, lastLogin.day))
-          .inDays;
-
-      int newStreak = _user!.streak;
-      if (newStreak == 0) newStreak = 1; // Base case for new users
-
-      if (difference == 1) {
-        newStreak++;
-      } else if (difference > 1) {
-        newStreak = 1;
-      }
-
-      if (difference > 0 || _user!.streak == 0) {
-        _user = _user!.copyWith(streak: newStreak, lastLogin: now);
-        notifyListeners();
-        await _firestoreService.updateUser(_user!.uid, {
-          'streak': newStreak,
-          'lastLogin': FieldValue.serverTimestamp(),
-        });
-      }
+      _user = _user!.copyWith(lastLogin: now);
+      notifyListeners();
+      await _firestoreService.updateUser(_user!.uid, {
+        'lastLogin': FieldValue.serverTimestamp(),
+      });
     } catch (e) {
-      debugPrint("Error updating streak: $e");
+      debugPrint("Error updating last login: $e");
+    }
+  }
+
+  Future<int> claimDailyBonus() async {
+    if (_user == null) throw Exception("Not logged in");
+    try {
+      _setLoading(true);
+      final result = await _firestoreService.claimDailyBonusTransaction(_user!.uid, AppConfig.streakRewards);
+      
+      _user = _user!.copyWith(
+        coins: _user!.coins + (result['reward'] as int),
+        totalEarned: _user!.totalEarned + (result['reward'] as int),
+        streak: result['streak'] as int,
+        lastDailyBonusClaim: DateTime.now(),
+      );
+      notifyListeners();
+      return result['reward'] as int;
+    } catch (e) {
+      debugPrint("Error claiming daily bonus: $e");
+      rethrow;
+    } finally {
+      _setLoading(false);
+    }
+  }
+
+  Future<void> claimAdReward(int rewardAmount) async {
+    if (_user == null) throw Exception("Not logged in");
+    try {
+      final result = await _firestoreService.claimAdRewardTransaction(_user!.uid, rewardAmount);
+      _user = _user!.copyWith(
+        coins: _user!.coins + (result['reward'] as int),
+        totalEarned: _user!.totalEarned + (result['reward'] as int),
+        dailyAdsWatched: _user!.dailyAdsWatched + 1,
+        dailyEarned: _user!.dailyEarned + (result['reward'] as int),
+      );
+      notifyListeners();
+    } catch (e) {
+      debugPrint("Error claiming ad reward: $e");
+      rethrow;
+    }
+  }
+
+  Future<void> claimSpinReward(int prize, bool isPremium) async {
+    if (_user == null) throw Exception("Not logged in");
+    try {
+      final result = await _firestoreService.claimSpinPrizeTransaction(_user!.uid, prize, isPremium);
+      _user = _user!.copyWith(
+        coins: _user!.coins + (result['reward'] as int),
+        totalEarned: _user!.totalEarned + (result['reward'] as int),
+        totalSpins: _user!.totalSpins + 1,
+        lastSpinDate: DateTime.now(),
+        premiumSpins: isPremium ? _user!.premiumSpins - 1 : _user!.premiumSpins,
+      );
+      notifyListeners();
+    } catch (e) {
+      debugPrint("Error claiming spin reward: $e");
+      rethrow;
     }
   }
 

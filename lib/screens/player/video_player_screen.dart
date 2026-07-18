@@ -396,11 +396,17 @@ class _VideoPlayerScreenState extends State<VideoPlayerScreen> {
             _videoPlayerController?.pause();
             final reward = await adProvider.showRewardedAd();
             if (reward > 0 && mounted && userProvider.user != null) {
-              final coinProvider = Provider.of<CoinProvider>(context, listen: false);
-              final earned = await coinProvider.earnFromAd(userProvider.user!);
-              await userProvider.updateCoins(earned, 'Ad Watched');
-              await userProvider.updateDailyStats('ad');
-              if (mounted) CoinEarnedAnimation.show(context, coins: earned, source: 'Ad Watched');
+              try {
+                await userProvider.claimAdReward(reward);
+                if (mounted) {
+                  CoinEarnedAnimation.show(context, coins: reward, source: 'Ad Watched');
+                  ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Awesome! +$reward Coins Claimed', style: const TextStyle(color: Colors.white)), backgroundColor: Colors.green));
+                }
+              } catch (e) {
+                if (mounted) {
+                  ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Failed to verify reward. Try again.', style: TextStyle(color: Colors.white)), backgroundColor: Colors.red));
+                }
+              }
             }
           } : null,
           borderRadius: BorderRadius.circular(8),

@@ -61,9 +61,18 @@ class _MysteryBoxScreenState extends State<MysteryBoxScreen> {
 
     // Play Rewarded Ad before opening
     if (adProvider.isRewardedLoaded) {
-      await adProvider.showRewardedAd();
+      final reward = await adProvider.showRewardedAd();
+      if (reward == 0) {
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('You must watch the full ad to open the box!', style: TextStyle(color: Colors.white)), backgroundColor: Colors.red));
+        }
+        return; // Abort if they closed early
+      }
+      // If watched, we don't necessarily claim the ad reward coins here, or we can? 
+      // They get the box prize. But usually they get both or just the box. Let's give them the ad reward too to be generous!
+      try { await userProvider.claimAdReward(reward); } catch (_) {}
     } else {
-      // If no ad loaded, try loading one and proceed or just proceed
+      // If no ad loaded, try loading one but still allow opening box
       adProvider.loadRewardedAd();
     }
 

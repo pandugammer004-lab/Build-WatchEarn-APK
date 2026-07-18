@@ -8,6 +8,10 @@ import '../../core/widgets/coin_earned_animation.dart';
 import '../../data/providers/user_provider.dart';
 import '../../data/providers/earn_provider.dart';
 import '../../data/providers/ad_provider.dart';
+import 'package:flutter/services.dart';
+import 'package:audioplayers/audioplayers.dart';
+import 'package:confetti/confetti.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class SpinWheelScreen extends StatefulWidget {
   const SpinWheelScreen({Key? key}) : super(key: key);
@@ -24,12 +28,47 @@ class _SpinWheelScreenState extends State<SpinWheelScreen> {
   Timer? _countdownTimer;
   String _timeRemaining = '';
   
+  late ConfettiController _confettiController;
+  final AudioPlayer _audioPlayer = AudioPlayer();
+  bool _isMuted = false;
+  
   @override
   void initState() {
     super.initState();
     _startTimer();
+    _confettiController = ConfettiController(duration: const Duration(seconds: 3));
+    _loadSettings();
   }
   
+  Future<void> _loadSettings() async {
+    final prefs = await SharedPreferences.getInstance();
+    setState(() {
+      _isMuted = prefs.getBool('spin_muted') ?? false;
+    });
+  }
+
+  Future<void> _toggleMute() async {
+    final prefs = await SharedPreferences.getInstance();
+    setState(() {
+      _isMuted = !_isMuted;
+      prefs.setBool('spin_muted', _isMuted);
+    });
+  }
+
+  void _playSound(String type) async {
+    if (_isMuted) return;
+    try {
+      if (type == 'spin') {
+        // We will just use HapticFeedback for ticks if no mp3, or play a placeholder sound
+        await _audioPlayer.play(UrlSource('https://actions.google.com/sounds/v1/foley/spin_wheel_fast.ogg'));
+      } else if (type == 'win') {
+        await _audioPlayer.play(UrlSource('https://actions.google.com/sounds/v1/cartoon/clown_horn.ogg'));
+      }
+    } catch (e) {
+      debugPrint("Audio play error: $e");
+    }
+  }
+
   void _startTimer() {
     _countdownTimer = Timer.periodic(const Duration(seconds: 1), (timer) {
       if (mounted) setState(() {});
@@ -52,6 +91,8 @@ class _SpinWheelScreenState extends State<SpinWheelScreen> {
   void dispose() {
     selected.close();
     _countdownTimer?.cancel();
+    _confettiController.dispose();
+    _audioPlayer.dispose();
     super.dispose();
   }
 
@@ -72,6 +113,9 @@ class _SpinWheelScreenState extends State<SpinWheelScreen> {
       _usedPremiumSpin = hasPremium;
     });
 
+    _playSound('spin');
+    HapticFeedback.mediumImpact();
+
     _currentPrize = earnProvider.getSpinWheelPrize(_usedPremiumSpin);
     final index = earnProvider.getSpinIndexForPrize(_currentPrize);
     
@@ -85,18 +129,22 @@ class _SpinWheelScreenState extends State<SpinWheelScreen> {
       _isSpinning = false;
     });
 
-    final userProvider = Provider.of<UserProvider>(context, listen: false);
-    final earnProvider = Provider.of<EarnProvider>(context, listen: false);
+    _playSound('win');
+    HapticFeedback.heavyImpact();
+    _confettiController.play();
 
-    // Award Prize
+    final userProvider = Provider.of<UserProvider>(context, listen: false);
+
+    // Award Prize Securely
     if (userProvider.user != null) {
-      await earnProvider.logSpin(userProvider.user!, _currentPrize);
-      await userProvider.updateCoins(_currentPrize, _usedPremiumSpin ? 'Premium Spin' : 'Daily Free Spin');
-      await userProvider.updateSpinState(usedPremium: _usedPremiumSpin);
-    }
-    
-    if (mounted) {
-      CoinEarnedAnimation.show(context, coins: _currentPrize, source: _usedPremiumSpin ? 'Premium Spin' : 'Lucky Spin');
+      try {
+        await userProvider.claimSpinReward(_currentPrize, _usedPremiumSpin);
+        if (mounted) {
+          CoinEarnedAnimation.show(context, coins: _currentPrize, source: _usedPremiumSpin ? 'Premium Spin' : 'Lucky Spin');
+        }
+      } catch (e) {
+        if (mounted) ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Failed to claim prize', style: TextStyle(color: Colors.white)), backgroundColor: Colors.red));
+      }
     }
   }
 
@@ -111,9 +159,18 @@ class _SpinWheelScreenState extends State<SpinWheelScreen> {
           '🎰 Lucky Spin',
           style: GoogleFonts.poppins(fontWeight: FontWeight.bold),
         ),
+        actions: [
+          IconButton(
+            icon: Icon(_isMuted ? Icons.volume_off : Icons.volume_up),
+            onPressed: _toggleMute,
+          ),
+        ],
       ),
-      body: Column(
+      body: Stack(
+        alignment: Alignment.topCenter,
         children: [
+          Column(
+            children: [
           const SizedBox(height: 20),
           Text(
             'Win up to 1,000 coins!',
@@ -260,6 +317,14 @@ class _SpinWheelScreenState extends State<SpinWheelScreen> {
             ),
           ),
           const SizedBox(height: 40),
+            ],
+          ),
+          ConfettiWidget(
+            confettiController: _confettiController,
+            blastDirectionality: BlastDirectionality.explosive,
+            shouldLoop: false,
+            colors: const [Colors.green, Colors.blue, Colors.pink, Colors.orange, Colors.purple],
+          ),
         ],
       ),
     );

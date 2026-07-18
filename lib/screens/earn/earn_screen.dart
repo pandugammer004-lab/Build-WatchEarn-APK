@@ -128,16 +128,40 @@ class EarnScreen extends StatelessWidget {
                 Text('Daily Login Bonus', style: GoogleFonts.poppins(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 16)),
                 const SizedBox(height: 4),
                 Text('🔥 Day ${user?.streak ?? 1} Streak!', style: const TextStyle(color: Colors.amber, fontWeight: FontWeight.bold, fontSize: 12)),
+                if (hasClaimed) ...[
+                  const SizedBox(height: 4),
+                  StreamBuilder(
+                    stream: Stream.periodic(const Duration(seconds: 1)),
+                    builder: (context, snapshot) {
+                      final now = DateTime.now();
+                      final tomorrow = DateTime(now.year, now.month, now.day + 1);
+                      final diff = tomorrow.difference(now);
+                      final h = diff.inHours.toString().padLeft(2, '0');
+                      final m = (diff.inMinutes % 60).toString().padLeft(2, '0');
+                      final s = (diff.inSeconds % 60).toString().padLeft(2, '0');
+                      return Text('Next in: $h:$m:$s', style: const TextStyle(color: Colors.white70, fontSize: 11));
+                    },
+                  ),
+                ]
               ],
             ),
           ),
           ElevatedButton(
             onPressed: hasClaimed ? null : () async {
-              int amount = await userProvider.claimDailyBonus();
-              if (context.mounted && amount > 0) {
-                ScaffoldMessenger.of(context).showSnackBar(
-                  SnackBar(content: Text('Daily Bonus Claimed! +$amount Coins')),
-                );
+              try {
+                int amount = await userProvider.claimDailyBonus();
+                if (context.mounted && amount > 0) {
+                  CoinEarnedAnimation.show(context, coins: amount, source: 'Daily Login');
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(content: Text('Daily Bonus Claimed! +$amount Coins', style: const TextStyle(color: Colors.white)), backgroundColor: Colors.green),
+                  );
+                }
+              } catch (e) {
+                if (context.mounted) {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(content: Text('Failed to claim: ${e.toString().replaceAll('Exception: ', '')}', style: const TextStyle(color: Colors.white)), backgroundColor: Colors.red),
+                  );
+                }
               }
             },
             style: ElevatedButton.styleFrom(
@@ -293,19 +317,24 @@ class EarnScreen extends StatelessWidget {
         children: [
           Consumer2<AdProvider, UserProvider>(
             builder: (context, adProvider, userProvider, _) {
-              return _buildListTile(Icons.ondemand_video, 'Watch Rewarded Ad', '+15 Coins per ad', adProvider.isRewardedLoaded ? 'Watch' : 'Loading...', Colors.blue, () async {
+              return _buildListTile(Icons.ondemand_video, 'Watch Rewarded Ad', '+50 Coins per ad', adProvider.isRewardedLoaded ? 'Watch' : 'Loading...', Colors.blue, () async {
                 if (!adProvider.isRewardedLoaded) {
                   ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Ad is not ready yet, please wait.')));
+                  adProvider.loadRewardedAd(); // Retry loading
                   return;
                 }
                 final reward = await adProvider.showRewardedAd();
                 if (reward > 0 && context.mounted && userProvider.user != null) {
-                  final coinProvider = Provider.of<CoinProvider>(context, listen: false);
-                  final earned = await coinProvider.earnFromAd(userProvider.user!);
-                  await userProvider.updateCoins(earned, 'Ad Watched');
-                  await userProvider.updateDailyStats('ad');
-                  if (context.mounted) {
-                    CoinEarnedAnimation.show(context, coins: earned, source: 'Ad Watched');
+                  try {
+                    await userProvider.claimAdReward(reward);
+                    if (context.mounted) {
+                      CoinEarnedAnimation.show(context, coins: reward, source: 'Ad Watched');
+                      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Awesome! +$reward Coins Claimed', style: const TextStyle(color: Colors.white)), backgroundColor: Colors.green));
+                    }
+                  } catch (e) {
+                    if (context.mounted) {
+                      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Failed to verify reward. Try again.', style: TextStyle(color: Colors.white)), backgroundColor: Colors.red));
+                    }
                   }
                 }
               });

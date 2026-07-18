@@ -147,4 +147,128 @@ class FirestoreService {
     // Requires userId context usually, simplistic placeholder
     // await _db.collection('users').doc(userId).collection('notifications').doc(notifId).update({'isRead': true});
   }
+
+  // Transactions for Secure Rewards
+  Future<Map<String, dynamic>> claimDailyBonusTransaction(String uid, List<int> streakRewards) async {
+    return await _db.runTransaction((transaction) async {
+      final userRef = _db.collection('users').doc(uid);
+      final snapshot = await transaction.get(userRef);
+      if (!snapshot.exists) throw Exception("User not found");
+
+      final data = snapshot.data()!;
+      final DateTime now = DateTime.now();
+      DateTime? lastClaim;
+      if (data['lastDailyBonusClaim'] != null) {
+        lastClaim = (data['lastDailyBonusClaim'] as Timestamp).toDate();
+      }
+
+      int streak = data['streak'] ?? 0;
+      
+      if (lastClaim != null) {
+        final difference = DateTime(now.year, now.month, now.day)
+            .difference(DateTime(lastClaim.year, lastClaim.month, lastClaim.day))
+            .inDays;
+        
+        if (difference == 0) {
+          throw Exception("Already claimed today");
+        } else if (difference == 1) {
+          streak += 1;
+        } else {
+          streak = 1;
+        }
+      } else {
+        streak = 1;
+      }
+
+      if (streak > 7) streak = 1;
+
+      final reward = streakRewards[streak - 1];
+
+      transaction.update(userRef, {
+        'coins': FieldValue.increment(reward),
+        'totalEarned': FieldValue.increment(reward),
+        'streak': streak,
+        'lastDailyBonusClaim': FieldValue.serverTimestamp(),
+      });
+
+      final transactionRef = _db.collection('transactions').doc();
+      transaction.set(transactionRef, {
+        'id': transactionRef.id,
+        'userId': uid,
+        'amount': reward,
+        'type': 'credit',
+        'source': 'streak',
+        'status': 'completed',
+        'timestamp': FieldValue.serverTimestamp(),
+      });
+
+      return {'reward': reward, 'streak': streak};
+    });
+  }
+
+  Future<Map<String, dynamic>> claimAdRewardTransaction(String uid, int rewardAmount) async {
+    return await _db.runTransaction((transaction) async {
+      final userRef = _db.collection('users').doc(uid);
+      final snapshot = await transaction.get(userRef);
+      if (!snapshot.exists) throw Exception("User not found");
+
+      transaction.update(userRef, {
+        'coins': FieldValue.increment(rewardAmount),
+        'totalEarned': FieldValue.increment(rewardAmount),
+        'dailyAdsWatched': FieldValue.increment(1),
+        'dailyEarned': FieldValue.increment(rewardAmount),
+      });
+
+      final transactionRef = _db.collection('transactions').doc();
+      transaction.set(transactionRef, {
+        'id': transactionRef.id,
+        'userId': uid,
+        'amount': rewardAmount,
+        'type': 'credit',
+        'source': 'ad',
+        'status': 'completed',
+        'timestamp': FieldValue.serverTimestamp(),
+      });
+
+      return {'reward': rewardAmount};
+    });
+  }
+
+  Future<Map<String, dynamic>> claimSpinPrizeTransaction(String uid, int prize, bool isPremium) async {
+    return await _db.runTransaction((transaction) async {
+      final userRef = _db.collection('users').doc(uid);
+      final snapshot = await transaction.get(userRef);
+      if (!snapshot.exists) throw Exception("User not found");
+
+      final data = snapshot.data()!;
+      int premiumSpins = data['premiumSpins'] ?? 0;
+
+      Map<String, dynamic> updates = {
+        'coins': FieldValue.increment(prize),
+        'totalEarned': FieldValue.increment(prize),
+        'totalSpins': FieldValue.increment(1),
+        'lastSpinDate': FieldValue.serverTimestamp(),
+      };
+
+      if (isPremium) {
+        if (premiumSpins <= 0) throw Exception("No premium spins available");
+        updates['premiumSpins'] = FieldValue.increment(-1);
+      }
+
+      transaction.update(userRef, updates);
+
+      final transactionRef = _db.collection('transactions').doc();
+      transaction.set(transactionRef, {
+        'id': transactionRef.id,
+        'userId': uid,
+        'amount': prize,
+        'type': 'credit',
+        'source': 'spin',
+        'status': 'completed',
+        'timestamp': FieldValue.serverTimestamp(),
+      });
+
+      return {'reward': prize};
+    });
+  }
 }
