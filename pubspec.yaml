@@ -40,6 +40,7 @@ dependencies:
   chewie: ^1.7.5
   http: ^1.1.0
   audioplayers: ^5.2.1
+  scratcher: ^2.4.0
   
   # Ads - Re-enabled
   google_mobile_ads: ^5.1.0

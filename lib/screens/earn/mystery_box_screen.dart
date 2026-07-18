@@ -2,6 +2,10 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
+import 'package:audioplayers/audioplayers.dart';
+import 'package:confetti/confetti.dart';
+import 'package:flutter/services.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import '../../core/constants/app_colors.dart';
 import '../../core/widgets/animations/shake_animation.dart';
 import '../../core/widgets/coin_earned_animation.dart';
@@ -23,6 +27,10 @@ class _MysteryBoxScreenState extends State<MysteryBoxScreen> {
   int _prize = 0;
   Timer? _countdownTimer;
 
+  late ConfettiController _confettiController;
+  final AudioPlayer _audioPlayer = AudioPlayer();
+  bool _isMuted = false;
+
   @override
   void initState() {
     super.initState();
@@ -32,6 +40,24 @@ class _MysteryBoxScreenState extends State<MysteryBoxScreen> {
     
     _boxType = earnProvider.getMysteryBoxType(userProvider.user!);
     _prize = earnProvider.getMysteryBoxPrize(_boxType);
+    
+    _confettiController = ConfettiController(duration: const Duration(seconds: 3));
+    _loadSettings();
+  }
+  
+  Future<void> _loadSettings() async {
+    final prefs = await SharedPreferences.getInstance();
+    setState(() {
+      _isMuted = prefs.getBool('mystery_muted') ?? false;
+    });
+  }
+
+  Future<void> _toggleMute() async {
+    final prefs = await SharedPreferences.getInstance();
+    setState(() {
+      _isMuted = !_isMuted;
+      prefs.setBool('mystery_muted', _isMuted);
+    });
   }
   
   void _startTimer() {
@@ -43,13 +69,27 @@ class _MysteryBoxScreenState extends State<MysteryBoxScreen> {
   @override
   void dispose() {
     _countdownTimer?.cancel();
+    _confettiController.dispose();
+    _audioPlayer.dispose();
     super.dispose();
+  }
+
+  void _playSound(String type) async {
+    if (_isMuted) return;
+    try {
+      if (type == 'shake') {
+        await _audioPlayer.play(UrlSource('https://actions.google.com/sounds/v1/doors/wood_door_opening_and_closing.ogg'));
+      } else if (type == 'win') {
+        await _audioPlayer.play(UrlSource('https://actions.google.com/sounds/v1/cartoon/clown_horn.ogg'));
+      }
+    } catch (e) {
+      debugPrint("Audio play error: $e");
+    }
   }
 
   void _openBox() async {
     final adProvider = Provider.of<AdProvider>(context, listen: false);
     final userProvider = Provider.of<UserProvider>(context, listen: false);
-    final earnProvider = Provider.of<EarnProvider>(context, listen: false);
 
     final lastBox = userProvider.user?.lastMysteryBoxDate;
     if (lastBox != null && DateTime.now().difference(lastBox).inHours < 12) {
@@ -68,13 +108,13 @@ class _MysteryBoxScreenState extends State<MysteryBoxScreen> {
         }
         return; // Abort if they closed early
       }
-      // If watched, we don't necessarily claim the ad reward coins here, or we can? 
-      // They get the box prize. But usually they get both or just the box. Let's give them the ad reward too to be generous!
       try { await userProvider.claimAdReward(reward); } catch (_) {}
     } else {
-      // If no ad loaded, try loading one but still allow opening box
       adProvider.loadRewardedAd();
     }
+
+    _playSound('shake');
+    HapticFeedback.mediumImpact();
 
     setState(() {
       _isShaking = true;
@@ -84,17 +124,22 @@ class _MysteryBoxScreenState extends State<MysteryBoxScreen> {
 
     if (!mounted) return;
 
+    _playSound('win');
+    HapticFeedback.heavyImpact();
+    _confettiController.play();
+
     setState(() {
       _isShaking = false;
       _isOpen = true;
     });
 
-    await earnProvider.logMysteryBox(userProvider.user!, _prize, _boxType);
-    await userProvider.updateCoins(_prize, 'Mystery Box');
-    await userProvider.updateMysteryBoxState();
-
-    if (mounted) {
-      CoinEarnedAnimation.show(context, coins: _prize, source: 'Mystery Box');
+    try {
+      await userProvider.claimMysteryBoxReward(_prize);
+      if (mounted) {
+        CoinEarnedAnimation.show(context, coins: _prize, source: 'Mystery Box');
+      }
+    } catch (e) {
+      if (mounted) ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Failed to claim prize', style: TextStyle(color: Colors.white)), backgroundColor: Colors.red));
     }
   }
 
@@ -116,141 +161,158 @@ class _MysteryBoxScreenState extends State<MysteryBoxScreen> {
         backgroundColor: Colors.transparent,
         elevation: 0,
         title: Text('📦 Mystery Box', style: GoogleFonts.poppins(fontWeight: FontWeight.bold)),
+        actions: [
+          IconButton(
+            icon: Icon(_isMuted ? Icons.volume_off : Icons.volume_up),
+            onPressed: _toggleMute,
+          ),
+        ],
       ),
-      body: Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Text(
-              "What's inside? Only one way to find out!",
-              style: GoogleFonts.poppins(color: Colors.white70, fontSize: 14),
-            ),
-            const SizedBox(height: 20),
-            Container(
-              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-              decoration: BoxDecoration(
-                color: _getBoxColor().withOpacity(0.2),
-                borderRadius: BorderRadius.circular(20),
-                border: Border.all(color: _getBoxColor()),
-              ),
-              child: Text(
-                'Today\'s Box: ${_boxType.toUpperCase()}',
-                style: TextStyle(color: _getBoxColor(), fontWeight: FontWeight.bold),
-              ),
-            ),
-            const SizedBox(height: 60),
-            
-            ShakeAnimation(
-              animate: _isShaking,
-              child: AnimatedContainer(
-                duration: const Duration(milliseconds: 500),
-                width: 200,
-                height: 200,
-                decoration: BoxDecoration(
-                  color: _isOpen ? Colors.transparent : _getBoxColor().withOpacity(0.8),
-                  borderRadius: BorderRadius.circular(20),
-                  boxShadow: _isOpen ? [] : [
-                    BoxShadow(
-                      color: _getBoxColor().withOpacity(0.5),
-                      blurRadius: 40,
-                      spreadRadius: 10,
-                    )
-                  ],
+      body: Stack(
+        alignment: Alignment.topCenter,
+        children: [
+          Center(
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Text(
+                  "What's inside? Only one way to find out!",
+                  style: GoogleFonts.poppins(color: Colors.white70, fontSize: 14),
                 ),
-                child: Center(
-                  child: _isOpen
-                      ? Column(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            const Text('🎉', style: TextStyle(fontSize: 60)),
-                            const SizedBox(height: 16),
-                            Text(
-                              '+$_prize 🪙',
-                              style: GoogleFonts.poppins(
-                                color: Colors.amber,
-                                fontSize: 32,
-                                fontWeight: FontWeight.bold,
+                const SizedBox(height: 20),
+                Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                  decoration: BoxDecoration(
+                    color: _getBoxColor().withOpacity(0.2),
+                    borderRadius: BorderRadius.circular(20),
+                    border: Border.all(color: _getBoxColor()),
+                  ),
+                  child: Text(
+                    'Today\'s Box: ${_boxType.toUpperCase()}',
+                    style: TextStyle(color: _getBoxColor(), fontWeight: FontWeight.bold),
+                  ),
+                ),
+                const SizedBox(height: 60),
+                
+                ShakeAnimation(
+                  animate: _isShaking,
+                  child: AnimatedContainer(
+                    duration: const Duration(milliseconds: 500),
+                    width: 200,
+                    height: 200,
+                    decoration: BoxDecoration(
+                      color: _isOpen ? Colors.transparent : _getBoxColor().withOpacity(0.8),
+                      borderRadius: BorderRadius.circular(20),
+                      boxShadow: _isOpen ? [] : [
+                        BoxShadow(
+                          color: _getBoxColor().withOpacity(0.5),
+                          blurRadius: 40,
+                          spreadRadius: 10,
+                        )
+                      ],
+                    ),
+                    child: Center(
+                      child: _isOpen
+                          ? Column(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                const Text('🎉', style: TextStyle(fontSize: 60)),
+                                const SizedBox(height: 16),
+                                Text(
+                                  '+$_prize 🪙',
+                                  style: GoogleFonts.poppins(
+                                    color: Colors.amber,
+                                    fontSize: 32,
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                ),
+                              ],
+                            )
+                          : const Icon(Icons.help_outline, color: Colors.white, size: 80),
+                    ),
+                  ),
+                ),
+                
+                const SizedBox(height: 60),
+                Consumer<UserProvider>(
+                  builder: (context, userProvider, _) {
+                    final user = userProvider.user;
+                    final lastBox = user?.lastMysteryBoxDate;
+                    bool hasFreeBox = false;
+                    String timeRemaining = '';
+                    
+                    if (lastBox == null) {
+                      hasFreeBox = true;
+                    } else {
+                      final diff = DateTime.now().difference(lastBox);
+                      if (diff.inHours >= 12) {
+                        hasFreeBox = true;
+                      } else {
+                        final remaining = const Duration(hours: 12) - diff;
+                        final h = remaining.inHours.toString().padLeft(2, '0');
+                        final m = (remaining.inMinutes % 60).toString().padLeft(2, '0');
+                        final s = (remaining.inSeconds % 60).toString().padLeft(2, '0');
+                        timeRemaining = '$h:$m:$s';
+                      }
+                    }
+                    
+                    return Column(
+                      children: [
+                        if (!_isOpen) ...[
+                          if (hasFreeBox)
+                            ElevatedButton(
+                              onPressed: _isShaking ? null : _openBox,
+                              style: ElevatedButton.styleFrom(
+                                backgroundColor: AppColors.primary,
+                                padding: const EdgeInsets.symmetric(horizontal: 40, vertical: 16),
+                                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(30)),
+                                minimumSize: const Size(250, 60),
+                              ),
+                              child: Text(
+                                _isShaking ? 'OPENING...' : 'OPEN BOX',
+                                style: GoogleFonts.poppins(fontSize: 18, fontWeight: FontWeight.bold),
+                              ),
+                            )
+                          else
+                            Container(
+                              padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 16),
+                              decoration: BoxDecoration(
+                                color: Colors.red.withOpacity(0.2),
+                                borderRadius: BorderRadius.circular(30),
+                                border: Border.all(color: Colors.redAccent),
+                              ),
+                              child: Text(
+                                'Next Box in: $timeRemaining',
+                                style: GoogleFonts.poppins(color: Colors.redAccent, fontSize: 18, fontWeight: FontWeight.bold),
                               ),
                             ),
-                          ],
-                        )
-                      : const Icon(Icons.help_outline, color: Colors.white, size: 80),
+                          const SizedBox(height: 12),
+                          const Text('Watch Ad to Open', style: TextStyle(color: Colors.white54)),
+                        ],
+                      ],
+                    );
+                  },
                 ),
-              ),
+                if (_isOpen)
+                  ElevatedButton(
+                    onPressed: () => Navigator.pop(context),
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: Colors.white10,
+                      padding: const EdgeInsets.symmetric(horizontal: 40, vertical: 16),
+                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(30)),
+                    ),
+                    child: const Text('Great!', style: TextStyle(color: Colors.white, fontSize: 16)),
+                  ),
+              ],
             ),
-            
-            const SizedBox(height: 60),
-            Consumer<UserProvider>(
-              builder: (context, userProvider, _) {
-                final user = userProvider.user;
-                final lastBox = user?.lastMysteryBoxDate;
-                bool hasFreeBox = false;
-                String timeRemaining = '';
-                
-                if (lastBox == null) {
-                  hasFreeBox = true;
-                } else {
-                  final diff = DateTime.now().difference(lastBox);
-                  if (diff.inHours >= 12) {
-                    hasFreeBox = true;
-                  } else {
-                    final remaining = const Duration(hours: 12) - diff;
-                    final h = remaining.inHours.toString().padLeft(2, '0');
-                    final m = (remaining.inMinutes % 60).toString().padLeft(2, '0');
-                    final s = (remaining.inSeconds % 60).toString().padLeft(2, '0');
-                    timeRemaining = '$h:$m:$s';
-                  }
-                }
-                
-                return Column(
-                  children: [
-                    if (!_isOpen) ...[
-                      if (hasFreeBox)
-                        ElevatedButton(
-                          onPressed: _isShaking ? null : _openBox,
-                          style: ElevatedButton.styleFrom(
-                            backgroundColor: AppColors.primary,
-                            padding: const EdgeInsets.symmetric(horizontal: 40, vertical: 16),
-                            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(30)),
-                            minimumSize: const Size(250, 60),
-                          ),
-                          child: Text(
-                            _isShaking ? 'OPENING...' : 'OPEN BOX',
-                            style: GoogleFonts.poppins(fontSize: 18, fontWeight: FontWeight.bold),
-                          ),
-                        )
-                      else
-                        Container(
-                          padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 16),
-                          decoration: BoxDecoration(
-                            color: Colors.red.withOpacity(0.2),
-                            borderRadius: BorderRadius.circular(30),
-                            border: Border.all(color: Colors.redAccent),
-                          ),
-                          child: Text(
-                            'Next Box in: $timeRemaining',
-                            style: GoogleFonts.poppins(color: Colors.redAccent, fontSize: 18, fontWeight: FontWeight.bold),
-                          ),
-                        ),
-                      const SizedBox(height: 12),
-                      const Text('Watch Ad to Open', style: TextStyle(color: Colors.white54)),
-                    ],
-                  ],
-                );
-              },
-            ),
-            if (_isOpen)
-              ElevatedButton(
-                onPressed: () => Navigator.pop(context),
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: Colors.white10,
-                  padding: const EdgeInsets.symmetric(horizontal: 40, vertical: 16),
-                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(30)),
-                ),
-                child: const Text('Great!', style: TextStyle(color: Colors.white, fontSize: 16)),
-              ),
-          ],
-        ),
+          ),
+          ConfettiWidget(
+            confettiController: _confettiController,
+            blastDirectionality: BlastDirectionality.explosive,
+            shouldLoop: false,
+            colors: const [Colors.amber, Colors.blue, Colors.pink, Colors.orange, Colors.purple],
+          ),
+        ],
       ),
     );
   }

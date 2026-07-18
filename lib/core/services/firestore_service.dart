@@ -271,4 +271,75 @@ class FirestoreService {
       return {'reward': prize};
     });
   }
+
+  Future<Map<String, dynamic>> claimScratchCardPrizeTransaction(String uid, int prize) async {
+    return await _db.runTransaction((transaction) async {
+      final userRef = _db.collection('users').doc(uid);
+      final snapshot = await transaction.get(userRef);
+      if (!snapshot.exists) throw Exception("User not found");
+
+      final data = snapshot.data()!;
+      if (data['lastScratchDate'] != null) {
+        final lastScratch = (data['lastScratchDate'] as Timestamp).toDate();
+        if (DateTime.now().difference(lastScratch).inHours < 12) {
+          throw Exception("Wait for the timer to expire");
+        }
+      }
+
+      transaction.update(userRef, {
+        'coins': FieldValue.increment(prize),
+        'totalEarned': FieldValue.increment(prize),
+        'totalScratchCards': FieldValue.increment(1),
+        'lastScratchDate': FieldValue.serverTimestamp(),
+      });
+
+      final transactionRef = _db.collection('transactions').doc();
+      transaction.set(transactionRef, {
+        'id': transactionRef.id,
+        'userId': uid,
+        'amount': prize,
+        'type': 'credit',
+        'source': 'scratch_card',
+        'status': 'completed',
+        'timestamp': FieldValue.serverTimestamp(),
+      });
+
+      return {'reward': prize};
+    });
+  }
+
+  Future<Map<String, dynamic>> claimMysteryBoxPrizeTransaction(String uid, int prize) async {
+    return await _db.runTransaction((transaction) async {
+      final userRef = _db.collection('users').doc(uid);
+      final snapshot = await transaction.get(userRef);
+      if (!snapshot.exists) throw Exception("User not found");
+
+      final data = snapshot.data()!;
+      if (data['lastMysteryBoxDate'] != null) {
+        final lastBox = (data['lastMysteryBoxDate'] as Timestamp).toDate();
+        if (DateTime.now().difference(lastBox).inHours < 12) {
+          throw Exception("Wait for the timer to expire");
+        }
+      }
+
+      transaction.update(userRef, {
+        'coins': FieldValue.increment(prize),
+        'totalEarned': FieldValue.increment(prize),
+        'lastMysteryBoxDate': FieldValue.serverTimestamp(),
+      });
+
+      final transactionRef = _db.collection('transactions').doc();
+      transaction.set(transactionRef, {
+        'id': transactionRef.id,
+        'userId': uid,
+        'amount': prize,
+        'type': 'credit',
+        'source': 'mystery_box',
+        'status': 'completed',
+        'timestamp': FieldValue.serverTimestamp(),
+      });
+
+      return {'reward': prize};
+    });
+  }
 }

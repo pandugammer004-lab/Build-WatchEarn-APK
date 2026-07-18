@@ -261,6 +261,39 @@ class UserProvider extends ChangeNotifier {
     }
   }
 
+  Future<void> claimScratchCardReward(int prize) async {
+    if (_user == null) throw Exception("Not logged in");
+    try {
+      final result = await _firestoreService.claimScratchCardPrizeTransaction(_user!.uid, prize);
+      _user = _user!.copyWith(
+        coins: _user!.coins + (result['reward'] as int),
+        totalEarned: _user!.totalEarned + (result['reward'] as int),
+        totalScratchCards: _user!.totalScratchCards + 1,
+        lastScratchDate: DateTime.now(),
+      );
+      notifyListeners();
+    } catch (e) {
+      debugPrint("Error claiming scratch card reward: $e");
+      rethrow;
+    }
+  }
+
+  Future<void> claimMysteryBoxReward(int prize) async {
+    if (_user == null) throw Exception("Not logged in");
+    try {
+      final result = await _firestoreService.claimMysteryBoxPrizeTransaction(_user!.uid, prize);
+      _user = _user!.copyWith(
+        coins: _user!.coins + (result['reward'] as int),
+        totalEarned: _user!.totalEarned + (result['reward'] as int),
+        lastMysteryBoxDate: DateTime.now(),
+      );
+      notifyListeners();
+    } catch (e) {
+      debugPrint("Error claiming mystery box reward: $e");
+      rethrow;
+    }
+  }
+
   Future<void> updateProfile(String name, String? profilePic) async {
     if (_user == null) return;
     try {
