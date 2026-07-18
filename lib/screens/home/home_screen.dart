@@ -12,6 +12,7 @@ import '../../data/providers/video_provider.dart';
 import '../../data/providers/coin_provider.dart';
 import '../../data/models/video_model.dart';
 import '../../data/providers/ad_provider.dart';
+import '../../core/constants/app_colors.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({Key? key}) : super(key: key);
@@ -582,7 +583,7 @@ class _HomeScreenState extends State<HomeScreen> {
         final unwatchedAll = provider.getUnwatchedVideos(provider.allVideos, userProvider.user);
         if (unwatchedAll.isEmpty) return const SizedBox.shrink();
         
-        final popular = List.from(unwatchedAll)..sort((a, b) => (b as VideoModel).views.compareTo((a as VideoModel).views));
+        final popular = List<VideoModel>.from(unwatchedAll)..sort((a, b) => b.views.compareTo(a.views));
         
         return Column(
           crossAxisAlignment: CrossAxisAlignment.start,
