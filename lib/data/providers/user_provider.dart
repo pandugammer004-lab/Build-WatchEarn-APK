@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import '../../core/constants/app_config.dart';
+import '../../core/services/notification_service.dart';
 import '../models/user_model.dart';
 import '../models/transaction_model.dart';
 import '../models/notification_model.dart';
@@ -92,32 +94,6 @@ class UserProvider extends ChangeNotifier {
       
     } catch (e) {
       debugPrint("Error updating coins: $e");
-    }
-  }
-
-  Future<int> claimDailyBonus() async {
-    if (_user == null) return 0;
-    try {
-      final now = DateTime.now();
-      if (_user!.lastDailyBonusClaim != null) {
-        final last = _user!.lastDailyBonusClaim!;
-        if (last.year == now.year && last.month == now.month && last.day == now.day) {
-          return 0; // Already claimed today
-        }
-      }
-      
-      _user = _user!.copyWith(lastDailyBonusClaim: now);
-      await _firestoreService.updateUser(_user!.uid, {
-        'lastDailyBonusClaim': FieldValue.serverTimestamp(),
-      });
-      
-      final streakCount = _user!.streak.clamp(1, 7);
-      final amount = streakCount == 7 ? 1000 : 50 * streakCount;
-      await updateCoins(amount, 'Daily Bonus');
-      return amount;
-    } catch (e) {
-      debugPrint("Error claiming daily bonus: $e");
-      return 0;
     }
   }
 
@@ -216,6 +192,10 @@ class UserProvider extends ChangeNotifier {
         streak: result['streak'] as int,
         lastDailyBonusClaim: DateTime.now(),
       );
+      
+      // Schedule next notification for exactly 24 hours later
+      await NotificationService().scheduleDailyLoginReminder();
+      
       notifyListeners();
       return result['reward'] as int;
     } catch (e) {
@@ -389,6 +369,26 @@ class UserProvider extends ChangeNotifier {
       }
     } catch (e) {
       debugPrint("Error updating daily stats: $e");
+    }
+  }
+
+  Future<void> watchVideoReward(String videoId, int rewardCoins) async {
+    if (_user == null) return;
+    try {
+      if (_user!.watchedVideoIds.contains(videoId)) return;
+
+      final newWatched = List<String>.from(_user!.watchedVideoIds)..add(videoId);
+      _user = _user!.copyWith(watchedVideoIds: newWatched);
+      notifyListeners();
+
+      await _firestoreService.updateUser(_user!.uid, {
+        'watchedVideoIds': FieldValue.arrayUnion([videoId]),
+      });
+
+      await updateCoins(rewardCoins, 'Video Reward');
+      await updateDailyStats('video');
+    } catch (e) {
+      debugPrint("Error in watchVideoReward: $e");
     }
   }
 

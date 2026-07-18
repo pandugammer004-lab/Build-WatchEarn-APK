@@ -7,6 +7,7 @@ import 'package:hive_flutter/hive_flutter.dart';
 import 'package:provider/provider.dart';
 
 import 'app/app.dart';
+import 'core/services/notification_service.dart';
 import 'data/providers/auth_provider.dart';
 import 'data/providers/user_provider.dart';
 import 'data/providers/video_provider.dart';
@@ -33,6 +34,10 @@ void main() async {
   } catch (e) {
     debugPrint("Firebase initialization error: $e");
   }
+
+  // Initialize Local Notifications
+  await NotificationService().init();
+  await NotificationService().requestPermission();
 
   // Initialize Hive
   await Hive.initFlutter();

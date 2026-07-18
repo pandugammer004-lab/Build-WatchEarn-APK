@@ -1,12 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
+import '../../data/models/category_model.dart';
 import '../../core/constants/app_colors.dart';
 import '../../core/widgets/video_card.dart';
 import '../../core/widgets/custom_text_field.dart';
+import '../player/shorts_feed_screen.dart';
 import '../../data/providers/video_provider.dart';
 import '../../data/providers/user_provider.dart';
-import '../player/video_player_screen.dart';
 import 'category_videos_screen.dart';
 
 class ExploreScreen extends StatefulWidget {
@@ -102,7 +103,7 @@ class _ExploreScreenState extends State<ExploreScreen> {
                                 onTap: () {
                                   Navigator.push(
                                     context,
-                                    MaterialPageRoute(builder: (_) => VideoPlayerScreen(video: provider.filteredVideos[index])),
+                                    MaterialPageRoute(builder: (_) => ShortsFeedScreen(videos: provider.filteredVideos, initialIndex: index)),
                                   );
                                 },
                               );

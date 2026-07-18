@@ -2,9 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import '../../core/constants/app_colors.dart';
 import '../../core/widgets/video_card.dart';
 import '../../core/widgets/gradient_text.dart';
+import '../player/shorts_feed_screen.dart';
+import 'widgets/recent_withdrawals_widget.dart';
 import '../../core/utils/helpers.dart';
 import '../../data/providers/user_provider.dart';
 import '../../data/providers/video_provider.dart';
@@ -72,7 +73,7 @@ class _HomeScreenState extends State<HomeScreen> {
               const SizedBox(height: 24),
               _buildForYou(),
               const SizedBox(height: 24),
-              _buildRecentWithdrawals(),
+              const RecentWithdrawalsWidget(),
               const SizedBox(height: 24),
               _buildVipPromo(),
               const SizedBox(height: 24),
@@ -87,97 +88,7 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
 
-  Widget _buildRecentWithdrawals() {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 16.0),
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Text(
-                'Recent Withdrawals',
-                style: GoogleFonts.poppins(color: Colors.white, fontSize: 18, fontWeight: FontWeight.bold),
-              ),
-              const Icon(Icons.receipt_long, color: Colors.amber, size: 20),
-            ],
-          ),
-        ),
-        const SizedBox(height: 12),
-        StreamBuilder<QuerySnapshot>(
-          stream: FirebaseFirestore.instance
-              .collection('withdrawals')
-              .where('status', isEqualTo: 'approved')
-              .orderBy('timestamp', descending: true)
-              .limit(5)
-              .snapshots(),
-          builder: (context, snapshot) {
-            if (snapshot.connectionState == ConnectionState.waiting) {
-              return const Center(child: CircularProgressIndicator());
-            }
-            if (!snapshot.hasData || snapshot.data!.docs.isEmpty) {
-              return const Padding(
-                padding: EdgeInsets.symmetric(horizontal: 16.0),
-                child: Text('No recent withdrawals.', style: TextStyle(color: Colors.white54)),
-              );
-            }
 
-            final withdrawals = snapshot.data!.docs;
-            return ListView.builder(
-              shrinkWrap: true,
-              physics: const NeverScrollableScrollPhysics(),
-              padding: const EdgeInsets.symmetric(horizontal: 16.0),
-              itemCount: withdrawals.length,
-              itemBuilder: (context, index) {
-                final doc = withdrawals[index];
-                final data = doc.data() as Map<String, dynamic>;
-                final amount = data['amount'] ?? 0.0;
-                final email = data['paymentEmail'] ?? 'User';
-                // Mask email for privacy
-                final maskedName = email.contains('@') 
-                    ? '${email.split('@')[0].substring(0, 3)}***' 
-                    : 'User***';
-                
-                return Container(
-                  margin: const EdgeInsets.only(bottom: 8),
-                  padding: const EdgeInsets.all(12),
-                  decoration: BoxDecoration(
-                    color: AppColors.cardColor,
-                    borderRadius: BorderRadius.circular(12),
-                    border: Border.all(color: Colors.white10),
-                  ),
-                  child: Row(
-                    children: [
-                      const CircleAvatar(
-                        backgroundColor: Colors.green,
-                        radius: 16,
-                        child: Icon(Icons.check, color: Colors.white, size: 16),
-                      ),
-                      const SizedBox(width: 12),
-                      Expanded(
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(maskedName, style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
-                            Text('Withdrew via ${data['paymentMethod'] ?? 'PayPal'}', style: const TextStyle(color: Colors.white54, fontSize: 12)),
-                          ],
-                        ),
-                      ),
-                      Text(
-                        '+\$${amount.toStringAsFixed(2)}',
-                        style: const TextStyle(color: Colors.greenAccent, fontWeight: FontWeight.bold, fontSize: 16),
-                      ),
-                    ],
-                  ),
-                );
-              },
-            );
-          },
-        ),
-      ],
-    );
-  }
 
   PreferredSizeWidget _buildAppBar() {
     return AppBar(
@@ -488,19 +399,35 @@ class _HomeScreenState extends State<HomeScreen> {
   Widget _buildFeaturedVideo() {
     return Consumer2<VideoProvider, UserProvider>(
       builder: (context, provider, userProvider, _) {
-        final unwatchedFeatured = provider.getUnwatchedVideos(provider.featuredVideos, userProvider.user);
-        if (unwatchedFeatured.isEmpty) return const SizedBox.shrink();
+        final mixedShorts = provider.getMixedUnwatchedShorts(userProvider.user?.watchedVideoIds ?? []);
+        if (mixedShorts.isEmpty) return const SizedBox.shrink();
         
-        final video = unwatchedFeatured.first;
+        final video = mixedShorts.first;
         return Padding(
           padding: const EdgeInsets.symmetric(horizontal: 16.0),
-          child: VideoCard(
-            video: video,
-            type: VideoCardType.featured,
-            isVipUnlocked: userProvider.user?.isVip ?? false,
-            onTap: () {
-              Navigator.push(context, MaterialPageRoute(builder: (_) => VideoPlayerScreen(video: video)));
-            },
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Text(
+                    'Mix Shorts Feed',
+                    style: GoogleFonts.poppins(color: Colors.white, fontSize: 18, fontWeight: FontWeight.bold),
+                  ),
+                  const Icon(Icons.shuffle, color: Colors.amber, size: 20),
+                ],
+              ),
+              const SizedBox(height: 12),
+              VideoCard(
+                video: video,
+                type: VideoCardType.featured,
+                isVipUnlocked: userProvider.user?.isVip ?? false,
+                onTap: () {
+                  Navigator.push(context, MaterialPageRoute(builder: (_) => ShortsFeedScreen(videos: mixedShorts, initialIndex: 0)));
+                },
+              ),
+            ],
           ),
         );
       },
@@ -541,7 +468,7 @@ class _HomeScreenState extends State<HomeScreen> {
                     type: VideoCardType.vertical,
                     isVipUnlocked: userProvider.user?.isVip ?? false,
                     onTap: () {
-                      Navigator.push(context, MaterialPageRoute(builder: (_) => VideoPlayerScreen(video: unwatchedTrending[index])));
+                      Navigator.push(context, MaterialPageRoute(builder: (_) => ShortsFeedScreen(videos: unwatchedTrending, initialIndex: index)));
                     },
                   );
                 },
@@ -587,7 +514,7 @@ class _HomeScreenState extends State<HomeScreen> {
                   type: VideoCardType.grid,
                   isVipUnlocked: userProvider.user?.isVip ?? false,
                   onTap: () {
-                    Navigator.push(context, MaterialPageRoute(builder: (_) => VideoPlayerScreen(video: unwatchedFiltered[index])));
+                    Navigator.push(context, MaterialPageRoute(builder: (_) => ShortsFeedScreen(videos: unwatchedFiltered, initialIndex: index)));
                   },
                 );
               },
@@ -680,7 +607,7 @@ class _HomeScreenState extends State<HomeScreen> {
                   type: VideoCardType.horizontal,
                   isVipUnlocked: userProvider.user?.isVip ?? false,
                   onTap: () {
-                    Navigator.push(context, MaterialPageRoute(builder: (_) => VideoPlayerScreen(video: popular[index])));
+                    Navigator.push(context, MaterialPageRoute(builder: (_) => ShortsFeedScreen(videos: popular, initialIndex: index)));
                   },
                 );
               },
@@ -727,7 +654,7 @@ class _HomeScreenState extends State<HomeScreen> {
                   type: VideoCardType.grid,
                   isVipUnlocked: userProvider.user?.isVip ?? false,
                   onTap: () {
-                    Navigator.push(context, MaterialPageRoute(builder: (_) => VideoPlayerScreen(video: recent[index])));
+                    Navigator.push(context, MaterialPageRoute(builder: (_) => ShortsFeedScreen(videos: recent, initialIndex: index)));
                   },
                 );
               },

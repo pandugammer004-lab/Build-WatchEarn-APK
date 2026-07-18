@@ -1,4 +1,3 @@
-import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:flutter/material.dart';
 
@@ -7,113 +6,84 @@ class NotificationService {
   factory NotificationService() => _instance;
   NotificationService._internal();
 
-  final FirebaseMessaging _fcm = FirebaseMessaging.instance;
-  final FlutterLocalNotificationsPlugin _localNotifs = FlutterLocalNotificationsPlugin();
+  final FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin = FlutterLocalNotificationsPlugin();
 
-  Future<void> initialize() async {
-    await requestPermission();
-    await _setupLocalNotifications();
+  Future<void> init() async {
+    const AndroidInitializationSettings initializationSettingsAndroid = AndroidInitializationSettings('@mipmap/ic_launcher');
     
-    // Handle background messages (must be a top-level function in main.dart usually)
-    // FirebaseMessaging.onBackgroundMessage(_firebaseMessagingBackgroundHandler);
+    // For iOS if needed later
+    const DarwinInitializationSettings initializationSettingsIOS = DarwinInitializationSettings(
+      requestAlertPermission: true,
+      requestBadgePermission: true,
+      requestSoundPermission: true,
+    );
     
-    // Schedule engagement notifications
-    await scheduleEngagementNotification();
-    
-    // Handle foreground messages
-    FirebaseMessaging.onMessage.listen((RemoteMessage message) {
-      showLocalNotification(message);
-    });
+    const InitializationSettings initializationSettings = InitializationSettings(
+      android: initializationSettingsAndroid,
+      iOS: initializationSettingsIOS,
+    );
 
-    // Handle tap on notification
-    FirebaseMessaging.onMessageOpenedApp.listen((RemoteMessage message) {
-      handleNotificationTap(message);
-    });
+    await flutterLocalNotificationsPlugin.initialize(
+      initializationSettings,
+      onDidReceiveNotificationResponse: (NotificationResponse response) {
+        debugPrint('Notification clicked: ${response.payload}');
+      },
+    );
   }
 
   Future<void> requestPermission() async {
-    try {
-      await _fcm.requestPermission(
-        alert: true,
-        badge: true,
-        sound: true,
-      );
-    } catch (e) {
-      debugPrint("FCM Permission error: $e");
+    final AndroidFlutterLocalNotificationsPlugin? androidImplementation = 
+        flutterLocalNotificationsPlugin.resolvePlatformSpecificImplementation<AndroidFlutterLocalNotificationsPlugin>();
+    
+    if (androidImplementation != null) {
+      await androidImplementation.requestNotificationsPermission();
     }
   }
 
-  Future<String?> getFCMToken() async {
-    try {
-      return await _fcm.getToken();
-    } catch (e) {
-      debugPrint("FCM Token error: $e");
-      return null;
-    }
-  }
-
-  Future<void> _setupLocalNotifications() async {
-    const androidInit = InitializationSettings(
-      android: AndroidInitializationSettings('@mipmap/ic_launcher'),
-      iOS: DarwinInitializationSettings(),
+  Future<void> showInstantNotification({required int id, required String title, required String body}) async {
+    const AndroidNotificationDetails androidPlatformChannelSpecifics = AndroidNotificationDetails(
+      'watch_earn_instant', 
+      'Instant Notifications',
+      channelDescription: 'General app notifications',
+      importance: Importance.max,
+      priority: Priority.high,
+      showWhen: true,
+      icon: '@mipmap/ic_launcher',
     );
-    await _localNotifs.initialize(
-      androidInit,
-      onDidReceiveNotificationResponse: (details) {
-        // Handle tap on local notification
-      }
+    
+    const NotificationDetails platformChannelSpecifics = NotificationDetails(android: androidPlatformChannelSpecifics);
+    
+    await flutterLocalNotificationsPlugin.show(
+      id,
+      title,
+      body,
+      platformChannelSpecifics,
     );
   }
 
-  Future<void> showLocalNotification(RemoteMessage message) async {
-    RemoteNotification? notification = message.notification;
-    AndroidNotification? android = message.notification?.android;
-
-    if (notification != null && android != null) {
-      await _localNotifs.show(
-        notification.hashCode,
-        notification.title,
-        notification.body,
-        const NotificationDetails(
-          android: AndroidNotificationDetails(
-            'watchearn_channel',
-            'WatchEarn Notifications',
-            channelDescription: 'Main notification channel',
-            importance: Importance.max,
-            priority: Priority.high,
-          ),
-          iOS: DarwinNotificationDetails(),
-        ),
-      );
-    }
+  // Uses built-in periodic scheduling to avoid needing timezone package
+  Future<void> scheduleDailyLoginReminder() async {
+    const AndroidNotificationDetails androidPlatformChannelSpecifics = AndroidNotificationDetails(
+      'watch_earn_daily', 
+      'Daily Reminders',
+      channelDescription: 'Daily login bonus reminders',
+      importance: Importance.high,
+      priority: Priority.high,
+    );
+    
+    const NotificationDetails platformChannelSpecifics = NotificationDetails(android: androidPlatformChannelSpecifics);
+    
+    await flutterLocalNotificationsPlugin.periodicallyShow(
+      1,
+      '🎁 Daily Bonus Ready!',
+      'Your daily coins are waiting. Open the app to claim them now!',
+      RepeatInterval.daily,
+      platformChannelSpecifics,
+      androidScheduleMode: AndroidScheduleMode.exactAllowWhileIdle,
+    );
   }
 
-  Future<void> scheduleEngagementNotification() async {
-    try {
-      await _localNotifs.periodicallyShow(
-        0,
-        '🎉 Come back and earn!',
-        'New rewards and videos are waiting for you. Watch and earn more coins now.',
-        RepeatInterval.hourly,
-        const NotificationDetails(
-          android: AndroidNotificationDetails(
-            'engagement_channel',
-            'Engagement Notifications',
-            channelDescription: 'Reminders to earn coins',
-            importance: Importance.defaultImportance,
-            priority: Priority.defaultPriority,
-          ),
-          iOS: DarwinNotificationDetails(),
-        ),
-        androidScheduleMode: AndroidScheduleMode.inexactAllowWhileIdle,
-      );
-    } catch (e) {
-      debugPrint("Error scheduling engagement notification: $e");
-    }
-  }
-
-  void handleNotificationTap(RemoteMessage message) {
-    // Navigation logic based on message data
-    debugPrint("Notification tapped: ${message.data}");
+  Future<void> cancelAllNotifications() async {
+    await flutterLocalNotificationsPlugin.cancelAll();
   }
 }

@@ -4,6 +4,7 @@ import 'package:provider/provider.dart';
 import '../../core/constants/app_colors.dart';
 import '../../core/widgets/custom_button.dart';
 import '../../core/widgets/custom_text_field.dart';
+import '../../core/services/notification_service.dart';
 import '../../data/providers/user_provider.dart';
 import '../../data/providers/auth_provider.dart';
 
@@ -108,7 +109,15 @@ class _SettingsScreenState extends State<SettingsScreen> {
 
   Widget _buildPreferencesSection() {
     return _buildCardContainer([
-      _buildSwitchTile('Push Notifications', 'Daily reminders & rewards', _pushNotifications, (v) => setState(() => _pushNotifications = v)),
+      _buildSwitchTile('Push Notifications', 'Daily reminders & rewards', _pushNotifications, (v) {
+        setState(() => _pushNotifications = v);
+        if (!v) {
+          NotificationService().cancelAllNotifications();
+        } else {
+          // Re-schedule based on current state (e.g., daily login)
+          NotificationService().scheduleDailyLoginReminder();
+        }
+      }),
       const Divider(color: Colors.white12, height: 1),
       _buildSwitchTile('Autoplay Videos', 'Auto-play next video', _autoplayVideos, (v) => setState(() => _autoplayVideos = v)),
       const Divider(color: Colors.white12, height: 1),

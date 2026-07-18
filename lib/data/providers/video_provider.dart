@@ -37,8 +37,14 @@ class VideoProvider extends ChangeNotifier {
   Future<void> loadVideos() async {
     try {
       _setLoading(true);
-      _allVideos = await _firestoreService.getVideos();
-      _trendingVideos = await _firestoreService.getVideos(trending: true);
+      final rawVideos = await _firestoreService.getVideos();
+      // Enforce the 3 strictly allowed categories
+      _allVideos = rawVideos.where((v) => 
+        v.categoryId == 'cricket' || 
+        v.categoryId == 'football' || 
+        v.categoryId == 'funny'
+      ).toList();
+      _trendingVideos = _allVideos.where((v) => v.isTrending).toList();
       _featuredVideos = _allVideos.where((v) => v.isFeatured).toList();
       _filteredVideos = _allVideos;
     } catch (e) {
@@ -46,6 +52,15 @@ class VideoProvider extends ChangeNotifier {
     } finally {
       _setLoading(false);
     }
+  }
+
+  /// Returns a shuffled list of all videos the user hasn't watched yet.
+  List<VideoModel> getMixedUnwatchedShorts(List<String> watchedIds) {
+    // Filter out videos the user has already watched
+    List<VideoModel> unwatched = _allVideos.where((v) => !watchedIds.contains(v.id)).toList();
+    // Shuffle to mix cricket, football, and funny
+    unwatched.shuffle();
+    return unwatched;
   }
 
   Future<void> loadCategories() async {
@@ -108,7 +123,7 @@ class VideoProvider extends ChangeNotifier {
         final video = _allVideos[index];
         _allVideos[index] = VideoModel(
           id: video.id,
-          youtubeId: video.youtubeId,
+          videoUrl: video.videoUrl,
           title: video.title,
           description: video.description,
           categoryId: video.categoryId,
@@ -124,6 +139,7 @@ class VideoProvider extends ChangeNotifier {
           isActive: video.isActive,
           order: video.order,
           tags: video.tags,
+          thumbnailUrl: video.thumbnailUrl,
         );
         notifyListeners();
       }

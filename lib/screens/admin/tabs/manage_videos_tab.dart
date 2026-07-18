@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:http/http.dart' as http;
 import '../../../core/constants/app_colors.dart';
 import '../../../data/models/video_model.dart';
 import '../../../data/providers/video_provider.dart';
@@ -49,11 +48,11 @@ class _ManageVideosTabState extends State<ManageVideosTab> {
                 color: AppColors.cardColor,
                 margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
                 child: ListTile(
-                  leading: Image.network(video.thumbnailMQ, width: 80, height: 60, fit: BoxFit.cover,
+                  leading: Image.network(video.thumbnail, width: 60, height: 80, fit: BoxFit.cover,
                     errorBuilder: (context, error, stackTrace) => const Icon(Icons.video_library, color: Colors.white),
                   ),
                   title: Text(video.title, style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold), maxLines: 1, overflow: TextOverflow.ellipsis),
-                  subtitle: Text('${video.views} views • ${video.formattedDuration}', style: const TextStyle(color: Colors.white54, fontSize: 12)),
+                  subtitle: Text('${video.categoryName} • ${video.views} views • ${video.formattedDuration}', style: const TextStyle(color: Colors.white54, fontSize: 12)),
                   trailing: IconButton(
                     icon: const Icon(Icons.delete, color: Colors.redAccent),
                     onPressed: () async {
@@ -80,70 +79,35 @@ class AddVideoDialog extends StatefulWidget {
 
 class _AddVideoDialogState extends State<AddVideoDialog> {
   final titleCtrl = TextEditingController();
+  final descCtrl = TextEditingController(text: 'Check out this awesome short!');
   final urlCtrl = TextEditingController();
   final thumbCtrl = TextEditingController();
-  final durationCtrl = TextEditingController(text: '10');
-  bool isFetching = false;
+  final durationCtrl = TextEditingController(text: '30');
   String? _selectedCategoryId;
-
-  void _fetchYoutubeDetails() async {
-    final url = urlCtrl.text.trim();
-    if (url.isEmpty || (!url.contains('youtube.com') && !url.contains('youtu.be'))) return;
-
-    setState(() { isFetching = true; });
-
-    try {
-      final response = await http.get(Uri.parse('https://www.youtube.com/oembed?url=$url&format=json'));
-      if (response.statusCode == 200) {
-        final titleMatch = RegExp(r'"title"\s*:\s*"([^"]+)"').firstMatch(response.body);
-        final thumbMatch = RegExp(r'"thumbnail_url"\s*:\s*"([^"]+)"').firstMatch(response.body);
-        
-        if (titleMatch != null && titleCtrl.text.isEmpty) {
-          titleCtrl.text = titleMatch.group(1) ?? '';
-        }
-        if (thumbMatch != null && thumbCtrl.text.isEmpty) {
-          thumbCtrl.text = (thumbMatch.group(1) ?? '').replaceAll('\\/', '/');
-        }
-      }
-    } catch (e) {
-      debugPrint('Error fetching youtube details: $e');
-    } finally {
-      setState(() { isFetching = false; });
-    }
-  }
 
   @override
   Widget build(BuildContext context) {
     return AlertDialog(
       backgroundColor: AppColors.cardColor,
-      title: Text('Add New Video', style: GoogleFonts.poppins(color: Colors.white)),
+      title: Text('Add New Short', style: GoogleFonts.poppins(color: Colors.white)),
       content: SingleChildScrollView(
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            Row(
-              children: [
-                Expanded(
-                  child: TextField(
-                    controller: urlCtrl, 
-                    style: const TextStyle(color: Colors.white), 
-                    decoration: const InputDecoration(labelText: 'Video URL', labelStyle: TextStyle(color: Colors.white54))
-                  ),
-                ),
-                IconButton(
-                  icon: isFetching ? const SizedBox(width: 20, height: 20, child: CircularProgressIndicator(strokeWidth: 2)) : const Icon(Icons.search, color: Colors.amber),
-                  onPressed: isFetching ? null : _fetchYoutubeDetails,
-                  tooltip: 'Fetch Title & Thumbnail',
-                ),
-              ],
+            TextField(
+              controller: urlCtrl, 
+              style: const TextStyle(color: Colors.white), 
+              decoration: const InputDecoration(labelText: 'Direct MP4 URL', labelStyle: TextStyle(color: Colors.white54))
             ),
+            TextField(controller: thumbCtrl, style: const TextStyle(color: Colors.white), decoration: const InputDecoration(labelText: 'Thumbnail Image URL', labelStyle: TextStyle(color: Colors.white54))),
             TextField(controller: titleCtrl, style: const TextStyle(color: Colors.white), decoration: const InputDecoration(labelText: 'Title', labelStyle: TextStyle(color: Colors.white54))),
-            TextField(controller: thumbCtrl, style: const TextStyle(color: Colors.white), decoration: const InputDecoration(labelText: 'Thumbnail URL', labelStyle: TextStyle(color: Colors.white54))),
-            TextField(controller: durationCtrl, keyboardType: TextInputType.number, style: const TextStyle(color: Colors.white), decoration: const InputDecoration(labelText: 'Duration (Minutes)', hintText: 'e.g. 10', hintStyle: TextStyle(color: Colors.white30), labelStyle: TextStyle(color: Colors.white54))),
+            TextField(controller: descCtrl, style: const TextStyle(color: Colors.white), decoration: const InputDecoration(labelText: 'Description', labelStyle: TextStyle(color: Colors.white54))),
+            TextField(controller: durationCtrl, keyboardType: TextInputType.number, style: const TextStyle(color: Colors.white), decoration: const InputDecoration(labelText: 'Duration (Seconds)', hintText: 'e.g. 30', hintStyle: TextStyle(color: Colors.white30), labelStyle: TextStyle(color: Colors.white54))),
             const SizedBox(height: 16),
             Consumer<VideoProvider>(
               builder: (context, videoProvider, _) {
-                final categories = videoProvider.categories.where((c) => c.id != 'all').toList();
+                // Ensure only cricket, football, funny are allowed
+                final categories = videoProvider.categories.where((c) => ['cricket', 'football', 'funny'].contains(c.id)).toList();
                 if (categories.isEmpty) return const SizedBox.shrink();
                 
                 return DropdownButtonFormField<String>(
@@ -173,47 +137,28 @@ class _AddVideoDialogState extends State<AddVideoDialog> {
         TextButton(onPressed: () => Navigator.pop(context), child: const Text('Cancel', style: TextStyle(color: Colors.white54))),
         ElevatedButton(
           onPressed: () async {
-            if (titleCtrl.text.trim().isEmpty || urlCtrl.text.trim().isEmpty) {
-              ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Please enter Title and URL')));
+            if (titleCtrl.text.trim().isEmpty || urlCtrl.text.trim().isEmpty || thumbCtrl.text.trim().isEmpty || _selectedCategoryId == null) {
+              ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Please fill all fields and select a category')));
               return;
-            }
-            
-            String yId = urlCtrl.text.trim();
-            // Handle different YouTube URL formats
-            if (yId.contains('v=')) {
-              yId = yId.split('v=')[1].split('&')[0];
-            } else if (yId.contains('youtu.be/')) {
-              yId = yId.split('youtu.be/')[1].split('?')[0];
-            } else if (yId.contains('shorts/')) {
-              yId = yId.split('shorts/')[1].split('?')[0];
-            } else if (!yId.contains('http') && yId.length == 11) {
-              // It's likely just the ID itself
-              yId = yId; 
             }
             
             try {
               final videoProvider = Provider.of<VideoProvider>(context, listen: false);
-              String catId = _selectedCategoryId ?? 'all';
-              String catName = 'All';
-              String catIcon = '🎬';
+              final catId = _selectedCategoryId!;
+              final cat = videoProvider.categories.firstWhere((c) => c.id == catId);
               
-              if (catId != 'all') {
-                final cat = videoProvider.categories.firstWhere((c) => c.id == catId, orElse: () => videoProvider.categories.first);
-                catName = cat.name;
-                catIcon = cat.icon;
-              }
-              
-              final int durationMinutes = int.tryParse(durationCtrl.text.trim()) ?? 10;
+              final int durationSeconds = int.tryParse(durationCtrl.text.trim()) ?? 30;
               final docRef = FirebaseFirestore.instance.collection('videos').doc();
               final newVideo = VideoModel(
                 id: docRef.id,
-                youtubeId: yId,
+                videoUrl: urlCtrl.text.trim(),
+                thumbnailUrl: thumbCtrl.text.trim(),
                 title: titleCtrl.text.trim(),
-                description: 'No description',
+                description: descCtrl.text.trim(),
                 categoryId: catId,
-                categoryName: catName,
-                categoryIcon: catIcon,
-                duration: durationMinutes * 60, // Convert minutes to seconds
+                categoryName: cat.name,
+                categoryIcon: cat.icon,
+                duration: durationSeconds,
                 views: 0,
                 likes: 0,
                 publishedAt: DateTime.now(),

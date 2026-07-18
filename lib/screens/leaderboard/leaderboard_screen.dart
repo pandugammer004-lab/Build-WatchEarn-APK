@@ -3,6 +3,8 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
 import '../../core/constants/app_colors.dart';
 import '../../core/services/firestore_service.dart';
+import '../../core/services/demo_data_service.dart';
+import '../../data/models/leaderboard_model.dart';
 import '../../data/providers/user_provider.dart';
 
 class LeaderboardScreen extends StatefulWidget {
@@ -108,17 +110,60 @@ class _LeaderboardScreenState extends State<LeaderboardScreen> with SingleTicker
   }
 
   Future<List<dynamic>> _fetchLeaderboard(bool isWeekly) async {
-    // We will use FirestoreService inside this method
-    // I need to import it at the top.
     final firestoreService = FirestoreService();
-    final leaderboard = await firestoreService.getLeaderboard(weekly: isWeekly);
-    // Convert to map format expected by UI or refactor UI to use LeaderboardModel directly
-    return leaderboard.map((model) => {
+    
+    // Fetch Real Users
+    final realUsers = await firestoreService.getLeaderboard(weekly: isWeekly);
+    
+    // Fetch Base AI Users
+    final baseAiUsers = await firestoreService.getBaseAiUsers();
+    
+    // If no AI users exist in DB, fallback to generating some locally to ensure it's never empty
+    List<LeaderboardModel> aiUsers = baseAiUsers;
+    if (aiUsers.isEmpty) {
+      final rawBaseAi = DemoDataService.generateBaseAiUsersForDatabase(100);
+      aiUsers = rawBaseAi.asMap().entries.map((entry) {
+        return LeaderboardModel(
+          rank: entry.key + 1,
+          userId: 'ai_${entry.key}',
+          name: entry.value['name'],
+          profilePic: entry.value['profilePic'],
+          countryFlag: entry.value['countryFlag'],
+          weeklyCoins: entry.value['weeklyCoins'],
+          totalCoins: entry.value['totalCoins'],
+          vipPlan: entry.value['vipPlan'],
+          isAi: true,
+          joinDate: DateTime.now().subtract(Duration(days: 7)),
+        );
+      }).toList();
+    }
+    
+    // Simulate dynamic growth
+    final simulatedAiUsers = DemoDataService.simulateAiCoinGrowth(aiUsers);
+    
+    // Combine and Sort
+    final allUsers = [...realUsers, ...simulatedAiUsers];
+    
+    if (isWeekly) {
+      allUsers.sort((a, b) => b.weeklyCoins.compareTo(a.weeklyCoins));
+    } else {
+      allUsers.sort((a, b) => b.totalCoins.compareTo(a.totalCoins));
+    }
+    
+    // Assign Ranks
+    for (int i = 0; i < allUsers.length; i++) {
+      allUsers[i].rank = i + 1;
+    }
+    
+    return allUsers.map((model) => {
       'name': model.name,
       'coins': isWeekly ? model.weeklyCoins : model.totalCoins,
       'rank': model.rank,
       'isVip': model.vipPlan != 'free',
       'userId': model.userId,
+      'countryFlag': model.countryFlag,
+      'isAi': model.isAi,
+      'rankTitle': model.rankTitle,
     }).toList();
   }
 
@@ -151,7 +196,7 @@ class _LeaderboardScreenState extends State<LeaderboardScreen> with SingleTicker
           ),
         ),
         const SizedBox(height: 8),
-        Text(user['name'], style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
+        Text('${user['countryFlag']} ${user['name']}', style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 12), overflow: TextOverflow.ellipsis),
         Text('${user['coins']}', style: TextStyle(color: color, fontWeight: FontWeight.bold, fontSize: 12)),
         const SizedBox(height: 8),
         Container(
@@ -249,17 +294,21 @@ class _LeaderboardScreenState extends State<LeaderboardScreen> with SingleTicker
             ),
             const SizedBox(width: 8),
             CircleAvatar(
-              backgroundColor: Colors.white10,
-              radius: 20,
+              backgroundColor: Colors.white12,
               child: Text(user['name'][0], style: const TextStyle(color: Colors.white)),
             ),
           ],
         ),
-        title: Row(
+        title: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text(user['name'], style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
-            if (user['isVip']) const SizedBox(width: 4),
-            if (user['isVip']) const Icon(Icons.workspace_premium, color: Colors.amber, size: 14),
+            Row(
+              children: [
+                Expanded(child: Text('${user['countryFlag']} ${user['name']}', style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold), overflow: TextOverflow.ellipsis)),
+                if (user['isVip']) const Padding(padding: EdgeInsets.only(left: 4), child: Icon(Icons.workspace_premium, color: Colors.amber, size: 14)),
+              ],
+            ),
+            Text(user['rankTitle'], style: const TextStyle(color: Colors.white70, fontSize: 12)),
           ],
         ),
         trailing: Row(

@@ -1,8 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'widgets/admin_stat_card.dart';
 import '../core/constants/app_colors.dart';
-// Note: In production, import fl_chart
+import '../core/services/demo_data_service.dart';
 
 class AdminDashboard extends StatelessWidget {
   const AdminDashboard({Key? key}) : super(key: key);
@@ -14,6 +15,19 @@ class AdminDashboard extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Text('Dashboard', style: GoogleFonts.poppins(color: Colors.white, fontSize: 24, fontWeight: FontWeight.bold)),
+              ElevatedButton.icon(
+                onPressed: () => _initializeAiUsers(context),
+                icon: const Icon(Icons.smart_toy),
+                label: const Text('Initialize AI Leaderboard Users'),
+                style: ElevatedButton.styleFrom(backgroundColor: Colors.purpleAccent),
+              ),
+            ],
+          ),
+          const SizedBox(height: 24),
           _buildKeyMetrics(),
           const SizedBox(height: 24),
           _buildChartsRow(),

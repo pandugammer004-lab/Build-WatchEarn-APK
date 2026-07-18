@@ -216,20 +216,24 @@ class ProfileScreen extends StatelessWidget {
     if (maxEarning == 0) maxEarning = 100; // default scale
     maxEarning = maxEarning * 1.2; // 20% padding top
 
-    return Container(
-      padding: const EdgeInsets.all(16),
-      decoration: BoxDecoration(color: AppColors.cardColor, borderRadius: BorderRadius.circular(16), border: Border.all(color: Colors.white12)),
+      padding: const EdgeInsets.all(20),
+      decoration: BoxDecoration(
+        color: AppColors.cardColor, 
+        borderRadius: BorderRadius.circular(24), 
+        border: Border.all(color: Colors.white12),
+        boxShadow: [BoxShadow(color: Colors.black.withOpacity(0.2), blurRadius: 10, offset: const Offset(0, 4))],
+      ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              Text('Earnings Overview', style: GoogleFonts.poppins(color: Colors.white, fontSize: 16, fontWeight: FontWeight.bold)),
+              Text('Earnings Analytics', style: GoogleFonts.poppins(color: Colors.white, fontSize: 18, fontWeight: FontWeight.bold)),
               Container(
-                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-                decoration: BoxDecoration(color: Colors.white10, borderRadius: BorderRadius.circular(12)),
-                child: const Text('Last 7 Days', style: TextStyle(color: Colors.white, fontSize: 10)),
+                padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                decoration: BoxDecoration(color: AppColors.primary.withOpacity(0.2), borderRadius: BorderRadius.circular(20)),
+                child: const Text('Last 7 Days', style: TextStyle(color: AppColors.primary, fontSize: 12, fontWeight: FontWeight.bold)),
               ),
             ],
           ),
@@ -250,8 +254,9 @@ class ProfileScreen extends StatelessWidget {
                       reservedSize: 22,
                       getTitlesWidget: (value, meta) {
                         final daysAgo = 6 - value.toInt();
-                        if (daysAgo == 0) return const Text('Today', style: TextStyle(color: Colors.white54, fontSize: 10));
-                        if (daysAgo == 6) return const Text('7d ago', style: TextStyle(color: Colors.white54, fontSize: 10));
+                        if (daysAgo == 0) return const Padding(padding: EdgeInsets.only(top: 8), child: Text('Today', style: TextStyle(color: AppColors.primary, fontSize: 11, fontWeight: FontWeight.bold)));
+                        if (daysAgo == 3) return const Padding(padding: EdgeInsets.only(top: 8), child: Text('3d ago', style: TextStyle(color: Colors.white54, fontSize: 10)));
+                        if (daysAgo == 6) return const Padding(padding: EdgeInsets.only(top: 8), child: Text('7d ago', style: TextStyle(color: Colors.white54, fontSize: 10)));
                         return const Text('');
                       },
                     ),
@@ -266,13 +271,21 @@ class ProfileScreen extends StatelessWidget {
                   LineChartBarData(
                     spots: spots,
                     isCurved: true,
-                    color: Colors.amber,
-                    barWidth: 3,
+                    color: AppColors.primary,
+                    barWidth: 4,
                     isStrokeCapRound: true,
-                    dotData: FlDotData(show: false),
+                    dotData: FlDotData(
+                      show: true,
+                      getDotPainter: (spot, percent, barData, index) => FlDotCirclePainter(
+                        radius: 4,
+                        color: AppColors.primary,
+                        strokeWidth: 2,
+                        strokeColor: AppColors.cardColor,
+                      ),
+                    ),
                     belowBarData: BarAreaData(
                       show: true,
-                      color: Colors.amber.withOpacity(0.15),
+                      color: AppColors.primary.withOpacity(0.2),
                     ),
                   ),
                 ],
@@ -283,9 +296,9 @@ class ProfileScreen extends StatelessWidget {
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              _buildSummaryItem('Total Earned', '${Helpers.formatCoins(user?.totalEarned ?? 0)} 🪙'),
-              _buildSummaryItem('Cash Value', '\$${((user?.coins ?? 0) / 10000).toStringAsFixed(2)}'),
-              _buildSummaryItem('Today', '${user?.dailyEarned ?? 0} 🪙'),
+              _buildSummaryItem('Lifetime Coins', '${Helpers.formatCoins(user?.totalEarned ?? 0)}', Icons.stars, Colors.amber),
+              _buildSummaryItem('Cash Value', '\$${((user?.coins ?? 0) / 10000).toStringAsFixed(2)}', Icons.attach_money, Colors.greenAccent),
+              _buildSummaryItem('Today\'s Coins', '${spots.last.y.toInt()}', Icons.today, Colors.blueAccent),
             ],
           ),
         ],
@@ -293,13 +306,19 @@ class ProfileScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildSummaryItem(String label, String value) {
+  Widget _buildSummaryItem(String label, String value, IconData icon, Color color) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(label, style: const TextStyle(color: Colors.white54, fontSize: 10)),
+        Row(
+          children: [
+            Icon(icon, color: color, size: 14),
+            const SizedBox(width: 4),
+            Text(label, style: const TextStyle(color: Colors.white54, fontSize: 10)),
+          ],
+        ),
         const SizedBox(height: 4),
-        Text(value, style: const TextStyle(color: Colors.white, fontSize: 14, fontWeight: FontWeight.bold)),
+        Text(value, style: GoogleFonts.poppins(color: Colors.white, fontSize: 16, fontWeight: FontWeight.bold)),
       ],
     );
   }

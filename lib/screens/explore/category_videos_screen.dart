@@ -1,12 +1,12 @@
 import 'package:flutter/material.dart';
-import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
+import 'package:google_fonts/google_fonts.dart';
 import '../../core/constants/app_colors.dart';
 import '../../core/widgets/video_card.dart';
 import '../../data/models/category_model.dart';
 import '../../data/providers/video_provider.dart';
 import '../../data/providers/user_provider.dart';
-import '../player/video_player_screen.dart';
+import '../player/shorts_feed_screen.dart';
 
 class CategoryVideosScreen extends StatelessWidget {
   final CategoryModel category;
@@ -65,7 +65,7 @@ class CategoryVideosScreen extends StatelessWidget {
                 onTap: () {
                   Navigator.push(
                     context,
-                    MaterialPageRoute(builder: (_) => VideoPlayerScreen(video: categoryVideos[index])),
+                    MaterialPageRoute(builder: (_) => ShortsFeedScreen(videos: categoryVideos, initialIndex: index)),
                   );
                 },
               );

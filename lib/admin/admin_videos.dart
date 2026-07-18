@@ -191,9 +191,9 @@ class AddVideoDialog extends StatelessWidget {
                   flex: 2,
                   child: Column(
                     children: [
-                      const CustomTextField(hintText: 'YouTube ID OR Direct MP4 URL', prefixIcon: Icons.link),
+                      const CustomTextField(hintText: 'Direct MP4 URL', prefixIcon: Icons.link),
                       const SizedBox(height: 16),
-                      const CustomTextField(hintText: 'Thumbnail URL (Optional for YouTube)', prefixIcon: Icons.image),
+                      const CustomTextField(hintText: 'Thumbnail Image URL', prefixIcon: Icons.image),
                       const SizedBox(height: 16),
                       const CustomTextField(hintText: 'Video Title', prefixIcon: Icons.title),
                       const SizedBox(height: 16),
@@ -202,11 +202,11 @@ class AddVideoDialog extends StatelessWidget {
                         decoration: BoxDecoration(color: Colors.white.withOpacity(0.05), borderRadius: BorderRadius.circular(12)),
                         child: DropdownButton<String>(
                           isExpanded: true,
-                          value: 'Satisfying',
+                          value: 'Cricket Shorts',
                           dropdownColor: const Color(0xFF1A1A2E),
                           style: const TextStyle(color: Colors.white),
                           underline: const SizedBox(),
-                          items: ['Satisfying', 'Gaming', 'Music'].map((String value) {
+                          items: ['Cricket Shorts', 'Football Shorts', 'Funny Videos'].map((String value) {
                             return DropdownMenuItem<String>(value: value, child: Text(value));
                           }).toList(),
                           onChanged: (_) {},
@@ -238,7 +238,7 @@ class AddVideoDialog extends StatelessWidget {
                           border: Border.all(color: Colors.white12),
                         ),
                         child: const Center(
-                          child: Text('Enter YouTube ID', style: TextStyle(color: Colors.white38, fontSize: 12)),
+                          child: Text('Preview Image', style: TextStyle(color: Colors.white38, fontSize: 12)),
                         ),
                       ),
                     ],

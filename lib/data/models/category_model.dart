@@ -54,16 +54,9 @@ class CategoryModel {
 
   static List<CategoryModel> get defaultCategories {
     return [
-      CategoryModel(id: 'all', name: 'All', icon: '✨', colorHex: '#6C63FF', videoCount: 0, order: 1, isActive: true),
-      CategoryModel(id: 'sand', name: 'Sand Cutting', icon: '🏖️', colorHex: '#FF6B9D', videoCount: 0, order: 2, isActive: true),
-      CategoryModel(id: 'soap', name: 'Soap Cutting', icon: '🧼', colorHex: '#00D9FF', videoCount: 0, order: 3, isActive: true),
-      CategoryModel(id: 'slime', name: 'Slime', icon: '🟢', colorHex: '#00E676', videoCount: 0, order: 4, isActive: true),
-      CategoryModel(id: 'wash', name: 'Pressure Wash', icon: '💦', colorHex: '#2196F3', videoCount: 0, order: 5, isActive: true),
-      CategoryModel(id: 'paint', name: 'Paint Mixing', icon: '🎨', colorHex: '#9C27B0', videoCount: 0, order: 6, isActive: true),
-      CategoryModel(id: 'cake', name: 'Cake Art', icon: '🎂', colorHex: '#E91E63', videoCount: 0, order: 7, isActive: true),
-      CategoryModel(id: 'press', name: 'Hydraulic Press', icon: '🔨', colorHex: '#795548', videoCount: 0, order: 8, isActive: true),
-      CategoryModel(id: 'print', name: '3D Printing', icon: '🖨️', colorHex: '#607D8B', videoCount: 0, order: 9, isActive: true),
-      CategoryModel(id: 'asmr', name: 'ASMR', icon: '🎧', colorHex: '#6C63FF', videoCount: 0, order: 10, isActive: true),
+      CategoryModel(id: 'cricket', name: 'Cricket Shorts', icon: '🏏', colorHex: '#4CAF50', videoCount: 0, order: 1, isActive: true),
+      CategoryModel(id: 'football', name: 'Football Shorts', icon: '⚽', colorHex: '#2196F3', videoCount: 0, order: 2, isActive: true),
+      CategoryModel(id: 'funny', name: 'Funny Videos', icon: '😂', colorHex: '#FFC107', videoCount: 0, order: 3, isActive: true),
     ];
   }
 }

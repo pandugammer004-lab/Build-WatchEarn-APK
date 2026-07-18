@@ -2,7 +2,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 
 class VideoModel {
   final String id;
-  final String youtubeId;
+  final String videoUrl;
   final String title;
   final String description;
   final String categoryId;
@@ -18,11 +18,11 @@ class VideoModel {
   final bool isActive;
   final int order;
   final List<String> tags;
-  final String? customThumbnail;
+  final String? thumbnailUrl;
 
   VideoModel({
     required this.id,
-    required this.youtubeId,
+    required this.videoUrl,
     required this.title,
     required this.description,
     required this.categoryId,
@@ -38,15 +38,13 @@ class VideoModel {
     required this.isActive,
     required this.order,
     required this.tags,
-    this.customThumbnail,
+    this.thumbnailUrl,
   });
 
-  String get thumbnailHQ => customThumbnail != null && customThumbnail!.isNotEmpty ? customThumbnail! : 'https://img.youtube.com/vi/$youtubeId/maxresdefault.jpg';
-  String get thumbnailMQ => customThumbnail != null && customThumbnail!.isNotEmpty ? customThumbnail! : 'https://img.youtube.com/vi/$youtubeId/hqdefault.jpg';
-  String get thumbnailSQ => customThumbnail != null && customThumbnail!.isNotEmpty ? customThumbnail! : 'https://img.youtube.com/vi/$youtubeId/mqdefault.jpg';
-  
-  bool get isDirectLink => youtubeId.startsWith('http://') || youtubeId.startsWith('https://');
-  
+  String get thumbnail => thumbnailUrl != null && thumbnailUrl!.isNotEmpty 
+      ? thumbnailUrl! 
+      : 'https://via.placeholder.com/400x600.png?text=No+Thumbnail';
+
   String get formattedDuration {
     int minutes = duration ~/ 60;
     int seconds = duration % 60;
@@ -79,7 +77,7 @@ class VideoModel {
     Map data = doc.data() as Map<String, dynamic>;
     return VideoModel(
       id: doc.id,
-      youtubeId: data['youtubeId'] ?? '',
+      videoUrl: data['videoUrl'] ?? data['youtubeId'] ?? '', // Fallback to old schema temporarily so it doesn't crash
       title: data['title'] ?? '',
       description: data['description'] ?? '',
       categoryId: data['categoryId'] ?? '',
@@ -95,13 +93,13 @@ class VideoModel {
       isActive: data['isActive'] ?? true,
       order: data['order'] ?? 0,
       tags: List<String>.from(data['tags'] ?? []),
-      customThumbnail: data['customThumbnail'],
+      thumbnailUrl: data['thumbnailUrl'] ?? data['customThumbnail'],
     );
   }
 
   Map<String, dynamic> toFirestore() {
     return {
-      'youtubeId': youtubeId,
+      'videoUrl': videoUrl,
       'title': title,
       'description': description,
       'categoryId': categoryId,
@@ -117,7 +115,7 @@ class VideoModel {
       'isActive': isActive,
       'order': order,
       'tags': tags,
-      'customThumbnail': customThumbnail,
+      'thumbnailUrl': thumbnailUrl,
     };
   }
 }

@@ -125,6 +125,19 @@ class FirestoreService {
     return leaderboard;
   }
 
+  Future<List<LeaderboardModel>> getBaseAiUsers() async {
+    try {
+      final snapshot = await _db.collection('ai_users').limit(150).get();
+      List<LeaderboardModel> aiUsers = [];
+      for (int i = 0; i < snapshot.docs.length; i++) {
+        aiUsers.add(LeaderboardModel.fromFirestore(snapshot.docs[i], i, isAiUser: true));
+      }
+      return aiUsers;
+    } catch (e) {
+      return [];
+    }
+  }
+
   // Notifications
   Future<void> sendNotificationToAll(String title, String body) async {
     // Usually done via Cloud Functions, placeholder here
