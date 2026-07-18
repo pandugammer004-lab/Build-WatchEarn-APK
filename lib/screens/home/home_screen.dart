@@ -623,7 +623,7 @@ class _HomeScreenState extends State<HomeScreen> {
         final unwatchedAll = provider.getUnwatchedVideos(provider.allVideos, userProvider.user);
         if (unwatchedAll.isEmpty) return const SizedBox.shrink();
         
-        final recent = List.from(unwatchedAll)..sort((a, b) => (b as VideoModel).publishedAt.compareTo((a as VideoModel).publishedAt));
+        final recent = List<VideoModel>.from(unwatchedAll)..sort((a, b) => b.publishedAt.compareTo(a.publishedAt));
         
         return Column(
           crossAxisAlignment: CrossAxisAlignment.start,
