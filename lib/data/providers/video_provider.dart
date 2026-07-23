@@ -38,10 +38,18 @@ class VideoProvider extends ChangeNotifier {
     try {
       _setLoading(true);
       final rawVideos = await _firestoreService.getVideos();
-      // Show all active videos - no category restriction
       _allVideos = rawVideos;
+      
       _trendingVideos = _allVideos.where((v) => v.isTrending).toList();
+      if (_trendingVideos.isEmpty) {
+        _trendingVideos = List.from(_allVideos);
+      }
+
       _featuredVideos = _allVideos.where((v) => v.isFeatured).toList();
+      if (_featuredVideos.isEmpty) {
+        _featuredVideos = List.from(_allVideos);
+      }
+
       _filteredVideos = _allVideos;
     } catch (e) {
       debugPrint("Error loading videos: $e");

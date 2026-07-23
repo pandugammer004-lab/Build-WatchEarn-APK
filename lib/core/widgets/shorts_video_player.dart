@@ -38,10 +38,10 @@ class _ShortsVideoPlayerState extends State<ShortsVideoPlayer> {
   }
 
   void _initializePlayer() async {
-    // If URL is empty, avoid crashing
-    if (widget.video.videoUrl.isEmpty) return;
+    final url = widget.video.playableVideoUrl;
+    if (url.isEmpty) return;
 
-    _controller = VideoPlayerController.networkUrl(Uri.parse(widget.video.videoUrl));
+    _controller = VideoPlayerController.networkUrl(Uri.parse(url));
     try {
       await _controller!.initialize();
       _controller!.setLooping(true);

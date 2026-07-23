@@ -73,27 +73,73 @@ class VideoModel {
     return 'Just now';
   }
 
+  String get playableVideoUrl {
+    String url = videoUrl.trim();
+    if (url.isEmpty) return '';
+
+    // Handle Dropbox direct video streaming URL format
+    if (url.contains('dropbox.com')) {
+      url = url.replaceAll('dl=0', 'raw=1');
+      if (!url.contains('raw=1') && !url.contains('dl=1')) {
+        url = url.contains('?') ? '$url&raw=1' : '$url?raw=1';
+      }
+      url = url.replaceAll('www.dropbox.com', 'dl.dropboxusercontent.com');
+    }
+
+    // Handle Google Drive direct video streaming URL format
+    if (url.contains('drive.google.com')) {
+      final regExp = RegExp(r'/file/d/([^/]+)');
+      final match = regExp.firstMatch(url);
+      if (match != null) {
+        final fileId = match.group(1);
+        url = 'https://drive.google.com/uc?export=download&id=$fileId';
+      }
+    }
+
+    return url;
+  }
+
   factory VideoModel.fromFirestore(DocumentSnapshot doc) {
     Map data = doc.data() as Map<String, dynamic>;
+
+    String rawVideoUrl = data['videoUrl'] ?? 
+                         data['url'] ?? 
+                         data['video_url'] ?? 
+                         data['link'] ?? 
+                         data['video'] ?? 
+                         data['mp4Url'] ?? 
+                         data['mediaUrl'] ?? 
+                         data['youtubeId'] ?? 
+                         data['src'] ?? 
+                         '';
+
+    String? rawThumb = data['thumbnailUrl'] ?? 
+                       data['customThumbnail'] ?? 
+                       data['thumbnail'] ?? 
+                       data['thumb'] ?? 
+                       data['image'] ?? 
+                       data['cover'] ?? 
+                       data['poster'];
+
     return VideoModel(
       id: doc.id,
-      videoUrl: data['videoUrl'] ?? data['youtubeId'] ?? '', // Fallback to old schema temporarily so it doesn't crash
-      title: data['title'] ?? '',
-      description: data['description'] ?? '',
-      categoryId: data['categoryId'] ?? '',
-      categoryName: data['categoryName'] ?? '',
-      categoryIcon: data['categoryIcon'] ?? '',
-      duration: data['duration'] ?? 0,
-      views: data['views'] ?? 0,
-      likes: data['likes'] ?? 0,
-      publishedAt: (data['publishedAt'] as Timestamp?)?.toDate() ?? DateTime.now(),
-      isTrending: data['isTrending'] ?? false,
-      isFeatured: data['isFeatured'] ?? false,
-      isVipOnly: data['isVipOnly'] ?? false,
+      videoUrl: rawVideoUrl,
+      title: data['title'] ?? data['name'] ?? 'Video Short',
+      description: data['description'] ?? data['desc'] ?? '',
+      categoryId: data['categoryId'] ?? data['category'] ?? 'all',
+      categoryName: data['categoryName'] ?? 'General',
+      categoryIcon: data['categoryIcon'] ?? '🎬',
+      duration: (data['duration'] as num?)?.toInt() ?? 30,
+      views: (data['views'] as num?)?.toInt() ?? 0,
+      likes: (data['likes'] as num?)?.toInt() ?? 0,
+      publishedAt: (data['publishedAt'] as Timestamp?)?.toDate() ?? (data['createdAt'] as Timestamp?)?.toDate() ?? DateTime.now(),
+      isTrending: data['isTrending'] == true,
+      isFeatured: data['isFeatured'] == true,
+      isVipOnly: data['isVipOnly'] == true,
       isActive: data['isActive'] != false, // Show video unless explicitly set to false
-      order: data['order'] ?? 0,
+      order: (data['order'] as num?)?.toInt() ?? 0,
       tags: List<String>.from(data['tags'] ?? []),
-      thumbnailUrl: data['thumbnailUrl'] ?? data['customThumbnail'],
+      thumbnailUrl: rawThumb,
     );
   }
 

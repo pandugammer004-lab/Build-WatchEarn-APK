@@ -62,10 +62,21 @@ class FirestoreService {
       videos.sort((a, b) => b.publishedAt.compareTo(a.publishedAt));
       
       if (category != null && category != 'all') {
-        videos = videos.where((v) => v.categoryId == category).toList();
+        final catLower = category.toLowerCase();
+        videos = videos.where((v) {
+          final vCatId = v.categoryId.toLowerCase();
+          final vCatName = v.categoryName.toLowerCase();
+          return vCatId == catLower || 
+                 vCatId.contains(catLower) || 
+                 catLower.contains(vCatId) || 
+                 vCatName.contains(catLower);
+        }).toList();
       }
       if (trending == true) {
-        videos = videos.where((v) => v.isTrending).toList();
+        final trendingFiltered = videos.where((v) => v.isTrending).toList();
+        if (trendingFiltered.isNotEmpty) {
+          videos = trendingFiltered;
+        }
       }
       
       return videos;
