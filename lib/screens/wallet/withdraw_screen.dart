@@ -6,6 +6,7 @@ import '../../core/widgets/custom_text_field.dart';
 import '../../core/widgets/custom_button.dart';
 import '../../data/providers/user_provider.dart';
 import '../../core/utils/helpers.dart';
+import '../../core/services/firestore_service.dart';
 
 class WithdrawScreen extends StatefulWidget {
   const WithdrawScreen({Key? key}) : super(key: key);
@@ -43,17 +44,50 @@ class _WithdrawScreenState extends State<WithdrawScreen> {
   }
 
   void _processWithdrawal() async {
+    final userProvider = Provider.of<UserProvider>(context, listen: false);
+    final user = userProvider.user;
+    if (user == null) return;
+
+    final int requiredCoins = (_selectedAmount * 10000).toInt();
+    if (user.coins < requiredCoins) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Insufficient coin balance for this withdrawal amount!'), backgroundColor: Colors.red),
+      );
+      return;
+    }
+
     setState(() => _isProcessing = true);
-    
-    // Simulate API call
-    await Future.delayed(const Duration(seconds: 2));
-    
-    if (!mounted) return;
-    
-    setState(() {
-      _isProcessing = false;
-      _currentStep = 5; // Success screen
-    });
+
+    try {
+      final paymentDetails = _detailController.text.trim();
+      
+      // Save withdrawal request to Firestore
+      await FirestoreService().createWithdrawal({
+        'userId': user.uid,
+        'paymentEmail': paymentDetails.isNotEmpty ? paymentDetails : user.email,
+        'method': _selectedMethod,
+        'amount': _selectedAmount,
+        'coinsDeducted': requiredCoins,
+        'status': 'pending',
+        'timestamp': DateTime.now(),
+      });
+
+      // Deduct coins & record transaction
+      await userProvider.updateCoins(-requiredCoins, 'Withdrawal ($_selectedMethod)');
+
+      if (!mounted) return;
+
+      setState(() {
+        _isProcessing = false;
+        _currentStep = 5; // Success screen
+      });
+    } catch (e) {
+      if (!mounted) return;
+      setState(() => _isProcessing = false);
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Withdrawal failed: $e'), backgroundColor: Colors.red),
+      );
+    }
   }
 
   @override

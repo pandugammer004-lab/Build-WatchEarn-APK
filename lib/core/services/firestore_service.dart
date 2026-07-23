@@ -1,4 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:flutter/foundation.dart';
 import '../../data/models/user_model.dart';
 import '../../data/models/video_model.dart';
 import '../../data/models/category_model.dart';
@@ -217,8 +218,9 @@ class FirestoreService {
       transaction.set(transactionRef, {
         'id': transactionRef.id,
         'userId': uid,
-        'amount': reward,
-        'type': 'credit',
+        'amount': 0.0,
+        'coins': reward,
+        'type': 'earning',
         'source': 'streak',
         'status': 'completed',
         'timestamp': FieldValue.serverTimestamp(),
@@ -245,8 +247,9 @@ class FirestoreService {
       transaction.set(transactionRef, {
         'id': transactionRef.id,
         'userId': uid,
-        'amount': rewardAmount,
-        'type': 'credit',
+        'amount': 0.0,
+        'coins': rewardAmount,
+        'type': 'earning',
         'source': 'ad',
         'status': 'completed',
         'timestamp': FieldValue.serverTimestamp(),
@@ -283,8 +286,9 @@ class FirestoreService {
       transaction.set(transactionRef, {
         'id': transactionRef.id,
         'userId': uid,
-        'amount': prize,
-        'type': 'credit',
+        'amount': 0.0,
+        'coins': prize,
+        'type': 'earning',
         'source': 'spin',
         'status': 'completed',
         'timestamp': FieldValue.serverTimestamp(),
@@ -319,8 +323,9 @@ class FirestoreService {
       transaction.set(transactionRef, {
         'id': transactionRef.id,
         'userId': uid,
-        'amount': prize,
-        'type': 'credit',
+        'amount': 0.0,
+        'coins': prize,
+        'type': 'earning',
         'source': 'scratch_card',
         'status': 'completed',
         'timestamp': FieldValue.serverTimestamp(),
@@ -354,8 +359,9 @@ class FirestoreService {
       transaction.set(transactionRef, {
         'id': transactionRef.id,
         'userId': uid,
-        'amount': prize,
-        'type': 'credit',
+        'amount': 0.0,
+        'coins': prize,
+        'type': 'earning',
         'source': 'mystery_box',
         'status': 'completed',
         'timestamp': FieldValue.serverTimestamp(),

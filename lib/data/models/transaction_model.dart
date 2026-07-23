@@ -66,14 +66,26 @@ class TransactionModel {
 
   factory TransactionModel.fromFirestore(DocumentSnapshot doc) {
     Map data = doc.data() as Map<String, dynamic>;
+    String typeVal = data['type'] ?? 'earning';
+    if (typeVal == 'credit') typeVal = 'earning';
+    
+    int coinsVal = data['coins'] ?? 0;
+    double amountVal = (data['amount'] as num?)?.toDouble() ?? 0.0;
+    
+    // Backward compatibility fallback if coins was 0 but amount was stored as coins integer
+    if (coinsVal == 0 && amountVal > 0 && typeVal != 'withdrawal') {
+      coinsVal = amountVal.toInt();
+      amountVal = 0.0;
+    }
+
     return TransactionModel(
       id: doc.id,
       userId: data['userId'] ?? '',
-      type: data['type'] ?? '',
+      type: typeVal,
       source: data['source'] ?? '',
-      coins: data['coins'] ?? 0,
-      amount: (data['amount'] ?? 0.0).toDouble(),
-      status: data['status'] ?? 'pending',
+      coins: coinsVal,
+      amount: amountVal,
+      status: data['status'] ?? 'completed',
       paymentMethod: data['paymentMethod'] ?? '',
       paymentEmail: data['paymentEmail'] ?? '',
       description: data['description'] ?? '',
