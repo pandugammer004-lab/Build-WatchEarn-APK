@@ -126,7 +126,7 @@ class _HelpScreenState extends State<HelpScreen> {
             padding: const EdgeInsets.all(16.0),
             child: ElevatedButton.icon(
               onPressed: () {
-                Helpers.launchURL(context, 'mailto:support@watchearn.app?subject=Support%20Request');
+                Helpers.openUrl('mailto:support@watchearn.app?subject=Support%20Request');
               },
               icon: const Icon(Icons.mail),
               label: const Text('Contact Support'),

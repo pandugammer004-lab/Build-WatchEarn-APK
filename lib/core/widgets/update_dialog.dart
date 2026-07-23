@@ -43,7 +43,7 @@ class UpdateDialog extends StatelessWidget {
               const SizedBox(height: 24),
               ElevatedButton(
                 onPressed: () {
-                  Helpers.launchURL(context, 'https://play.google.com/store/apps/details?id=com.watchearn.app');
+                  Helpers.openUrl('https://play.google.com/store/apps/details?id=com.watchearn.app');
                 },
                 style: ElevatedButton.styleFrom(
                   backgroundColor: AppColors.primary,

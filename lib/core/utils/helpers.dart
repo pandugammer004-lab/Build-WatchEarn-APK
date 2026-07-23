@@ -107,6 +107,10 @@ class Helpers {
     }
   }
 
+  static Future<void> launchURL(BuildContext context, String urlString) async {
+    await openUrl(urlString);
+  }
+
   static Future<void> shareText(String text) async {
     await Share.share(text);
   }
