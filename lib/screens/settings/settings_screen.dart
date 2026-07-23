@@ -486,9 +486,34 @@ class _SettingsScreenState extends State<SettingsScreen> {
                 const SizedBox(height: 16),
                 CustomTextField(controller: confirmPasswordController, hintText: 'Confirm New Password', prefixIcon: Icons.lock, isPassword: true),
                 const SizedBox(height: 24),
-                CustomButton(text: 'Save Password', onPressed: () {
-                  Navigator.pop(context);
-                  ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Password updated successfully!')));
+                CustomButton(text: 'Save Password', onPressed: () async {
+                  final cur = currentPasswordController.text.trim();
+                  final newP = newPasswordController.text.trim();
+                  final conf = confirmPasswordController.text.trim();
+                  if (cur.isEmpty || newP.isEmpty || conf.isEmpty) {
+                    ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Please fill all password fields!'), backgroundColor: Colors.red));
+                    return;
+                  }
+                  if (newP != conf) {
+                    ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('New passwords do not match!'), backgroundColor: Colors.red));
+                    return;
+                  }
+                  if (newP.length < 6) {
+                    ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Password must be at least 6 characters!'), backgroundColor: Colors.red));
+                    return;
+                  }
+                  try {
+                    final authProvider = Provider.of<AuthProvider>(context, listen: false);
+                    await authProvider.updatePassword(newP);
+                    if (context.mounted) {
+                      Navigator.pop(context);
+                      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Password updated successfully!'), backgroundColor: Colors.green));
+                    }
+                  } catch (e) {
+                    if (context.mounted) {
+                      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Error: ${e.toString().replaceAll("Exception: ", "")}'), backgroundColor: Colors.red));
+                    }
+                  }
                 }),
               ],
             ),

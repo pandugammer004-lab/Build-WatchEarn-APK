@@ -4,6 +4,7 @@ import '../core/constants/app_colors.dart';
 import '../core/widgets/custom_button.dart';
 import '../core/widgets/custom_text_field.dart';
 import '../core/utils/helpers.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 
 class AdminUsers extends StatefulWidget {
   const AdminUsers({Key? key}) : super(key: key);
@@ -144,9 +145,24 @@ class _AdminUsersState extends State<AdminUsers> {
   }
 }
 
-class UserDetailDialog extends StatelessWidget {
+class UserDetailDialog extends StatefulWidget {
   final String userName;
-  const UserDetailDialog({Key? key, required this.userName}) : super(key: key);
+  final String? userId;
+  const UserDetailDialog({Key? key, required this.userName, this.userId}) : super(key: key);
+
+  @override
+  State<UserDetailDialog> createState() => _UserDetailDialogState();
+}
+
+class _UserDetailDialogState extends State<UserDetailDialog> {
+  final _coinsController = TextEditingController();
+  String _selectedVip = 'Gold VIP';
+
+  @override
+  void dispose() {
+    _coinsController.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -165,13 +181,13 @@ class UserDetailDialog extends StatelessWidget {
               children: [
                 Row(
                   children: [
-                    CircleAvatar(radius: 24, backgroundColor: Colors.amber, child: Text(userName[0], style: const TextStyle(color: Colors.black, fontSize: 24))),
+                    CircleAvatar(radius: 24, backgroundColor: Colors.amber, child: Text(widget.userName[0].toUpperCase(), style: const TextStyle(color: Colors.black, fontSize: 24))),
                     const SizedBox(width: 16),
                     Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Text(userName, style: GoogleFonts.poppins(color: Colors.white, fontSize: 20, fontWeight: FontWeight.bold)),
-                        const Text('user@email.com', style: TextStyle(color: Colors.white54)),
+                        Text(widget.userName, style: GoogleFonts.poppins(color: Colors.white, fontSize: 20, fontWeight: FontWeight.bold)),
+                        const Text('User Profile', style: TextStyle(color: Colors.white54)),
                       ],
                     ),
                   ],
@@ -186,11 +202,36 @@ class UserDetailDialog extends StatelessWidget {
             const SizedBox(height: 8),
             Row(
               children: [
-                const Expanded(child: CustomTextField(hintText: 'Amount', prefixIcon: Icons.monetization_on)),
+                Expanded(child: CustomTextField(controller: _coinsController, hintText: 'Amount', prefixIcon: Icons.monetization_on, keyboardType: TextInputType.number)),
                 const SizedBox(width: 16),
-                CustomButton(text: 'Add', onPressed: () {}, width: 80, color: Colors.green),
+                CustomButton(text: 'Add', onPressed: () async {
+                  final amount = int.tryParse(_coinsController.text.trim()) ?? 0;
+                  if (amount <= 0) return;
+                  if (widget.userId != null) {
+                    await FirebaseFirestore.instance.collection('users').doc(widget.userId).update({
+                      'coins': FieldValue.increment(amount),
+                      'totalEarned': FieldValue.increment(amount),
+                    });
+                  }
+                  if (mounted) {
+                    ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Added $amount coins!'), backgroundColor: Colors.green));
+                    Navigator.pop(context);
+                  }
+                }, width: 80, color: Colors.green),
                 const SizedBox(width: 8),
-                CustomButton(text: 'Deduct', onPressed: () {}, width: 80, color: Colors.red),
+                CustomButton(text: 'Deduct', onPressed: () async {
+                  final amount = int.tryParse(_coinsController.text.trim()) ?? 0;
+                  if (amount <= 0) return;
+                  if (widget.userId != null) {
+                    await FirebaseFirestore.instance.collection('users').doc(widget.userId).update({
+                      'coins': FieldValue.increment(-amount),
+                    });
+                  }
+                  if (mounted) {
+                    ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Deducted $amount coins!'), backgroundColor: Colors.orange));
+                    Navigator.pop(context);
+                  }
+                }, width: 80, color: Colors.red),
               ],
             ),
             const SizedBox(height: 24),
@@ -204,19 +245,33 @@ class UserDetailDialog extends StatelessWidget {
                     decoration: BoxDecoration(color: Colors.white.withOpacity(0.05), borderRadius: BorderRadius.circular(12)),
                     child: DropdownButton<String>(
                       isExpanded: true,
-                      value: 'Gold VIP',
+                      value: _selectedVip,
                       dropdownColor: const Color(0xFF1A1A2E),
                       style: const TextStyle(color: Colors.white),
                       underline: const SizedBox(),
                       items: ['Free', 'Silver VIP', 'Gold VIP', 'Platinum VIP'].map((String value) {
                         return DropdownMenuItem<String>(value: value, child: Text(value));
                       }).toList(),
-                      onChanged: (_) {},
+                      onChanged: (val) {
+                        if (val != null) setState(() => _selectedVip = val);
+                      },
                     ),
                   ),
                 ),
                 const SizedBox(width: 16),
-                CustomButton(text: 'Apply VIP', onPressed: () {}, width: 120),
+                CustomButton(text: 'Apply VIP', onPressed: () async {
+                  final plan = _selectedVip.split(' ')[0].toLowerCase();
+                  if (widget.userId != null) {
+                    await FirebaseFirestore.instance.collection('users').doc(widget.userId).update({
+                      'vipPlan': plan,
+                      'vipExpiry': Timestamp.fromDate(DateTime.now().add(const Duration(days: 30))),
+                    });
+                  }
+                  if (mounted) {
+                    ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Applied $_selectedVip!'), backgroundColor: Colors.green));
+                    Navigator.pop(context);
+                  }
+                }, width: 120),
               ],
             ),
             const SizedBox(height: 32),
@@ -224,9 +279,31 @@ class UserDetailDialog extends StatelessWidget {
             const SizedBox(height: 8),
             Row(
               children: [
-                Expanded(child: CustomButton(text: 'Suspend Account', onPressed: () {}, color: Colors.orange)),
+                Expanded(
+                  child: CustomButton(text: 'Suspend Account', onPressed: () async {
+                    if (widget.userId != null) {
+                      await FirebaseFirestore.instance.collection('users').doc(widget.userId).update({
+                        'isBlocked': true,
+                      });
+                    }
+                    if (mounted) {
+                      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Account Suspended!'), backgroundColor: Colors.orange));
+                      Navigator.pop(context);
+                    }
+                  }, color: Colors.orange),
+                ),
                 const SizedBox(width: 16),
-                Expanded(child: CustomButton(text: 'Delete Account', onPressed: () {}, color: Colors.red)),
+                Expanded(
+                  child: CustomButton(text: 'Delete Account', onPressed: () async {
+                    if (widget.userId != null) {
+                      await FirebaseFirestore.instance.collection('users').doc(widget.userId).delete();
+                    }
+                    if (mounted) {
+                      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Account Deleted!'), backgroundColor: Colors.red));
+                      Navigator.pop(context);
+                    }
+                  }, color: Colors.red),
+                ),
               ],
             ),
           ],

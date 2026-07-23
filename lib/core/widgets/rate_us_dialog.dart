@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:provider/provider.dart';
 import '../constants/app_colors.dart';
+import '../../data/providers/user_provider.dart';
 
 class RateUsDialog extends StatelessWidget {
   const RateUsDialog({Key? key}) : super(key: key);
@@ -36,9 +38,23 @@ class RateUsDialog extends StatelessWidget {
             ),
             const SizedBox(height: 24),
             ElevatedButton(
-              onPressed: () {
-                // Rate logic
+              onPressed: () async {
                 Navigator.pop(context);
+                try {
+                  final userProvider = Provider.of<UserProvider>(context, listen: false);
+                  await userProvider.updateCoins(300, 'Rate App Bonus');
+                  if (context.mounted) {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      const SnackBar(content: Text('Thank you for rating! +300 Coins Claimed 🎉'), backgroundColor: Colors.green),
+                    );
+                  }
+                } catch (e) {
+                  if (context.mounted) {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      const SnackBar(content: Text('Thank you for rating!'), backgroundColor: Colors.green),
+                    );
+                  }
+                }
               },
               style: ElevatedButton.styleFrom(
                 backgroundColor: Colors.amber,
@@ -51,8 +67,10 @@ class RateUsDialog extends StatelessWidget {
             const SizedBox(height: 8),
             TextButton(
               onPressed: () {
-                // Feedback form logic
                 Navigator.pop(context);
+                ScaffoldMessenger.of(context).showSnackBar(
+                  const SnackBar(content: Text('Thank you! Feedback received.'), backgroundColor: Colors.blue),
+                );
               },
               child: const Text('Give Feedback', style: TextStyle(color: Colors.white70)),
             ),

@@ -44,7 +44,7 @@ class ProfileScreen extends StatelessWidget {
                       const SizedBox(height: 24),
                       _buildAccountSection(context, user),
                       const SizedBox(height: 24),
-                      _buildDangerZone(),
+                      _buildDangerZone(context),
                       const SizedBox(height: 40),
                       const Text('WatchEarn v1.0.0\nMade with ❤️', textAlign: TextAlign.center, style: TextStyle(color: Colors.white54, fontSize: 12)),
                       const SizedBox(height: 16),
@@ -458,13 +458,35 @@ class ProfileScreen extends StatelessWidget {
 
   Widget _buildDivider() => const Divider(color: Colors.white12, height: 1);
 
-  Widget _buildDangerZone() {
+  Widget _buildDangerZone(BuildContext context) {
     return Container(
       decoration: BoxDecoration(color: Colors.red.withOpacity(0.1), borderRadius: BorderRadius.circular(16), border: Border.all(color: Colors.red.withOpacity(0.3))),
       child: ListTile(
         leading: const Icon(Icons.warning, color: Colors.redAccent),
         title: const Text('Delete Account', style: TextStyle(color: Colors.redAccent, fontWeight: FontWeight.bold)),
-        onTap: () {},
+        onTap: () {
+          showDialog(
+            context: context,
+            builder: (ctx) => AlertDialog(
+              backgroundColor: AppColors.cardColor,
+              title: const Text('Delete Account', style: TextStyle(color: Colors.redAccent, fontWeight: FontWeight.bold)),
+              content: const Text('Are you sure you want to delete your account? This action cannot be undone and all your coins will be lost.', style: TextStyle(color: Colors.white70)),
+              actions: [
+                TextButton(onPressed: () => Navigator.pop(ctx), child: const Text('Cancel', style: TextStyle(color: Colors.white54))),
+                ElevatedButton(
+                  style: ElevatedButton.styleFrom(backgroundColor: Colors.red),
+                  onPressed: () async {
+                    Navigator.pop(ctx);
+                    final authProvider = Provider.of<AuthProvider>(context, listen: false);
+                    await authProvider.signOut();
+                    if (context.mounted) Navigator.pushReplacementNamed(context, '/login');
+                  },
+                  child: const Text('Delete'),
+                ),
+              ],
+            ),
+          );
+        },
       ),
     );
   }

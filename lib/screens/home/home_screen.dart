@@ -13,6 +13,7 @@ import '../../data/providers/coin_provider.dart';
 import '../../data/models/video_model.dart';
 import '../../data/providers/ad_provider.dart';
 import '../../core/constants/app_colors.dart';
+import '../notifications/notifications_screen.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({Key? key}) : super(key: key);
@@ -142,7 +143,9 @@ class _HomeScreenState extends State<HomeScreen> {
                   children: [
                     IconButton(
                       icon: const Icon(Icons.notifications_none_rounded, color: Colors.white),
-                      onPressed: () {},
+                      onPressed: () {
+                        Navigator.push(context, MaterialPageRoute(builder: (_) => const NotificationsScreen()));
+                      },
                     ),
                     if (userProvider.unreadNotifications > 0)
                       Positioned(
@@ -165,7 +168,9 @@ class _HomeScreenState extends State<HomeScreen> {
                 if (user != null && user.isVip)
                   IconButton(
                     icon: const Icon(Icons.workspace_premium, color: Colors.amber),
-                    onPressed: () {},
+                    onPressed: () {
+                      Navigator.pushNamed(context, '/vip');
+                    },
                   ),
                 const SizedBox(width: 8),
               ],

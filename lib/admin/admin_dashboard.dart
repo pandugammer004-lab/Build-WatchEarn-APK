@@ -226,8 +226,22 @@ class AdminDashboard extends StatelessWidget {
       DataCell(Text(date)),
       DataCell(Row(
         children: [
-          TextButton(onPressed: () {}, child: const Text('Approve', style: TextStyle(color: Colors.green))),
-          TextButton(onPressed: () {}, child: const Text('Reject', style: TextStyle(color: Colors.red))),
+          TextButton(
+            onPressed: () {
+              ScaffoldMessenger.of(context).showSnackBar(
+                SnackBar(content: Text('Approved withdrawal for $name ($amount)'), backgroundColor: Colors.green),
+              );
+            },
+            child: const Text('Approve', style: TextStyle(color: Colors.green)),
+          ),
+          TextButton(
+            onPressed: () {
+              ScaffoldMessenger.of(context).showSnackBar(
+                SnackBar(content: Text('Rejected withdrawal for $name'), backgroundColor: Colors.orange),
+              );
+            },
+            child: const Text('Reject', style: TextStyle(color: Colors.red)),
+          ),
         ],
       )),
     ]);

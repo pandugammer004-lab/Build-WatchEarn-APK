@@ -310,7 +310,9 @@ class _SpinWheelScreenState extends State<SpinWheelScreen> {
           ),
           const SizedBox(height: 16),
           TextButton(
-            onPressed: () {},
+            onPressed: () {
+              Navigator.pushNamed(context, '/referral');
+            },
             child: const Text(
               'Invite Friends for Premium Spins!',
               style: TextStyle(color: Colors.white70, decoration: TextDecoration.underline),

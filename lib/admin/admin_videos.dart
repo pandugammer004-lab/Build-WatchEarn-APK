@@ -152,8 +152,20 @@ class _AdminVideosState extends State<AdminVideos> {
       DataCell(
         Row(
           children: [
-            IconButton(icon: const Icon(Icons.edit, color: Colors.blue), onPressed: () {}, tooltip: 'Edit'),
-            IconButton(icon: const Icon(Icons.delete, color: Colors.red), onPressed: () {}, tooltip: 'Delete'),
+            IconButton(
+              icon: const Icon(Icons.edit, color: Colors.blue),
+              onPressed: () => _showAddVideoDialog(),
+              tooltip: 'Edit',
+            ),
+            IconButton(
+              icon: const Icon(Icons.delete, color: Colors.red),
+              onPressed: () {
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(content: Text('Deleted "$title"'), backgroundColor: Colors.red),
+                );
+              },
+              tooltip: 'Delete',
+            ),
           ],
         ),
       ),

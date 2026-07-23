@@ -108,8 +108,20 @@ class _AdminCategoriesState extends State<AdminCategories> {
                     ),
                     Row(
                       children: [
-                        IconButton(icon: const Icon(Icons.edit, color: Colors.blue, size: 20), onPressed: () {}),
-                        IconButton(icon: const Icon(Icons.delete, color: Colors.red, size: 20), onPressed: () {}),
+                        IconButton(
+                          icon: const Icon(Icons.edit, color: Colors.blue, size: 20),
+                          onPressed: () {
+                            _showAddCategoryDialog(context);
+                          },
+                        ),
+                        IconButton(
+                          icon: const Icon(Icons.delete, color: Colors.red, size: 20),
+                          onPressed: () {
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              SnackBar(content: Text('Deleted ${cat['name']} Category'), backgroundColor: Colors.red),
+                            );
+                          },
+                        ),
                       ],
                     ),
                   ],

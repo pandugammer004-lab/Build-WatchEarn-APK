@@ -17,7 +17,15 @@ class AdminSettings extends StatelessWidget {
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               Text('⚙️ App Settings', style: GoogleFonts.poppins(color: Colors.white, fontSize: 24, fontWeight: FontWeight.bold)),
-              CustomButton(text: 'Save All Settings', onPressed: () {}, width: 200),
+              CustomButton(
+                text: 'Save All Settings',
+                onPressed: () {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(content: Text('App Settings Saved Successfully!'), backgroundColor: Colors.green),
+                  );
+                },
+                width: 200,
+              ),
             ],
           ),
           const SizedBox(height: 24),

@@ -4,8 +4,27 @@ import '../core/constants/app_colors.dart';
 import '../core/widgets/custom_button.dart';
 import '../core/widgets/custom_text_field.dart';
 
-class AdminNotifications extends StatelessWidget {
+import 'package:cloud_firestore/cloud_firestore.dart';
+import '../core/services/firestore_service.dart';
+
+class AdminNotifications extends StatefulWidget {
   const AdminNotifications({Key? key}) : super(key: key);
+
+  @override
+  State<AdminNotifications> createState() => _AdminNotificationsState();
+}
+
+class _AdminNotificationsState extends State<AdminNotifications> {
+  final _titleController = TextEditingController();
+  final _bodyController = TextEditingController();
+  bool _isSending = false;
+
+  @override
+  void dispose() {
+    _titleController.dispose();
+    _bodyController.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -44,9 +63,10 @@ class AdminNotifications extends StatelessWidget {
                         const SizedBox(height: 32),
                         const Text('Notification Content', style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
                         const SizedBox(height: 16),
-                        const CustomTextField(hintText: 'Title (e.g. Flash Sale!)', prefixIcon: Icons.title),
+                        CustomTextField(controller: _titleController, hintText: 'Title (e.g. Flash Sale!)', prefixIcon: Icons.title),
                         const SizedBox(height: 16),
                         TextField(
+                          controller: _bodyController,
                           maxLines: 4,
                           style: const TextStyle(color: Colors.white),
                           decoration: InputDecoration(
@@ -58,7 +78,35 @@ class AdminNotifications extends StatelessWidget {
                           ),
                         ),
                         const SizedBox(height: 32),
-                        Center(child: CustomButton(text: 'Send Notification Now', onPressed: () {}, width: 300)),
+                        Center(
+                          child: CustomButton(
+                            text: _isSending ? 'Sending...' : 'Send Notification Now',
+                            onPressed: _isSending ? () {} : () async {
+                              final title = _titleController.text.trim();
+                              final body = _bodyController.text.trim();
+                              if (title.isEmpty || body.isEmpty) {
+                                ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Please enter title and body!'), backgroundColor: Colors.red));
+                                return;
+                              }
+                              setState(() => _isSending = true);
+                              try {
+                                await FirestoreService().sendNotificationToAll(title, body);
+                                _titleController.clear();
+                                _bodyController.clear();
+                                if (mounted) {
+                                  ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Notification Broadcast Sent Successfully!'), backgroundColor: Colors.green));
+                                }
+                              } catch (e) {
+                                if (mounted) {
+                                  ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Error: $e'), backgroundColor: Colors.red));
+                                }
+                              } finally {
+                                if (mounted) setState(() => _isSending = false);
+                              }
+                            },
+                            width: 300,
+                          ),
+                        ),
                       ],
                     ),
                   ),

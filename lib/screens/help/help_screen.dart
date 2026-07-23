@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import '../../core/constants/app_colors.dart';
+import '../../core/utils/helpers.dart';
 
 class HelpScreen extends StatefulWidget {
   const HelpScreen({Key? key}) : super(key: key);
@@ -125,7 +126,7 @@ class _HelpScreenState extends State<HelpScreen> {
             padding: const EdgeInsets.all(16.0),
             child: ElevatedButton.icon(
               onPressed: () {
-                // Open email to support
+                Helpers.launchURL(context, 'mailto:support@watchearn.app?subject=Support%20Request');
               },
               icon: const Icon(Icons.mail),
               label: const Text('Contact Support'),

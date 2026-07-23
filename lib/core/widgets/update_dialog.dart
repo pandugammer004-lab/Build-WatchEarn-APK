@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import '../constants/app_colors.dart';
+import '../utils/helpers.dart';
 
 class UpdateDialog extends StatelessWidget {
   final bool isForced;
@@ -42,7 +43,7 @@ class UpdateDialog extends StatelessWidget {
               const SizedBox(height: 24),
               ElevatedButton(
                 onPressed: () {
-                  // Open App Store/Play Store
+                  Helpers.launchURL(context, 'https://play.google.com/store/apps/details?id=com.watchearn.app');
                 },
                 style: ElevatedButton.styleFrom(
                   backgroundColor: AppColors.primary,

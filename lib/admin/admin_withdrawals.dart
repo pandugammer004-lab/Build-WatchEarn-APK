@@ -118,11 +118,33 @@ class _AdminWithdrawalsState extends State<AdminWithdrawals> {
       DataCell(Text(date, style: const TextStyle(color: Colors.white54))),
       DataCell(Chip(label: Text(status, style: const TextStyle(fontSize: 10, color: Colors.white)), backgroundColor: statusColor.withOpacity(0.2))),
       DataCell(
-        status == 'Pending' ? Row(
+        status.toLowerCase() == 'pending' ? Row(
           children: [
-            CustomButton(text: 'Approve', onPressed: () {}, width: 80, height: 30, color: Colors.green),
+            CustomButton(text: 'Approve', onPressed: () async {
+              try {
+                await FirebaseFirestore.instance.collection('withdrawals').doc(id).update({'status': 'approved'});
+                if (mounted) {
+                  ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Withdrawal Approved!'), backgroundColor: Colors.green));
+                }
+              } catch (e) {
+                if (mounted) {
+                  ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Error: $e'), backgroundColor: Colors.red));
+                }
+              }
+            }, width: 80, height: 30, color: Colors.green),
             const SizedBox(width: 8),
-            CustomButton(text: 'Reject', onPressed: () {}, width: 80, height: 30, color: Colors.red),
+            CustomButton(text: 'Reject', onPressed: () async {
+              try {
+                await FirebaseFirestore.instance.collection('withdrawals').doc(id).update({'status': 'rejected'});
+                if (mounted) {
+                  ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Withdrawal Rejected!'), backgroundColor: Colors.orange));
+                }
+              } catch (e) {
+                if (mounted) {
+                  ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Error: $e'), backgroundColor: Colors.red));
+                }
+              }
+            }, width: 80, height: 30, color: Colors.red),
           ],
         ) : const SizedBox(),
       ),
